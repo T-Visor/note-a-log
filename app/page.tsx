@@ -80,7 +80,7 @@ const NoteEditor = ({ note, onSave, onDelete }: {
   }
 
   return (
-    <div className="flex-1 p-4 flex flex-col h-full max-w-3xl mx-auto">
+    <div className="flex flex-col h-full max-w-3xl mx-auto">
       <div className="flex flex-col sm:flex-row justify-between mb-4">
         <Input
           value={title}
@@ -110,10 +110,10 @@ const NoteEditor = ({ note, onSave, onDelete }: {
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="Write your note in markdown..."
-          className="flex-1 mb-4 font-mono"
+          className="flex-1 mb-4 font-mono resize-none"
         />
       )}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center mt-4">
         <Button onClick={handleSave}>Save</Button>
         <div className="text-sm text-gray-500">
           {content.split(' ').length} words
@@ -188,7 +188,7 @@ export default function NotesApp() {
         onToggleVisibility={toggleSidebar}
       />
       <div className="flex-1 overflow-auto">
-        <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto px-4 py-8 h-full">
           <Button onClick={toggleSidebar} variant="ghost" size="icon" className="md:hidden fixed top-4 left-4 z-20">
             <Menu className="h-4 w-4" />
           </Button>
