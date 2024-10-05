@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Toggle } from "@/components/ui/toggle"
-import { Trash2, Search, Menu } from "lucide-react"
+import { Trash2, Search, Menu, X } from "lucide-react"
 
 type Note = {
   id: string
@@ -15,46 +15,50 @@ type Note = {
   content: string
 }
 
-const Sidebar = ({ notes, onSelectNote, onNewNote, onSearch, selectedNoteId, isCollapsed, onToggleCollapse }: { 
+const Sidebar = ({ notes, onSelectNote, onNewNote, onSearch, selectedNoteId, isVisible, onToggleVisibility }: { 
   notes: Note[], 
   onSelectNote: (note: Note) => void,
   onNewNote: () => void,
   onSearch: (query: string) => void,
   selectedNoteId: string | null,
-  isCollapsed: boolean,
-  onToggleCollapse: () => void
+  isVisible: boolean,
+  onToggleVisibility: () => void
 }) => (
-  <div className={`h-screen bg-gray-100 overflow-hidden transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'}`}>
-    <div className="p-4">
-      <Button onClick={onToggleCollapse} variant="ghost" size="icon" className="mb-4 w-full">
-        <Menu className="h-4 w-4" />
-      </Button>
-      {!isCollapsed && (
-        <>
-          <Button onClick={onNewNote} className="w-full mb-4">New Note</Button>
-          <div className="relative mb-4">
-            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-            <Input
-              placeholder="Search notes..."
-              className="pl-8"
-              onChange={(e) => onSearch(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 180px)' }}>
-            {notes.map(note => (
-              <div 
-                key={note.id} 
-                className={`cursor-pointer p-2 hover:bg-gray-200 rounded ${selectedNoteId === note.id ? 'bg-gray-200' : ''}`}
-                onClick={() => onSelectNote(note)}
-              >
-                {note.title || 'Untitled'}
-              </div>
-            ))}
-          </div>
-        </>
-      )}
+  <>
+    <Button onClick={onToggleVisibility} variant="ghost" size="icon" className="md:hidden fixed top-4 left-4 z-20">
+      <Menu className="h-4 w-4" />
+    </Button>
+    <div className={`fixed inset-y-0 left-0 w-64 bg-gray-100 overflow-hidden transition-transform duration-300 ease-in-out transform ${isVisible ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 z-10`}>
+      <div className="p-4">
+        <Button onClick={onToggleVisibility} variant="ghost" size="icon" className="mb-4 w-full md:hidden">
+          <X className="h-4 w-4" />
+        </Button>
+        <Button onClick={onNewNote} className="w-full mb-4">New Note</Button>
+        <div className="relative mb-4">
+          <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+          <Input
+            placeholder="Search notes..."
+            className="pl-8"
+            onChange={(e) => onSearch(e.target.value)}
+          />
+        </div>
+        <div className="space-y-2 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 180px)' }}>
+          {notes.map(note => (
+            <div 
+              key={note.id} 
+              className={`cursor-pointer p-2 hover:bg-gray-200 rounded ${selectedNoteId === note.id ? 'bg-gray-200' : ''}`}
+              onClick={() => {
+                onSelectNote(note)
+                onToggleVisibility() // Close sidebar on mobile after selecting a note
+              }}
+            >
+              {note.title || 'Untitled'}
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
-  </div>
+  </>
 )
 
 const NoteEditor = ({ note, onSave, onDelete }: { 
@@ -76,15 +80,15 @@ const NoteEditor = ({ note, onSave, onDelete }: {
   }
 
   return (
-    <div className="flex-1 p-4 flex flex-col h-screen">
-      <div className="flex justify-between mb-4">
+    <div className="flex-1 p-4 flex flex-col h-full max-w-3xl mx-auto">
+      <div className="flex flex-col sm:flex-row justify-between mb-4">
         <Input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Note title"
-          className="w-2/3"
+          className="w-full sm:w-2/3 mb-2 sm:mb-0"
         />
-        <div>
+        <div className="flex items-center">
           <Toggle
             pressed={isPreview}
             onPressedChange={setIsPreview}
@@ -109,7 +113,7 @@ const NoteEditor = ({ note, onSave, onDelete }: {
           className="flex-1 mb-4 font-mono"
         />
       )}
-      <div className="flex justify-between">
+      <div className="flex justify-between items-center">
         <Button onClick={handleSave}>Save</Button>
         <div className="text-sm text-gray-500">
           {content.split(' ').length} words
@@ -123,7 +127,7 @@ export default function NotesApp() {
   const [notes, setNotes] = useState<Note[]>([])
   const [selectedNote, setSelectedNote] = useState<Note | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
+  const [isSidebarVisible, setIsSidebarVisible] = useState(false)
 
   useEffect(() => {
     const savedNotes = localStorage.getItem('notes')
@@ -166,32 +170,40 @@ export default function NotesApp() {
   )
 
   const toggleSidebar = () => {
-    setIsSidebarCollapsed(!isSidebarCollapsed)
+    setIsSidebarVisible(!isSidebarVisible)
   }
 
   return (
-    <div className="flex h-screen">
+    <div className="flex md:flex-row h-screen bg-gray-50">
       <Sidebar 
         notes={filteredNotes} 
-        onSelectNote={setSelectedNote} 
+        onSelectNote={(note) => {
+          setSelectedNote(note)
+          setIsSidebarVisible(false) // Close sidebar on mobile after selecting a note
+        }}
         onNewNote={handleNewNote}
         onSearch={handleSearch}
         selectedNoteId={selectedNote?.id || null}
-        isCollapsed={isSidebarCollapsed}
-        onToggleCollapse={toggleSidebar}
+        isVisible={isSidebarVisible}
+        onToggleVisibility={toggleSidebar}
       />
-      <div className="flex-1 flex flex-col">
-        {selectedNote ? (
-          <NoteEditor 
-            note={selectedNote} 
-            onSave={handleSaveNote} 
-            onDelete={handleDeleteNote}
-          />
-        ) : (
-          <div className="flex-1 flex items-center justify-center text-gray-500">
-            Select a note or create a new one
-          </div>
-        )}
+      <div className="flex-1 overflow-auto">
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          <Button onClick={toggleSidebar} variant="ghost" size="icon" className="md:hidden fixed top-4 left-4 z-20">
+            <Menu className="h-4 w-4" />
+          </Button>
+          {selectedNote ? (
+            <NoteEditor 
+              note={selectedNote} 
+              onSave={handleSaveNote} 
+              onDelete={handleDeleteNote}
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full text-gray-500 p-4 text-center">
+              Select a note or create a new one
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
