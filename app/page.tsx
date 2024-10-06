@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Toggle } from "@/components/ui/toggle"
 import { Trash2, Search, Menu, X } from "lucide-react"
 import MarkdownIt from 'markdown-it'
+import 'react-markdown-editor-lite/lib/index.css'
 
 type Note = {
   id: string
@@ -118,12 +119,14 @@ const NoteEditor = ({ note, onSave, onDelete }: {
       </div>
 
       {/* Markdown Editor */}
-      <MdEditor
-        value={content} // Pass the current content
-        style={{ height: '400px' }}
-        renderHTML={(text) => mdParser.render(text)} // Render HTML from Markdown
-        onChange={handleEditorChange} // Update content state on change
-      />
+      <div className="prose lg:prose-xl">
+        <MdEditor
+          value={content} // Pass the current content
+          style={{ height: '400px' }}
+          renderHTML={(text) => mdParser.render(text)} // Render HTML from Markdown
+          onChange={handleEditorChange} // Update content state on change
+        />
+      </div>
 
       <div className="flex justify-between items-center mt-4">
         <Button onClick={handleSave}>Save</Button>
