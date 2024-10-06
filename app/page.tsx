@@ -27,7 +27,12 @@ const Sidebar = ({ notes, onSelectNote, onNewNote, onSearch, selectedNoteId, isV
   onToggleVisibility: () => void
 }) => (
   <>
-    <Button onClick={onToggleVisibility} variant="ghost" size="icon" className="md:hidden fixed top-4 left-4 z-20">
+    <Button
+      onClick={onToggleVisibility}
+      variant="ghost"
+      size="icon"
+      className={`md:hidden fixed top-4 left-4 z-20 ${isVisible ? 'hidden' : ''}`}
+    >
       <Menu className="h-4 w-4" />
     </Button>
     <div className={`fixed inset-y-0 left-0 w-64 bg-gray-100 overflow-hidden transition-transform duration-300 ease-in-out transform ${isVisible ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 z-10`}>
@@ -205,9 +210,15 @@ export default function NotesApp() {
       />
       <div className="flex-1 overflow-auto">
         <div className="max-w-4xl mx-auto px-4 py-8 h-full">
-          <Button onClick={toggleSidebar} variant="ghost" size="icon" className="md:hidden fixed top-4 left-4 z-20">
+          <Button
+            onClick={toggleSidebar}
+            variant="ghost"
+            size="icon"
+            className={`md:hidden fixed top-4 left-4 z-20 ${isSidebarVisible ? 'hidden' : ''}`}
+          >
             <Menu className="h-4 w-4" />
           </Button>
+
           {selectedNote ? (
             <NoteEditor
               note={selectedNote}
