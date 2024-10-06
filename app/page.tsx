@@ -15,8 +15,8 @@ type Note = {
   content: string
 }
 
-const Sidebar = ({ notes, onSelectNote, onNewNote, onSearch, selectedNoteId, isVisible, onToggleVisibility }: { 
-  notes: Note[], 
+const Sidebar = ({ notes, onSelectNote, onNewNote, onSearch, selectedNoteId, isVisible, onToggleVisibility }: {
+  notes: Note[],
   onSelectNote: (note: Note) => void,
   onNewNote: () => void,
   onSearch: (query: string) => void,
@@ -44,8 +44,8 @@ const Sidebar = ({ notes, onSelectNote, onNewNote, onSearch, selectedNoteId, isV
         </div>
         <div className="space-y-2 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 180px)' }}>
           {notes.map(note => (
-            <div 
-              key={note.id} 
+            <div
+              key={note.id}
               className={`cursor-pointer p-2 hover:bg-gray-200 rounded ${selectedNoteId === note.id ? 'bg-gray-200' : ''}`}
               onClick={() => {
                 onSelectNote(note)
@@ -61,8 +61,8 @@ const Sidebar = ({ notes, onSelectNote, onNewNote, onSearch, selectedNoteId, isV
   </>
 )
 
-const NoteEditor = ({ note, onSave, onDelete }: { 
-  note: Note, 
+const NoteEditor = ({ note, onSave, onDelete }: {
+  note: Note,
   onSave: (note: Note) => void,
   onDelete: (id: string) => void
 }) => {
@@ -71,9 +71,19 @@ const NoteEditor = ({ note, onSave, onDelete }: {
   const [isPreview, setIsPreview] = useState(false)
 
   useEffect(() => {
-    setTitle(note.title)
-    setContent(note.content)
-  }, [note])
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === 's') {
+        e.preventDefault() // Prevent the browser's default save dialog
+        handleSave() // Call the save function
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [title, content, note])
 
   const handleSave = () => {
     onSave({ ...note, title, content })
@@ -147,7 +157,7 @@ export default function NotesApp() {
   }
 
   const handleSaveNote = (updatedNote: Note) => {
-    const updatedNotes = notes.map(note => 
+    const updatedNotes = notes.map(note =>
       note.id === updatedNote.id ? updatedNote : note
     )
     setNotes(updatedNotes)
@@ -164,7 +174,7 @@ export default function NotesApp() {
     setSearchQuery(query)
   }
 
-  const filteredNotes = notes.filter(note => 
+  const filteredNotes = notes.filter(note =>
     note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     note.content.toLowerCase().includes(searchQuery.toLowerCase())
   )
@@ -175,8 +185,8 @@ export default function NotesApp() {
 
   return (
     <div className="flex md:flex-row h-screen bg-gray-50">
-      <Sidebar 
-        notes={filteredNotes} 
+      <Sidebar
+        notes={filteredNotes}
         onSelectNote={(note) => {
           setSelectedNote(note)
           setIsSidebarVisible(false) // Close sidebar on mobile after selecting a note
@@ -193,9 +203,9 @@ export default function NotesApp() {
             <Menu className="h-4 w-4" />
           </Button>
           {selectedNote ? (
-            <NoteEditor 
-              note={selectedNote} 
-              onSave={handleSaveNote} 
+            <NoteEditor
+              note={selectedNote}
+              onSave={handleSaveNote}
               onDelete={handleDeleteNote}
             />
           ) : (
