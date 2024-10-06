@@ -1,13 +1,14 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import ReactMarkdown from 'react-markdown'
+import MdEditor from 'react-markdown-editor-lite'
+import 'react-markdown-editor-lite/lib/index.css'
 import { v4 as uuidv4 } from 'uuid'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { Toggle } from "@/components/ui/toggle"
 import { Trash2, Search, Menu, X } from "lucide-react"
+import MarkdownIt from 'markdown-it'
 
 type Note = {
   id: string
@@ -68,7 +69,13 @@ const NoteEditor = ({ note, onSave, onDelete }: {
 }) => {
   const [title, setTitle] = useState(note.title)
   const [content, setContent] = useState(note.content)
-  const [isPreview, setIsPreview] = useState(false)
+  const mdParser = new MarkdownIt()
+
+  useEffect(() => {
+    // Update the editor content when the note changes
+    setTitle(note.title)
+    setContent(note.content)
+  }, [note])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -83,10 +90,15 @@ const NoteEditor = ({ note, onSave, onDelete }: {
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
     }
-  }, [title, content, note])
+  }, [title, content])
 
   const handleSave = () => {
+    // Save the updated note with the current content
     onSave({ ...note, title, content })
+  }
+
+  const handleEditorChange = ({ text }: { text: string }) => {
+    setContent(text)  // Update the local state with the latest content from the editor
   }
 
   return (
@@ -99,30 +111,20 @@ const NoteEditor = ({ note, onSave, onDelete }: {
           className="w-full sm:w-2/3 mb-2 sm:mb-0"
         />
         <div className="flex items-center">
-          <Toggle
-            pressed={isPreview}
-            onPressedChange={setIsPreview}
-            aria-label="Toggle markdown preview"
-          >
-            Preview
-          </Toggle>
           <Button variant="outline" className="ml-2" onClick={() => onDelete(note.id)}>
             <Trash2 size={18} />
           </Button>
         </div>
       </div>
-      {isPreview ? (
-        <div className="flex-1 overflow-auto prose">
-          <ReactMarkdown>{content}</ReactMarkdown>
-        </div>
-      ) : (
-        <Textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="Write your note in markdown..."
-          className="flex-1 mb-4 font-mono resize-none"
-        />
-      )}
+
+      {/* Markdown Editor */}
+      <MdEditor
+        value={content} // Pass the current content
+        style={{ height: '400px' }}
+        renderHTML={(text) => mdParser.render(text)} // Render HTML from Markdown
+        onChange={handleEditorChange} // Update content state on change
+      />
+
       <div className="flex justify-between items-center mt-4">
         <Button onClick={handleSave}>Save</Button>
         <div className="text-sm text-gray-500">
