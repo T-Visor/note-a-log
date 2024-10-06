@@ -122,7 +122,7 @@ const NoteEditor = ({ note, onSave, onDelete }: {
       <div className="prose lg:prose-xl">
         <MdEditor
           value={content} // Pass the current content
-          style={{ height: '400px' }}
+          style={{ height: '70vh' }}
           renderHTML={(text) => mdParser.render(text)} // Render HTML from Markdown
           onChange={handleEditorChange} // Update content state on change
         />
