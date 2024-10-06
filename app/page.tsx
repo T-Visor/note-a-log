@@ -103,7 +103,8 @@ const NoteEditor = ({ note, onSave, onDelete }: {
   }
 
   return (
-    <div className="flex flex-col h-full max-w-3xl mx-auto">
+    // <div className="flex flex-col h-full max-w-3xl mx-auto">
+    <div className="flex flex-col h-full max-w-3xl mx-auto mt-5 md:mt-0"> {/* Added margin-top */}
       <div className="flex flex-col sm:flex-row justify-between mb-4">
         <Input
           value={title}
