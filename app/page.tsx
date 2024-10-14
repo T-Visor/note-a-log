@@ -30,12 +30,12 @@ const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   return (
     <>
-      {/* Toggle Button for Sidebar */}
-      <Button
+     {/* Toggle Button for Sidebar */}
+     <Button
         onClick={onToggleVisibility}
         variant="ghost"
         size="icon"
-        className={`md:hidden fixed top-4 left-4 z-20 ${isVisible ? 'hidden' : ''}`}
+        className={`md:hidden absolute top-4 right-4 z-20 ${isVisible ? 'hidden' : ''}`}
       >
         <Menu className="h-4 w-4" />
       </Button>
@@ -200,7 +200,7 @@ export default function NotesApp() {
   )
 
   return (
-    <div className="flex md:flex-row h-screen bg-gray-50">
+    <div className="flex md:flex-row h-screen bg-gray-50 relative">
       {/* Sidebar */}
       <Sidebar
         notes={filteredNotes}
