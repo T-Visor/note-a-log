@@ -121,17 +121,18 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete }) => {
   return (
     <div className="flex flex-col h-full max-w-3xl mx-auto mt-5 md:mt-0">
       {/* Title Input */}
-      <div className="flex flex-col sm:flex-row justify-between mb-4">
+      <div className="flex flex-row justify-between items-center mb-4">
         <Input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Note title"
-          className="w-full sm:w-2/3 mb-2 sm:mb-0"
+          className="flex-grow mr-2"
         />
-        <Button variant="outline" className="ml-2" onClick={() => onDelete(note.id)}>
+        <Button variant="outline" className="w-auto" onClick={() => onDelete(note.id)}>
           <Trash2 size={18} />
         </Button>
       </div>
+
 
       {/* Markdown Editor */}
       <div className="prose lg:prose-xl">
@@ -210,7 +211,7 @@ export default function NotesApp() {
         onSearch={handleSearch}
         onToggleVisibility={toggleSidebar}
       />
-      
+
       {/* Main Content */}
       <div className="flex-1 overflow-auto">
         <div className="max-w-4xl mx-auto px-4 py-8 h-full">
