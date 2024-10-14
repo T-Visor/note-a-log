@@ -6,7 +6,6 @@ import 'react-markdown-editor-lite/lib/index.css'
 import { v4 as uuidv4 } from 'uuid'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Toggle } from "@/components/ui/toggle"
 import { Trash2, Search, Menu, X } from "lucide-react"
 import MarkdownIt from 'markdown-it'
 import 'react-markdown-editor-lite/lib/index.css'
@@ -108,7 +107,6 @@ const NoteEditor = ({ note, onSave, onDelete }: {
   }
 
   return (
-    // <div className="flex flex-col h-full max-w-3xl mx-auto">
     <div className="flex flex-col h-full max-w-3xl mx-auto mt-5 md:mt-0"> {/* Added margin-top */}
       <div className="flex flex-col sm:flex-row justify-between mb-4">
         <Input
@@ -210,15 +208,6 @@ export default function NotesApp() {
       />
       <div className="flex-1 overflow-auto">
         <div className="max-w-4xl mx-auto px-4 py-8 h-full">
-          <Button
-            onClick={toggleSidebar}
-            variant="ghost"
-            size="icon"
-            className={`md:hidden fixed top-4 left-4 z-20 ${isSidebarVisible ? 'hidden' : ''}`}
-          >
-            <Menu className="h-4 w-4" />
-          </Button>
-
           {selectedNote ? (
             <NoteEditor
               note={selectedNote}
