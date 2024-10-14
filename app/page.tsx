@@ -35,7 +35,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         onClick={onToggleVisibility}
         variant="ghost"
         size="icon"
-        className={`md:hidden absolute top-4 right-4 z-20 ${isVisible ? 'hidden' : ''}`}
+        className={`md:hidden absolute top-4 left-4 z-20 ${isVisible ? 'hidden' : ''}`}
       >
         <Menu className="h-4 w-4" />
       </Button>
