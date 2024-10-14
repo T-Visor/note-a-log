@@ -6,8 +6,10 @@ import MarkdownIt from 'markdown-it'
 import { v4 as uuidv4 } from 'uuid'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Trash2, Search, Menu, X } from "lucide-react"
+import { Trash2, Search, Menu, X, Moon, Sun } from "lucide-react"
+import { useTheme } from "next-themes"
 import 'react-markdown-editor-lite/lib/index.css'
+
 
 type Note = {
   id: string
@@ -28,10 +30,12 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({
   notes, onSelectNote, onNewNote, onSearch, selectedNoteId, isVisible, onToggleVisibility
 }) => {
+  const { theme, setTheme } = useTheme()
+
   return (
     <>
-     {/* Toggle Button for Sidebar */}
-     <Button
+      {/* Toggle Button for Sidebar */}
+      <Button
         onClick={onToggleVisibility}
         variant="ghost"
         size="icon"
@@ -41,12 +45,24 @@ const Sidebar: React.FC<SidebarProps> = ({
       </Button>
 
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 w-64 bg-gray-100 overflow-hidden transition-transform duration-300 ease-in-out transform ${isVisible ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 z-10`}>
+      <div className={`fixed inset-y-0 left-0 w-64 bg-gray-100 dark:bg-gray-800 overflow-hidden transition-transform duration-300 ease-in-out transform ${isVisible ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 z-10`}>
         <div className="p-4">
           {/* Close Button */}
           <Button onClick={onToggleVisibility} variant="ghost" size="icon" className="mb-4 w-full md:hidden">
             <X className="h-4 w-4" />
           </Button>
+
+          {/* Dark Mode Toggle */}
+          <div className="flex justify-center mb-4">
+            <Button
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              variant="outline"
+              size="icon"
+              className="w-8 h-8 rounded-full"
+            >
+              {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </Button>
+          </div>
 
           {/* New Note Button */}
           <Button onClick={onNewNote} className="w-full mb-4">New Note</Button>
@@ -56,7 +72,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
             <Input
               placeholder="Search notes..."
-              className="pl-8"
+              className="pl-8 bg-white dark:bg-gray-700"
               onChange={(e) => onSearch(e.target.value)}
             />
           </div>
@@ -66,7 +82,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             {notes.map(note => (
               <div
                 key={note.id}
-                className={`cursor-pointer p-2 hover:bg-gray-200 rounded ${selectedNoteId === note.id ? 'bg-gray-200' : ''}`}
+                className={`cursor-pointer p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded ${selectedNoteId === note.id ? 'bg-gray-200 dark:bg-gray-700' : ''}`}
                 onClick={() => {
                   onSelectNote(note)
                   onToggleVisibility() // Close sidebar on mobile after selecting a note
@@ -200,7 +216,7 @@ export default function NotesApp() {
   )
 
   return (
-    <div className="flex md:flex-row h-screen bg-gray-50 relative">
+    <div className="flex md:flex-row h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 relative">
       {/* Sidebar */}
       <Sidebar
         notes={filteredNotes}
@@ -222,7 +238,7 @@ export default function NotesApp() {
               onDelete={handleDeleteNote}
             />
           ) : (
-            <div className="flex items-center justify-center h-full text-gray-500 p-4 text-center">
+            <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400 p-4 text-center">
               Select a note or create a new one
             </div>
           )}
