@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Trash2, Search, Menu, X, Moon, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
 import 'react-markdown-editor-lite/lib/index.css'
+import styles from '@/styles/MDEditor.module.css'
 
 
 type Note = {
@@ -108,6 +109,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete }) => {
   const [title, setTitle] = useState(note.title)
   const [content, setContent] = useState(note.content)
   const mdParser = new MarkdownIt()
+  const { theme } = useTheme()
 
   useEffect(() => {
     setTitle(note.title)
@@ -150,13 +152,27 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete }) => {
       </div>
 
 
-      {/* Markdown Editor */}
-      <div className="prose lg:prose-xl">
+     {/* Markdown Editor */}
+     <div className={`prose lg:prose-xl dark:prose-invert ${theme === 'dark' ? styles.editorDark : ''}`}>
         <MdEditor
           value={content}
           style={{ height: '70vh' }}
           renderHTML={(text) => mdParser.render(text)}
           onChange={handleEditorChange}
+          config={{
+            view: {
+              menu: true,
+              md: true,
+              html: true,
+            },
+            canView: {
+              menu: true,
+              md: true,
+              html: true,
+              fullScreen: false,
+              hideMenu: false,
+            },
+          }}
         />
       </div>
 
