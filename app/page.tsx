@@ -6,6 +6,7 @@ import MarkdownIt from 'markdown-it'
 import { v4 as uuidv4 } from 'uuid'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Trash2, Search, Menu, X, Moon, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
 import 'react-markdown-editor-lite/lib/index.css'
@@ -77,19 +78,19 @@ const Sidebar: React.FC<SidebarProps> = ({
               onChange={(e) => onSearch(e.target.value)}
             />
           </div>
-
           {/* Notes List */}
           <div className="space-y-2 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 180px)' }}>
             {notes.map(note => (
               <div
                 key={note.id}
-                className={`cursor-pointer p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded ${selectedNoteId === note.id ? 'bg-gray-200 dark:bg-gray-700' : ''}`}
+                className={`flex items-center justify-between cursor-pointer p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded ${selectedNoteId === note.id ? 'bg-gray-200 dark:bg-gray-700' : ''}`}
                 onClick={() => {
-                  onSelectNote(note)
-                  onToggleVisibility() // Close sidebar on mobile after selecting a note
+                  onSelectNote(note);
+                  onToggleVisibility(); // Close sidebar on mobile after selecting a note
                 }}
               >
-                {note.title || 'Untitled'}
+                <span>{note.title || 'Untitled'}</span>
+                <Checkbox className="ml-4" /> {/* Checkbox aligned to the right */}
               </div>
             ))}
           </div>
