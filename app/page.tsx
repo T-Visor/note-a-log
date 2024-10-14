@@ -137,23 +137,26 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete }) => {
   }
 
   return (
-    <div className="flex flex-col h-full max-w-3xl mx-auto mt-5 md:mt-0">
-      {/* Title Input */}
-      <div className="flex flex-row justify-between items-center mb-4">
-        <Input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Note title"
-          className="flex-grow mr-2"
-        />
-        <Button variant="outline" className="w-auto" onClick={() => onDelete(note.id)}>
-          <Trash2 size={18} />
-        </Button>
+    <div className="flex flex-col h-full w-full max-w-3xl mx-auto mt-5 md:mt-0">
+      {/* Title Input and Delete Button */}
+      <div className="flex flex-row justify-between items-center mb-4 w-full">
+        <div className="flex-grow mr-2">
+          <Input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Note title"
+            className="w-full bg-white dark:bg-gray-700"
+          />
+        </div>
+        <div className="flex-shrink-0">
+          <Button variant="outline" onClick={() => onDelete(note.id)}>
+            <Trash2 size={18} />
+          </Button>
+        </div>
       </div>
 
-
-     {/* Markdown Editor */}
-     <div className={`prose lg:prose-xl dark:prose-invert ${theme === 'dark' ? styles.editorDark : ''}`}>
+      {/* Markdown Editor */}
+      <div className={`w-full ${theme === 'dark' ? styles.editorDark : ''}`}>
         <MdEditor
           value={content}
           style={{ height: '70vh' }}
@@ -177,9 +180,9 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete }) => {
       </div>
 
       {/* Save Button and Word Count */}
-      <div className="flex justify-between items-center mt-4">
+      <div className="flex justify-between items-center mt-4 w-full">
         <Button onClick={handleSave}>Save</Button>
-        <div className="text-sm text-gray-500">
+        <div className="text-sm text-gray-500 dark:text-gray-400">
           {content.split(' ').length} words
         </div>
       </div>
