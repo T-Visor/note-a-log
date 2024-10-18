@@ -108,6 +108,9 @@ const Sidebar: React.FC<SidebarProps> = ({
             </DialogContent>
           </Dialog>
 
+          {/* Separator Line */}
+          <hr className="border-t border-gray-300 dark:border-gray-600 mt-1 mb-4" />
+
           {/* Search Bar */}
           <div className="relative mb-4">
             <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
