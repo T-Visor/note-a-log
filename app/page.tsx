@@ -69,6 +69,9 @@ const Sidebar: React.FC<SidebarProps> = ({
           {/* New Note Button */}
           <Button onClick={onNewNote} className="w-full mb-4">New Note</Button>
 
+          {/* TODO: Implement deletion behavior */}
+          <Button className="w-full mb-4 bg-red-700">Delete All</Button>
+
           {/* Search Bar */}
           <div className="relative mb-4">
             <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
@@ -78,6 +81,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               onChange={(e) => onSearch(e.target.value)}
             />
           </div>
+
           {/* Notes List */}
           <div className="space-y-2 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 180px)' }}>
             {notes.map(note => (
