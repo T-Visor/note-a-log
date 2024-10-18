@@ -38,12 +38,12 @@ interface SidebarProps {
   onNewNote: () => void
   onSearch: (query: string) => void
   onToggleVisibility: () => void
-  onDeleteAllNotes: () => void
+  onConfirmDeleteAll: () => void
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
   notes, onSelectNote, onNewNote, onSearch, selectedNoteId, isVisible, onToggleVisibility,
-  onDeleteAllNotes
+  onConfirmDeleteAll
 }) => {
   const { theme, setTheme } = useTheme()
 
@@ -85,7 +85,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           {/* TODO: Implement deletion behavior */}
           <Dialog>
             <DialogTrigger className="w-full">
-              <Button className="w-full mb-4 bg-red-700">Delete All</Button>
+              <Button className="w-full mb-4 bg-red-700 dark:bg-red-400">Delete All</Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
@@ -95,7 +95,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
-                <Button variant="outline" onClick={onDeleteAllNotes}>
+                <Button variant="submit" onClick={onConfirmDeleteAll}>
                   Confirm
                 </Button>
               </DialogFooter>
@@ -285,7 +285,7 @@ export default function NotesApp() {
         onNewNote={handleNewNote}
         onSearch={handleSearch}
         onToggleVisibility={toggleSidebar}
-        onDeleteAllNotes={handleDeleteAllNotes}
+        onConfirmDeleteAll={handleDeleteAllNotes}
       />
 
       {/* Main Content */}
