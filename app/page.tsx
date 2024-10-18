@@ -46,6 +46,12 @@ const Sidebar: React.FC<SidebarProps> = ({
   onConfirmDeleteAll
 }) => {
   const { theme, setTheme } = useTheme()
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleConfirm = () => {
+    onConfirmDeleteAll();
+    setIsOpen(false); // Close the dialog
+  };
 
   return (
     <>
@@ -82,8 +88,8 @@ const Sidebar: React.FC<SidebarProps> = ({
           {/* New Note Button */}
           <Button onClick={onNewNote} className="w-full mb-4">New Note</Button>
 
-          {/* TODO: Implement deletion behavior */}
-          <Dialog>
+          {/* Delete All Button with confirmation dialogu */}
+          <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger className="w-full">
               <Button className="w-full mb-4 bg-red-700 dark:bg-red-400">Delete All</Button>
             </DialogTrigger>
@@ -95,7 +101,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
-                <Button variant="submit" onClick={onConfirmDeleteAll}>
+                <Button variant="submit" onClick={handleConfirm}>
                   Confirm
                 </Button>
               </DialogFooter>
