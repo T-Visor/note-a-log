@@ -38,10 +38,12 @@ interface SidebarProps {
   onNewNote: () => void
   onSearch: (query: string) => void
   onToggleVisibility: () => void
+  onDeleteAllNotes: () => void
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
-  notes, onSelectNote, onNewNote, onSearch, selectedNoteId, isVisible, onToggleVisibility
+  notes, onSelectNote, onNewNote, onSearch, selectedNoteId, isVisible, onToggleVisibility,
+  onDeleteAllNotes
 }) => {
   const { theme, setTheme } = useTheme()
 
@@ -93,7 +95,9 @@ const Sidebar: React.FC<SidebarProps> = ({
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
-                <Button type="submit">Confirm</Button>
+                <Button variant="outline" onClick={onDeleteAllNotes}>
+                  Confirm
+                </Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -252,6 +256,11 @@ export default function NotesApp() {
     setSelectedNote(null)
   }
 
+  const handleDeleteAllNotes = () => {
+    setNotes([]) // Clear all notes
+    setSelectedNote(null)
+  }
+
   const handleSearch = (query: string) => {
     setSearchQuery(query)
   }
@@ -276,6 +285,7 @@ export default function NotesApp() {
         onNewNote={handleNewNote}
         onSearch={handleSearch}
         onToggleVisibility={toggleSidebar}
+        onDeleteAllNotes={handleDeleteAllNotes}
       />
 
       {/* Main Content */}
