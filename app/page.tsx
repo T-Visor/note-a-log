@@ -12,6 +12,17 @@ import { useTheme } from "next-themes"
 import 'react-markdown-editor-lite/lib/index.css'
 import styles from '@/styles/MDEditor.module.css'
 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter
+} from "@/components/ui/dialog"
+
+
 
 type Note = {
   id: string
@@ -70,7 +81,22 @@ const Sidebar: React.FC<SidebarProps> = ({
           <Button onClick={onNewNote} className="w-full mb-4">New Note</Button>
 
           {/* TODO: Implement deletion behavior */}
-          <Button className="w-full mb-4 bg-red-700">Delete All</Button>
+          <Dialog>
+            <DialogTrigger className="w-full">
+              <Button className="w-full mb-4 bg-red-700">Delete All</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Delete all notes?</DialogTitle>
+                <DialogDescription>
+                  This will remove every note.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button type="submit">Confirm</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
 
           {/* Search Bar */}
           <div className="relative mb-4">
