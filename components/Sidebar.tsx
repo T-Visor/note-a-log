@@ -3,7 +3,7 @@ import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Trash2, Search, Menu, X, Moon, Sun } from "lucide-react";
+import { Trash2, Search, Menu, X, Moon, Sun, Folder, ChevronRight, ChevronDown } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -13,27 +13,34 @@ import {
   DialogTrigger,
   DialogFooter
 } from "@/components/ui/dialog";
-import { Note } from '@/types';
+import { Note, Folder as FolderType } from '@/types';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 interface SidebarProps {
-  notes: Note[]
-  selectedNoteId: string | null
-  isVisible: boolean
-  onSelectNote: (note: Note) => void
-  onNewNote: () => void
-  onSearch: (query: string) => void
-  onToggleVisibility: () => void
-  onConfirmDeleteAll: () => void
-  onDeleteSelected: (ids: string[]) => void
+  folders: FolderType[];
+  notes: Note[];
+  selectedNoteId: string | null;
+  isVisible: boolean;
+  onSelectNote: (note: Note) => void;
+  onNewNote: (folderId: string | null) => void;
+  onNewFolder: (name: string) => void;
+  onDeleteFolder: (id: string) => void;
+  onSearch: (query: string) => void;
+  onToggleVisibility: () => void;
+  onConfirmDeleteAll: () => void;
+  onDeleteSelected: (ids: string[]) => void;
+  onMoveNote: (noteId: string, targetFolderId: string | null) => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
-  notes, onSelectNote, onNewNote, onSearch, selectedNoteId, isVisible, onToggleVisibility,
-  onConfirmDeleteAll, onDeleteSelected
+  folders, notes, onSelectNote, onNewNote, onNewFolder, onDeleteFolder, onSearch, selectedNoteId, 
+  isVisible, onToggleVisibility, onConfirmDeleteAll, onDeleteSelected, onMoveNote
 }) => {
-  const { theme, setTheme } = useTheme()
+  const { theme, setTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedNoteIds, setSelectedNoteIds] = useState<string[]>([]);
+  const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
+  const [newFolderName, setNewFolderName] = useState('');
 
   const handleConfirm = () => {
     onConfirmDeleteAll();
@@ -41,7 +48,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const toggleNoteSelection = (id: string, event: React.MouseEvent) => {
-    event.stopPropagation(); // Prevent the click from bubbling up to the parent div
+    event.stopPropagation();
     setSelectedNoteIds(prev =>
       prev.includes(id) ? prev.filter(noteId => noteId !== id) : [...prev, id]
     );
@@ -52,8 +59,68 @@ export const Sidebar: React.FC<SidebarProps> = ({
     setSelectedNoteIds([]);
   };
 
+  const toggleFolderExpansion = (folderId: string) => {
+    setExpandedFolders(prev =>
+      prev.includes(folderId) ? prev.filter(id => id !== folderId) : [...prev, folderId]
+    );
+  };
+
+  const handleCreateFolder = () => {
+    if (newFolderName.trim()) {
+      onNewFolder(newFolderName.trim());
+      setNewFolderName('');
+    }
+  };
+
+  const onDragEnd = (result: any) => {
+    if (!result.destination) return;
+
+    const sourceId = result.source.droppableId;
+    const destId = result.destination.droppableId;
+    const noteId = result.draggableId;
+
+    if (sourceId !== destId) {
+      onMoveNote(noteId, destId === 'root' ? null : destId);
+    }
+  };
+
+  const renderNotes = (folderId: string | null) => {
+    const folderNotes = notes.filter(note => note.folderId === folderId);
+    return (
+      <>
+        {folderNotes.map((note, index) => (
+          <Draggable key={note.id} draggableId={note.id} index={index}>
+            {(provided) => (
+              <div
+                ref={provided.innerRef}
+                {...provided.draggableProps}
+                {...provided.dragHandleProps}
+                className={`flex items-center justify-between cursor-pointer p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded ${selectedNoteId === note.id ? 'bg-gray-200 dark:bg-gray-700' : ''}`}
+                onClick={() => onSelectNote(note)}
+              >
+                <span>{note.title || 'Untitled'}</span>
+                <Checkbox
+                  checked={selectedNoteIds.includes(note.id)}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      setSelectedNoteIds(prev => [...prev, note.id]);
+                    } else {
+                      setSelectedNoteIds(prev => prev.filter(id => id !== note.id));
+                    }
+                  }}
+                  onClick={(event) => event.stopPropagation()}
+                  className="ml-4"
+                />
+              </div>
+            )}
+          </Draggable>
+        ))}
+      </>
+    );
+  };
+
   return (
-    <>
+    <DragDropContext onDragEnd={onDragEnd}>
       {/* Toggle Button for Sidebar */}
       <Button
         onClick={onToggleVisibility}
@@ -85,7 +152,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
 
           {/* New Note Button */}
-          <Button onClick={onNewNote} className="w-full mb-4">New Note</Button>
+          <Button onClick={() => onNewNote(null)} className="w-full mb-4">New Note</Button>
+
+          {/* New Folder Input and Button */}
+          <div className="flex mb-4">
+            <Input
+              value={newFolderName}
+              onChange={(e) => setNewFolderName(e.target.value)}
+              placeholder="New folder name"
+              className="mr-2"
+            />
+            <Button onClick={handleCreateFolder}>
+              <Folder className="h-4 w-4" />
+            </Button>
+          </div>
 
           {/* Delete All Button with confirmation dialog */}
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -130,32 +210,67 @@ export const Sidebar: React.FC<SidebarProps> = ({
             />
           </div>
 
-          {/* Notes List */}
+          {/* Folders and Notes List */}
           <div className="space-y-2 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 180px)' }}>
-            {notes.map(note => (
-              <div
-                key={note.id}
-                className={`flex items-center justify-between cursor-pointer p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded ${selectedNoteId === note.id ? 'bg-gray-200 dark:bg-gray-700' : ''}`}
-                onClick={() => onSelectNote(note)}
-              >
-                <span>{note.title || 'Untitled'}</span>
-                <Checkbox
-                  checked={selectedNoteIds.includes(note.id)}
-                  onCheckedChange={(checked) => {
-                    if (checked) {
-                      setSelectedNoteIds(prev => [...prev, note.id]);
-                    } else {
-                      setSelectedNoteIds(prev => prev.filter(id => id !== note.id));
-                    }
-                  }}
-                  onClick={(event) => event.stopPropagation()}
-                  className="ml-4"
-                />
+            <Droppable droppableId="root">
+              {(provided) => (
+                <div {...provided.droppableProps} ref={provided.innerRef}>
+                  {renderNotes(null)}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+            {folders.map(folder => (
+              <div key={folder.id} className="mb-2">
+                <div
+                  className="flex items-center justify-between cursor-pointer p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
+                  onClick={() => toggleFolderExpansion(folder.id)}
+                >
+                  <div className="flex items-center">
+                    {expandedFolders.includes(folder.id) ? (
+                      <ChevronDown className="h-4 w-4 mr-2" />
+                    ) : (
+                      <ChevronRight className="h-4 w-4 mr-2" />
+                    )}
+                    <Folder className="h-4 w-4 mr-2" />
+                    <span>{folder.name}</span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDeleteFolder(folder.id);
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+                {expandedFolders.includes(folder.id) && (
+                  <div className="ml-6">
+                    <Button
+                      onClick={() => onNewNote(folder.id)}
+                      variant="ghost"
+                      size="sm"
+                      className="mb-2"
+                    >
+                      New Note
+                    </Button>
+                    <Droppable droppableId={folder.id}>
+                      {(provided) => (
+                        <div {...provided.droppableProps} ref={provided.innerRef}>
+                          {renderNotes(folder.id)}
+                          {provided.placeholder}
+                        </div>
+                      )}
+                    </Droppable>
+                  </div>
+                )}
               </div>
             ))}
           </div>
         </div>
       </div>
-    </>
-  )
-}
+    </DragDropContext>
+  );
+};

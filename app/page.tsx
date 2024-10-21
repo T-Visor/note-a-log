@@ -7,14 +7,18 @@ import { useNotes } from '@/hooks/useNotes';
 
 export default function NotesApp() {
   const {
+    folders,
     notes,
     selectedNote,
     setSelectedNote,
+    handleNewFolder,
+    handleDeleteFolder,
     handleNewNote,
     handleSaveNote,
     handleDeleteNote,
+    handleDeleteSelectedNotes,
     handleDeleteAllNotes,
-    handleDeleteSelectedNotes
+    handleMoveNote,
   } = useNotes();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -36,15 +40,19 @@ export default function NotesApp() {
   return (
     <div className="flex md:flex-row h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 relative">
       <Sidebar
+        folders={folders}
         notes={filteredNotes}
         selectedNoteId={selectedNote?.id || null}
         isVisible={isSidebarVisible}
         onSelectNote={setSelectedNote}
         onNewNote={handleNewNote}
+        onNewFolder={handleNewFolder}
+        onDeleteFolder={handleDeleteFolder}
         onSearch={handleSearch}
         onToggleVisibility={toggleSidebar}
         onConfirmDeleteAll={handleDeleteAllNotes}
         onDeleteSelected={handleDeleteSelectedNotes}
+        onMoveNote={handleMoveNote}
       />
 
       <div className="flex-1 overflow-auto">
