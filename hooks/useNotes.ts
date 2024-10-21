@@ -31,6 +31,11 @@ export const useNotes = () => {
     setSelectedNote(null);
   };
 
+  const handleDeleteSelectedNotes = (ids: string[]) => {
+    setNotes(notes.filter(note => !ids.includes(note.id)));
+    setSelectedNote(null);
+  };
+
   const handleDeleteAllNotes = () => {
     setNotes([]);
     setSelectedNote(null);
@@ -43,6 +48,7 @@ export const useNotes = () => {
     handleNewNote,
     handleSaveNote,
     handleDeleteNote,
+    handleDeleteSelectedNotes, // Export the new function
     handleDeleteAllNotes,
   };
 };

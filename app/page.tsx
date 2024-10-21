@@ -14,6 +14,7 @@ export default function NotesApp() {
     handleSaveNote,
     handleDeleteNote,
     handleDeleteAllNotes,
+    handleDeleteSelectedNotes
   } = useNotes();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -43,6 +44,7 @@ export default function NotesApp() {
         onSearch={handleSearch}
         onToggleVisibility={toggleSidebar}
         onConfirmDeleteAll={handleDeleteAllNotes}
+        onDeleteSelected={handleDeleteSelectedNotes}
       />
 
       <div className="flex-1 overflow-auto">

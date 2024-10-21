@@ -24,18 +24,32 @@ interface SidebarProps {
   onSearch: (query: string) => void
   onToggleVisibility: () => void
   onConfirmDeleteAll: () => void
+  onDeleteSelected: (ids: string[]) => void
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   notes, onSelectNote, onNewNote, onSearch, selectedNoteId, isVisible, onToggleVisibility,
-  onConfirmDeleteAll
+  onConfirmDeleteAll, onDeleteSelected
 }) => {
   const { theme, setTheme } = useTheme()
   const [isOpen, setIsOpen] = useState(false);
+  const [selectedNoteIds, setSelectedNoteIds] = useState<string[]>([]);
 
   const handleConfirm = () => {
     onConfirmDeleteAll();
-    setIsOpen(false); // Close the dialog
+    setIsOpen(false);
+  };
+
+  const toggleNoteSelection = (id: string, event: React.MouseEvent) => {
+    event.stopPropagation(); // Prevent the click from bubbling up to the parent div
+    setSelectedNoteIds(prev =>
+      prev.includes(id) ? prev.filter(noteId => noteId !== id) : [...prev, id]
+    );
+  };
+
+  const handleDeleteSelected = () => {
+    onDeleteSelected(selectedNoteIds);
+    setSelectedNoteIds([]);
   };
 
   return (
@@ -73,9 +87,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* New Note Button */}
           <Button onClick={onNewNote} className="w-full mb-4">New Note</Button>
 
-          {/* Delete All Button with confirmation dialogu */}
+          {/* Delete All Button with confirmation dialog */}
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger className="w-full">
+            <DialogTrigger asChild>
               <Button className="w-full mb-4 bg-red-700 dark:bg-red-400">Delete All</Button>
             </DialogTrigger>
             <DialogContent>
@@ -86,12 +100,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
-                <Button variant="submit" onClick={handleConfirm}>
+                <Button variant="destructive" onClick={handleConfirm}>
                   Confirm
                 </Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
+
+          {/* Delete Selected Button */}
+          {selectedNoteIds.length > 0 && (
+            <Button
+              className="w-full mb-4 bg-red-600 dark:bg-red-500"
+              onClick={handleDeleteSelected}
+            >
+              Delete Selected ({selectedNoteIds.length})
+            </Button>
+          )}
 
           {/* Separator Line */}
           <hr className="border-t border-gray-300 dark:border-gray-600 mt-1 mb-4" />
@@ -112,13 +136,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <div
                 key={note.id}
                 className={`flex items-center justify-between cursor-pointer p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded ${selectedNoteId === note.id ? 'bg-gray-200 dark:bg-gray-700' : ''}`}
-                onClick={() => {
-                  onSelectNote(note);
-                  onToggleVisibility(); // Close sidebar on mobile after selecting a note
-                }}
+                onClick={() => onSelectNote(note)}
               >
                 <span>{note.title || 'Untitled'}</span>
-                <Checkbox className="ml-4" /> {/* Checkbox aligned to the right */}
+                <Checkbox
+                  checked={selectedNoteIds.includes(note.id)}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      setSelectedNoteIds(prev => [...prev, note.id]);
+                    } else {
+                      setSelectedNoteIds(prev => prev.filter(id => id !== note.id));
+                    }
+                  }}
+                  onClick={(event) => event.stopPropagation()}
+                  className="ml-4"
+                />
               </div>
             ))}
           </div>
