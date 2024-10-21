@@ -33,7 +33,7 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
-  folders, notes, onSelectNote, onNewNote, onNewFolder, onDeleteFolder, onSearch, selectedNoteId, 
+  folders, notes, onSelectNote, onNewNote, onNewFolder, onDeleteFolder, onSearch, selectedNoteId,
   isVisible, onToggleVisibility, onConfirmDeleteAll, onDeleteSelected, onMoveNote
 }) => {
   const { theme, setTheme } = useTheme();
@@ -72,6 +72,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   };
 
+  const getDefaultFolderId = () => {
+    let defaultFolder = folders.find(folder => folder.name === "Default");
+    if (!defaultFolder) {
+      // If the "Default" folder doesn't exist, create it
+      const newFolder = { id: `folder-${Date.now()}`, name: "Default" };
+      onNewFolder(newFolder.name);
+      defaultFolder = newFolder;
+    }
+    return defaultFolder.id;
+  };
+  
+  const handleNewNote = () => {
+    const defaultFolderId = getDefaultFolderId();
+    onNewNote(defaultFolderId);
+  };  
+
   const onDragEnd = (result: any) => {
     if (!result.destination) return;
 
@@ -88,6 +104,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
     const folderNotes = notes.filter(note => note.folderId === folderId);
     return (
       <>
+        {folderNotes.length === 0 && (
+          <div className="p-2 text-gray-500 dark:text-gray-400">
+            No notes
+          </div>
+        )}
         {folderNotes.map((note, index) => (
           <Draggable key={note.id} draggableId={note.id} index={index}>
             {(provided) => (
@@ -152,7 +173,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
 
           {/* New Note Button */}
-          <Button onClick={() => onNewNote(null)} className="w-full mb-4">New Note</Button>
+          <Button onClick={handleNewNote} className="w-full mb-4">New Note</Button>
 
           {/* New Folder Input and Button */}
           <div className="flex mb-4">
@@ -220,6 +241,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </div>
               )}
             </Droppable>
+
             {folders.map(folder => (
               <div key={folder.id} className="mb-2">
                 <div
