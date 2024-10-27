@@ -71,6 +71,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   };
 
+  const handleEnterKeyForFolderNameSubmit = () => {
+    // This function is only used to handle a hotkey.
+    setNewFolderName(''); // clear input field
+  };
+
   const onDragEnd = (result: DropResult) => {
     const { source, destination, draggableId } = result;
 
@@ -99,7 +104,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const renderNotes = (folderId: string | null) => {
     createDefaultFolder();
     const folderNotes = notes.filter(note => note.folderId === folderId);
-    
+
     return (
       <>
         {folderNotes.map((note, index) => (
@@ -109,11 +114,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 ref={provided.innerRef}
                 {...provided.draggableProps}
                 {...provided.dragHandleProps}
-                className={`flex items-center justify-between cursor-pointer p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded ${
-                  selectedNoteId === note.id ? 'bg-gray-200 dark:bg-gray-700' : ''
-                } ${
-                  snapshot.isDragging ? 'opacity-50' : ''
-                }`}
+                className={`flex items-center justify-between cursor-pointer p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded ${selectedNoteId === note.id ? 'bg-gray-200 dark:bg-gray-700' : ''
+                  } ${snapshot.isDragging ? 'opacity-50' : ''
+                  }`}
                 onClick={() => onSelectNote(note)}
               >
                 <span className="truncate flex-1 mr-2">{note.title || 'Untitled'}</span>
@@ -148,9 +151,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <Menu className="h-4 w-4" />
       </Button>
 
-      <div className={`fixed inset-y-0 left-0 w-64 bg-gray-100 dark:bg-gray-800 overflow-hidden transition-transform duration-300 ease-in-out transform ${
-        isVisible ? 'translate-x-0' : '-translate-x-full'
-      } md:relative md:translate-x-0 z-10`}>
+      <div className={`fixed inset-y-0 left-0 w-64 bg-gray-100 dark:bg-gray-800 overflow-hidden transition-transform duration-300 ease-in-out transform ${isVisible ? 'translate-x-0' : '-translate-x-full'
+        } md:relative md:translate-x-0 z-10`}>
         <div className="p-4">
           <Button onClick={onToggleVisibility} variant="ghost" size="icon" className="mb-4 w-full md:hidden">
             <X className="h-4 w-4" />
@@ -171,9 +173,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <Input
               value={newFolderName}
               onChange={(e) => setNewFolderName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleCreateFolder();
+                }
+              }}
               placeholder="New folder name"
               className="mr-2"
             />
+
             <Button onClick={handleCreateFolder}>
               <Folder className="h-4 w-4" />
             </Button>
@@ -226,9 +234,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <div
                   {...provided.droppableProps}
                   ref={provided.innerRef}
-                  className={`p-2 rounded ${
-                    snapshot.isDraggingOver ? 'bg-gray-200 dark:bg-gray-700' : ''
-                  }`}
+                  className={`p-2 rounded ${snapshot.isDraggingOver ? 'bg-gray-200 dark:bg-gray-700' : ''
+                    }`}
                 >
                   {renderNotes(null)}
                   {provided.placeholder}
@@ -277,9 +284,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         <div
                           {...provided.droppableProps}
                           ref={provided.innerRef}
-                          className={`p-2 rounded ${
-                            snapshot.isDraggingOver ? 'bg-gray-200 dark:bg-gray-700' : ''
-                          }`}
+                          className={`p-2 rounded ${snapshot.isDraggingOver ? 'bg-gray-200 dark:bg-gray-700' : ''
+                            }`}
                         >
                           {renderNotes(folder.id)}
                           {provided.placeholder}
