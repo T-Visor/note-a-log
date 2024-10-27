@@ -65,17 +65,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   };
 
-  const getDefaultFolderId = () => {
-    let defaultFolder = folders.find(folder => folder.name === "Default");
-    if (!defaultFolder) {
-      // If the "Default" folder doesn't exist, create it
-      const newFolder = { id: `folder-${Date.now()}`, name: "Default" };
-      onNewFolder(newFolder.name);
-      defaultFolder = newFolder;
-    }
-    return defaultFolder.id;
-  };
-
   const onDragEnd = (result: any) => {
     if (!result.destination) return;
 
