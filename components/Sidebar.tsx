@@ -65,6 +65,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   };
 
+  const createDefaultFolder = () => {
+    if (folders.length === 0) {
+      onNewFolder('Default');
+    }
+  }
+
   const onDragEnd = (result: any) => {
     if (!result.destination) return;
 
@@ -78,6 +84,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const renderNotes = (folderId: string | null) => {
+    // Create a default folder if no folders exist yet.
+    createDefaultFolder();
     const folderNotes = notes.filter(note => note.folderId === folderId);
     return (
       <>
