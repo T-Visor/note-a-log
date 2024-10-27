@@ -250,7 +250,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <Button
                       onClick={() => onNewNote(folder.id)}
                       variant="ghost"
-                      size="sm"
+                      size="md"
                       className="mb-2"
                     >
                       New Note
