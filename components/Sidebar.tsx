@@ -47,13 +47,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     setIsOpen(false);
   };
 
-  const toggleNoteSelection = (id: string, event: React.MouseEvent) => {
-    event.stopPropagation();
-    setSelectedNoteIds(prev =>
-      prev.includes(id) ? prev.filter(noteId => noteId !== id) : [...prev, id]
-    );
-  };
-
   const handleDeleteSelected = () => {
     onDeleteSelected(selectedNoteIds);
     setSelectedNoteIds([]);
@@ -82,11 +75,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
     return defaultFolder.id;
   };
-  
-  const handleNewNote = () => {
-    const defaultFolderId = getDefaultFolderId();
-    onNewNote(defaultFolderId);
-  };  
 
   const onDragEnd = (result: any) => {
     if (!result.destination) return;
