@@ -104,11 +104,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     const folderNotes = notes.filter(note => note.folderId === folderId);
     return (
       <>
-        {folderNotes.length === 0 && (
-          <div className="p-2 text-gray-500 dark:text-gray-400">
-            No notes
-          </div>
-        )}
         {folderNotes.map((note, index) => (
           <Draggable key={note.id} draggableId={note.id} index={index}>
             {(provided) => (
@@ -171,9 +166,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
               {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </Button>
           </div>
-
-          {/* New Note Button */}
-          <Button onClick={handleNewNote} className="w-full mb-4">New Note</Button>
 
           {/* New Folder Input and Button */}
           <div className="flex mb-4">
