@@ -14,7 +14,7 @@ import {
   DialogFooter
 } from "@/components/ui/dialog";
 import { Note, Folder as FolderType } from '@/types';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 
 interface SidebarProps {
   folders: FolderType[];
@@ -69,37 +69,54 @@ export const Sidebar: React.FC<SidebarProps> = ({
     if (folders.length === 0) {
       onNewFolder('Default');
     }
-  }
+  };
 
-  const onDragEnd = (result: any) => {
-    if (!result.destination) return;
+  const onDragEnd = (result: DropResult) => {
+    const { source, destination, draggableId } = result;
 
-    const sourceId = result.source.droppableId;
-    const destId = result.destination.droppableId;
-    const noteId = result.draggableId;
+    // Return if dropped outside any droppable
+    if (!destination) return;
 
-    if (sourceId !== destId) {
-      onMoveNote(noteId, destId === 'root' ? null : destId);
+    // Return if dropped in the same position
+    if (
+      source.droppableId === destination.droppableId &&
+      source.index === destination.index
+    ) return;
+
+    // Get the source and destination folder IDs
+    const sourceFolderId = source.droppableId === 'root' ? null : source.droppableId;
+    const destinationFolderId = destination.droppableId === 'root' ? null : destination.droppableId;
+
+    // Move the note
+    onMoveNote(draggableId, destinationFolderId);
+
+    // Auto-expand the destination folder if it's not already expanded
+    if (destinationFolderId && !expandedFolders.includes(destinationFolderId)) {
+      setExpandedFolders(prev => [...prev, destinationFolderId]);
     }
   };
 
   const renderNotes = (folderId: string | null) => {
-    // Create a default folder if no folders exist yet.
     createDefaultFolder();
     const folderNotes = notes.filter(note => note.folderId === folderId);
+    
     return (
       <>
         {folderNotes.map((note, index) => (
           <Draggable key={note.id} draggableId={note.id} index={index}>
-            {(provided) => (
+            {(provided, snapshot) => (
               <div
                 ref={provided.innerRef}
                 {...provided.draggableProps}
                 {...provided.dragHandleProps}
-                className={`flex items-center justify-between cursor-pointer p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded ${selectedNoteId === note.id ? 'bg-gray-200 dark:bg-gray-700' : ''}`}
+                className={`flex items-center justify-between cursor-pointer p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded ${
+                  selectedNoteId === note.id ? 'bg-gray-200 dark:bg-gray-700' : ''
+                } ${
+                  snapshot.isDragging ? 'opacity-50' : ''
+                }`}
                 onClick={() => onSelectNote(note)}
               >
-                <span>{note.title || 'Untitled'}</span>
+                <span className="truncate flex-1 mr-2">{note.title || 'Untitled'}</span>
                 <Checkbox
                   checked={selectedNoteIds.includes(note.id)}
                   onCheckedChange={(checked) => {
@@ -110,7 +127,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     }
                   }}
                   onClick={(event) => event.stopPropagation()}
-                  className="ml-4"
+                  className="shrink-0"
                 />
               </div>
             )}
@@ -122,7 +139,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      {/* Toggle Button for Sidebar */}
       <Button
         onClick={onToggleVisibility}
         variant="ghost"
@@ -132,15 +148,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <Menu className="h-4 w-4" />
       </Button>
 
-      {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 w-64 bg-gray-100 dark:bg-gray-800 overflow-hidden transition-transform duration-300 ease-in-out transform ${isVisible ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 z-10`}>
+      <div className={`fixed inset-y-0 left-0 w-64 bg-gray-100 dark:bg-gray-800 overflow-hidden transition-transform duration-300 ease-in-out transform ${
+        isVisible ? 'translate-x-0' : '-translate-x-full'
+      } md:relative md:translate-x-0 z-10`}>
         <div className="p-4">
-          {/* Close Button */}
           <Button onClick={onToggleVisibility} variant="ghost" size="icon" className="mb-4 w-full md:hidden">
             <X className="h-4 w-4" />
           </Button>
 
-          {/* Dark Mode Toggle */}
           <div className="flex justify-center mb-4">
             <Button
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
@@ -152,7 +167,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </Button>
           </div>
 
-          {/* New Folder Input and Button */}
           <div className="flex mb-4">
             <Input
               value={newFolderName}
@@ -165,10 +179,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </Button>
           </div>
 
-          {/* Delete All Button with confirmation dialog */}
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-              <Button className="w-full mb-4 bg-red-700 dark:bg-red-400">Delete All</Button>
+              <Button className="w-full mb-4 bg-red-700 hover:bg-red-800 dark:bg-red-400 dark:hover:bg-red-500">
+                Delete All
+              </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
@@ -185,20 +200,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </DialogContent>
           </Dialog>
 
-          {/* Delete Selected Button */}
           {selectedNoteIds.length > 0 && (
             <Button
-              className="w-full mb-4 bg-red-600 dark:bg-red-500"
+              className="w-full mb-4 bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
               onClick={handleDeleteSelected}
             >
               Delete Selected ({selectedNoteIds.length})
             </Button>
           )}
 
-          {/* Separator Line */}
           <hr className="border-t border-gray-300 dark:border-gray-600 mt-1 mb-4" />
 
-          {/* Search Bar */}
           <div className="relative mb-4">
             <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
             <Input
@@ -208,11 +220,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
             />
           </div>
 
-          {/* Folders and Notes List */}
           <div className="space-y-2 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 180px)' }}>
             <Droppable droppableId="root">
-              {(provided) => (
-                <div {...provided.droppableProps} ref={provided.innerRef}>
+              {(provided, snapshot) => (
+                <div
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                  className={`p-2 rounded ${
+                    snapshot.isDraggingOver ? 'bg-gray-200 dark:bg-gray-700' : ''
+                  }`}
+                >
                   {renderNotes(null)}
                   {provided.placeholder}
                 </div>
@@ -232,7 +249,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       <ChevronRight className="h-4 w-4 mr-2" />
                     )}
                     <Folder className="h-4 w-4 mr-2" />
-                    <span>{folder.name}</span>
+                    <span className="truncate">{folder.name}</span>
                   </div>
                   <Button
                     variant="ghost"
@@ -256,8 +273,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       New Note
                     </Button>
                     <Droppable droppableId={folder.id}>
-                      {(provided) => (
-                        <div {...provided.droppableProps} ref={provided.innerRef}>
+                      {(provided, snapshot) => (
+                        <div
+                          {...provided.droppableProps}
+                          ref={provided.innerRef}
+                          className={`p-2 rounded ${
+                            snapshot.isDraggingOver ? 'bg-gray-200 dark:bg-gray-700' : ''
+                          }`}
+                        >
                           {renderNotes(folder.id)}
                           {provided.placeholder}
                         </div>
