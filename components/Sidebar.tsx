@@ -3,7 +3,7 @@ import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Trash2, Search, Menu, X, Moon, Sun, Folder, ChevronRight, ChevronDown } from "lucide-react";
+import { Trash2, Search, Menu, X, Moon, Sun, Folder, ChevronRight, ChevronDown, Pencil } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -25,6 +25,7 @@ interface SidebarProps {
   onNewNote: (folderId: string | null) => void;
   onNewFolder: (name: string) => void;
   onDeleteFolder: (id: string) => void;
+  onRenameFolder: (id: string, newName: string) => void;
   onSearch: (query: string) => void;
   onToggleVisibility: () => void;
   onConfirmDeleteAll: () => void;
@@ -33,7 +34,7 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
-  folders, notes, onSelectNote, onNewNote, onNewFolder, onDeleteFolder, onSearch, selectedNoteId,
+  folders, notes, onSelectNote, onNewNote, onNewFolder, onDeleteFolder, onRenameFolder, onSearch, selectedNoteId,
   isVisible, onToggleVisibility, onConfirmDeleteAll, onDeleteSelected, onMoveNote
 }) => {
   const { theme, setTheme } = useTheme();
@@ -41,6 +42,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const [selectedNoteIds, setSelectedNoteIds] = useState<string[]>([]);
   const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
   const [newFolderName, setNewFolderName] = useState('');
+  const [editingFolderId, setEditingFolderId] = useState<string | null>(null);
+  const [editingFolderName, setEditingFolderName] = useState('');
 
   const handleConfirm = () => {
     onConfirmDeleteAll();
@@ -53,9 +56,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const toggleFolderExpansion = (folderId: string) => {
-    setExpandedFolders(prev =>
-      prev.includes(folderId) ? prev.filter(id => id !== folderId) : [...prev, folderId]
-    );
+    if (editingFolderId !== folderId) {
+      setExpandedFolders(prev =>
+        prev.includes(folderId) ? prev.filter(id => id !== folderId) : [...prev, folderId]
+      );
+    }
   };
 
   const handleCreateFolder = () => {
@@ -65,37 +70,49 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   };
 
+  const startEditingFolder = (e: React.MouseEvent, folder: FolderType) => {
+    e.stopPropagation();
+    setEditingFolderId(folder.id);
+    setEditingFolderName(folder.name);
+  };
+
+  const handleRenameFolder = (folderId: string) => {
+    if (editingFolderName.trim() && editingFolderName !== folders.find(f => f.id === folderId)?.name) {
+      onRenameFolder(folderId, editingFolderName.trim());
+    }
+    setEditingFolderId(null);
+    setEditingFolderName('');
+  };
+
+  const handleRenameFolderKeyDown = (e: React.KeyboardEvent, folderId: string) => {
+    if (e.key === 'Enter') {
+      handleRenameFolder(folderId);
+    } else if (e.key === 'Escape') {
+      setEditingFolderId(null);
+      setEditingFolderName('');
+    }
+    e.stopPropagation();
+  };
+
   const createDefaultFolder = () => {
     if (folders.length === 0) {
       onNewFolder('Default');
     }
   };
 
-  const handleEnterKeyForFolderNameSubmit = () => {
-    // This function is only used to handle a hotkey.
-    setNewFolderName(''); // clear input field
-  };
-
   const onDragEnd = (result: DropResult) => {
     const { source, destination, draggableId } = result;
-
-    // Return if dropped outside any droppable
     if (!destination) return;
-
-    // Return if dropped in the same position
     if (
       source.droppableId === destination.droppableId &&
       source.index === destination.index
     ) return;
 
-    // Get the source and destination folder IDs
     const sourceFolderId = source.droppableId === 'root' ? null : source.droppableId;
     const destinationFolderId = destination.droppableId === 'root' ? null : destination.droppableId;
 
-    // Move the note
     onMoveNote(draggableId, destinationFolderId);
 
-    // Auto-expand the destination folder if it's not already expanded
     if (destinationFolderId && !expandedFolders.includes(destinationFolderId)) {
       setExpandedFolders(prev => [...prev, destinationFolderId]);
     }
@@ -114,9 +131,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 ref={provided.innerRef}
                 {...provided.draggableProps}
                 {...provided.dragHandleProps}
-                className={`flex items-center justify-between cursor-pointer p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded ${selectedNoteId === note.id ? 'bg-gray-200 dark:bg-gray-700' : ''
-                  } ${snapshot.isDragging ? 'opacity-50' : ''
-                  }`}
+                className={`flex items-center justify-between cursor-pointer p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded ${
+                  selectedNoteId === note.id ? 'bg-gray-200 dark:bg-gray-700' : ''
+                } ${
+                  snapshot.isDragging ? 'opacity-50' : ''
+                }`}
                 onClick={() => onSelectNote(note)}
               >
                 <span className="truncate flex-1 mr-2">{note.title || 'Untitled'}</span>
@@ -151,8 +170,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <Menu className="h-4 w-4" />
       </Button>
 
-      <div className={`fixed inset-y-0 left-0 w-64 bg-gray-100 dark:bg-gray-800 overflow-hidden transition-transform duration-300 ease-in-out transform ${isVisible ? 'translate-x-0' : '-translate-x-full'
-        } md:relative md:translate-x-0 z-10`}>
+      <div className={`fixed inset-y-0 left-0 w-64 bg-gray-100 dark:bg-gray-800 overflow-hidden transition-transform duration-300 ease-in-out transform ${
+        isVisible ? 'translate-x-0' : '-translate-x-full'
+      } md:relative md:translate-x-0 z-10`}>
         <div className="p-4">
           <Button onClick={onToggleVisibility} variant="ghost" size="icon" className="mb-4 w-full md:hidden">
             <X className="h-4 w-4" />
@@ -234,8 +254,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <div
                   {...provided.droppableProps}
                   ref={provided.innerRef}
-                  className={`p-2 rounded ${snapshot.isDraggingOver ? 'bg-gray-200 dark:bg-gray-700' : ''
-                    }`}
+                  className={`p-2 rounded ${
+                    snapshot.isDraggingOver ? 'bg-gray-200 dark:bg-gray-700' : ''
+                  }`}
                 >
                   {renderNotes(null)}
                   {provided.placeholder}
@@ -249,25 +270,47 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   className="flex items-center justify-between cursor-pointer p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
                   onClick={() => toggleFolderExpansion(folder.id)}
                 >
-                  <div className="flex items-center">
+                  <div className="flex items-center flex-1">
                     {expandedFolders.includes(folder.id) ? (
                       <ChevronDown className="h-4 w-4 mr-2" />
                     ) : (
                       <ChevronRight className="h-4 w-4 mr-2" />
                     )}
                     <Folder className="h-4 w-4 mr-2" />
-                    <span className="truncate">{folder.name}</span>
+                    {editingFolderId === folder.id ? (
+                      <Input
+                        value={editingFolderName}
+                        onChange={(e) => setEditingFolderName(e.target.value)}
+                        onKeyDown={(e) => handleRenameFolderKeyDown(e, folder.id)}
+                        onBlur={() => handleRenameFolder(folder.id)}
+                        className="h-6 py-0 px-1"
+                        autoFocus
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    ) : (
+                      <span className="truncate">{folder.name}</span>
+                    )}
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDeleteFolder(folder.id);
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <div className="flex items-center">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={(e) => startEditingFolder(e, folder)}
+                      className="mr-1"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDeleteFolder(folder.id);
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
                 {expandedFolders.includes(folder.id) && (
                   <div className="ml-6">
@@ -284,8 +327,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         <div
                           {...provided.droppableProps}
                           ref={provided.innerRef}
-                          className={`p-2 rounded ${snapshot.isDraggingOver ? 'bg-gray-200 dark:bg-gray-700' : ''
-                            }`}
+                          className={`p-2 rounded ${
+                            snapshot.isDraggingOver ? 'bg-gray-200 dark:bg-gray-700' : ''
+                          }`}
                         >
                           {renderNotes(folder.id)}
                           {provided.placeholder}
