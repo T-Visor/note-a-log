@@ -4,17 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Trash2, Search, Menu, X, Moon, Sun, Folder, ChevronRight, ChevronDown, Pencil } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter
-} from "@/components/ui/dialog";
 import { Note, Folder as FolderType } from '@/types';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
+import DeleteAllDialoge  from "@/components/Sidebar/DeleteAllDialogue"
 
 interface SidebarProps {
   folders: FolderType[];
@@ -207,6 +199,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </Button>
           </div>
 
+          <DeleteAllDialoge
+            isOpen={isOpen}
+            setIsOpen={setIsOpen}
+            onConfirm={handleConfirm}
+          />
+
+          {/*
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
               <Button className="w-full mb-4 bg-red-700 hover:bg-red-800 dark:bg-red-400 dark:hover:bg-red-500">
@@ -226,7 +225,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </Button>
               </DialogFooter>
             </DialogContent>
-          </Dialog>
+          </Dialog> */}
 
           {selectedNoteIds.length > 0 && (
             <Button
