@@ -104,14 +104,14 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete }) => {
 
         {isPreview ? (
           <div
-            className="min-h-[70vh] p-4 border rounded-md bg-background"
+            className="min-h-[55vh] p-4 border rounded-md bg-background"
             dangerouslySetInnerHTML={{ __html: renderMarkdown(content) }}
           />
         ) : (
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="w-full min-h-[70vh] p-4 border rounded-md bg-background resize-none focus:outline-none focus:ring-2 focus:ring-ring"
+            className="w-full min-h-[55vh] p-4 border rounded-md bg-background resize-none focus:outline-none focus:ring-2 focus:ring-ring"
             placeholder="Write your markdown here..."
           />
         )}
