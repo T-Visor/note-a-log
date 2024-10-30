@@ -24,6 +24,22 @@ export const useNotes = () => {
     setFolders([...folders, newFolder]);
   };
 
+  const handleRenameFolder = (id: string, newName: string) => {
+    // Validate inputs
+    if (!newName.trim()) {
+      console.warn('Folder name cannot be empty');
+      return;
+    }
+  
+    setFolders(prevFolders => 
+      prevFolders.map(folder =>
+        folder.id === id
+          ? { ...folder, name: newName.trim() }
+          : folder
+      )
+    );
+  };
+
   const handleDeleteFolder = (id: string) => {
     setFolders(folders.filter(folder => folder.id !== id));
     // Move notes from deleted folder to root
@@ -68,6 +84,7 @@ export const useNotes = () => {
     selectedNote,
     setSelectedNote,
     handleNewFolder,
+    handleRenameFolder,
     handleDeleteFolder,
     handleNewNote,
     handleSaveNote,

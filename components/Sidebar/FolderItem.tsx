@@ -37,8 +37,12 @@ export const FolderItem: React.FC<FolderItemProps> = ({
   const [editingName, setEditingName] = useState(folder.name);
 
   const handleRename = () => {
-    if (editingName.trim() && editingName !== folder.name) {
-      onRenameFolder(folder.id, editingName.trim());
+    const newName = editingName.trim();
+    if (newName && newName !== folder.name) {
+      onRenameFolder(folder.id, newName);
+      setEditingName(newName);
+    } else {
+      setEditingName(folder.name); // Reset to original name if invalid
     }
     setIsEditing(false);
   };
@@ -53,11 +57,16 @@ export const FolderItem: React.FC<FolderItemProps> = ({
     e.stopPropagation();
   };
 
+  // Reset editing name when folder name changes externally
+  React.useEffect(() => {
+    setEditingName(folder.name);
+  }, [folder.name]);
+
   return (
     <div className="mb-2">
       <div
         className="flex items-center justify-between cursor-pointer p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
-        onClick={() => onToggleExpand(folder.id)}
+        onClick={() => !isEditing && onToggleExpand(folder.id)}
       >
         <div className="flex items-center flex-1">
           {isExpanded ? (
@@ -75,19 +84,17 @@ export const FolderItem: React.FC<FolderItemProps> = ({
               className="h-6 py-0 px-1"
               autoFocus
               onClick={(e) => e.stopPropagation()}
+              onFocus={(e) => e.target.select()}
             />
           ) : (
             <span className="truncate">{folder.name}</span>
           )}
         </div>
-        <div className="flex items-center">
+        <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
           <Button
             variant="ghost"
             size="icon"
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsEditing(true);
-            }}
+            onClick={() => setIsEditing(true)}
             className="mr-1"
           >
             <Pencil className="h-4 w-4" />
@@ -95,10 +102,7 @@ export const FolderItem: React.FC<FolderItemProps> = ({
           <Button
             variant="ghost"
             size="icon"
-            onClick={(e) => {
-              e.stopPropagation();
-              onDeleteFolder(folder.id);
-            }}
+            onClick={() => onDeleteFolder(folder.id)}
           >
             <Trash2 className="h-4 w-4" />
           </Button>

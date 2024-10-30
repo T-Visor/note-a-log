@@ -12,6 +12,7 @@ export default function NotesApp() {
     selectedNote,
     setSelectedNote,
     handleNewFolder,
+    handleRenameFolder,
     handleDeleteFolder,
     handleNewNote,
     handleSaveNote,
@@ -48,6 +49,7 @@ export default function NotesApp() {
         onNewNote={handleNewNote}
         onNewFolder={handleNewFolder}
         onDeleteFolder={handleDeleteFolder}
+        onRenameFolder={handleRenameFolder}
         onSearch={handleSearch}
         onToggleVisibility={toggleSidebar}
         onConfirmDeleteAll={handleDeleteAllNotes}
