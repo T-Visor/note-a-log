@@ -41,7 +41,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onMoveNote,
 }) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [selectedNoteIds, setSelectedNoteIds] = useState<string[]>([]);
   const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
   const [newFolderName, setNewFolderName] = useState('');
 
@@ -52,20 +51,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   };
 
-  const handleDeleteSelected = () => {
-    onDeleteSelected(selectedNoteIds);
-    setSelectedNoteIds([]);
-  };
-
   const toggleFolderExpansion = (folderId: string) => {
     setExpandedFolders(prev =>
       prev.includes(folderId) ? prev.filter(id => id !== folderId) : [...prev, folderId]
-    );
-  };
-
-  const handleSelectNoteForDeletion = (noteId: string, selected: boolean) => {
-    setSelectedNoteIds(prev =>
-      selected ? [...prev, noteId] : prev.filter(id => id !== noteId)
     );
   };
 
@@ -115,15 +103,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
             }}
           />
 
-          {selectedNoteIds.length > 0 && (
-            <Button
-              className="w-full mb-4 bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
-              onClick={handleDeleteSelected}
-            >
-              Delete Selected ({selectedNoteIds.length})
-            </Button>
-          )}
-
           <hr className="border-t border-gray-300 dark:border-gray-600 mt-1 mb-4" />
 
           <div className="space-y-2 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 180px)' }}>
@@ -131,16 +110,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <FolderItem
                 key={folder.id}
                 folder={folder}
-                notes={notes.filter(note => note.folderId === folder.id)} // Filter notes by folder
+                notes={notes.filter(note => note.folderId === folder.id)}
                 isExpanded={expandedFolders.includes(folder.id)}
                 selectedNoteId={selectedNoteId}
-                selectedNoteIds={selectedNoteIds}
+                selectedNoteIds={[]}
                 onToggleExpand={toggleFolderExpansion}
                 onSelectNote={onSelectNote}
                 onDeleteFolder={onDeleteFolder}
                 onRenameFolder={onRenameFolder}
                 onNewNote={onNewNote}
-                onSelectNoteForDeletion={handleSelectNoteForDeletion}
+                onSelectNoteForDeletion={onDeleteSelected}
               />
             ))}
           </div>
