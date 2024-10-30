@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from 'react';
-import { Sidebar } from '@/components/Sidebar';
+import { Sidebar } from '@/components/Sidebar/Sidebar';
 import { NoteEditor } from '@/components/NoteEditor';
 import { useNotes } from '@/hooks/useNotes';
 
