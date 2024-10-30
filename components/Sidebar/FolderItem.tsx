@@ -1,8 +1,20 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Folder, ChevronRight, ChevronDown, Pencil, Trash2 } from "lucide-react";
+import { 
+  Folder, 
+  ChevronRight, 
+  ChevronDown, 
+  Pencil, 
+  Trash2, 
+  MoreVertical 
+} from "lucide-react";
 import { Droppable } from 'react-beautiful-dnd';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import type { Folder as FolderType, Note } from '@/types';
 import { NoteList } from './NoteList';
 
@@ -65,7 +77,7 @@ export const FolderItem: React.FC<FolderItemProps> = ({
   return (
     <div className="mb-2">
       <div
-        className="flex items-center justify-between cursor-pointer p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
+        className="flex items-center justify-between cursor-pointer p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded group"
         onClick={() => !isEditing && onToggleExpand(folder.id)}
       >
         <div className="flex items-center flex-1">
@@ -90,22 +102,41 @@ export const FolderItem: React.FC<FolderItemProps> = ({
             <span className="truncate">{folder.name}</span>
           )}
         </div>
-        <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsEditing(true)}
-            className="mr-1"
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onDeleteFolder(folder.id)}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+        <div 
+          className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity" 
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+              >
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-40 p-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsEditing(true)}
+                className="w-full flex items-center justify-start"
+              >
+                <Pencil className="h-4 w-4 mr-2" />
+                Rename
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onDeleteFolder(folder.id)}
+                className="w-full flex items-center justify-start text-red-600 hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-900/10"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete
+              </Button>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
       {isExpanded && (
