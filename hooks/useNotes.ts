@@ -24,6 +24,12 @@ export const useNotes = () => {
     setFolders([...folders, newFolder]);
   };
 
+  const handleDeleteFolder = (id: string) => {
+    setFolders(folders.filter(folder => folder.id !== id));
+    // Move notes from deleted folder to root
+    setNotes(notes.map(note => note.folderId === id ? { ...note, folderId: null } : note));
+  };
+
   const handleRenameFolder = (id: string, newName: string) => {
     // Validate inputs
     if (!newName.trim()) {
@@ -38,12 +44,6 @@ export const useNotes = () => {
           : folder
       )
     );
-  };
-
-  const handleDeleteFolder = (id: string) => {
-    setFolders(folders.filter(folder => folder.id !== id));
-    // Move notes from deleted folder to root
-    setNotes(notes.map(note => note.folderId === id ? { ...note, folderId: null } : note));
   };
 
   const handleNewNote = (folderId: string | null = null) => {
@@ -84,8 +84,8 @@ export const useNotes = () => {
     selectedNote,
     setSelectedNote,
     handleNewFolder,
-    handleRenameFolder,
     handleDeleteFolder,
+    handleRenameFolder,
     handleNewNote,
     handleSaveNote,
     handleDeleteNote,
