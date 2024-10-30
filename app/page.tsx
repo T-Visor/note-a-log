@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Sidebar } from '@/components/Sidebar/Sidebar';
-import { NoteEditor } from '@/components/NoteEditor';
+import NoteEditor from '@/components/NoteEditor';
 import { useNotes } from '@/hooks/useNotes';
 
 export default function NotesApp() {
