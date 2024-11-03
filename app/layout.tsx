@@ -5,8 +5,8 @@ import { Providers } from './providers'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'Notes App',
-  description: 'A simple notes app built with Next.js',
+  title: 'Note-a-log',
+  description: 'Offline notes with automated organization.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
