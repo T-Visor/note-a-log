@@ -8,6 +8,7 @@ export const useNotes = () => {
   const [notes, setNotes] = useState<Note[]>([]);
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
 
+  // Load folders/notes during start-up.
   useEffect(() => {
     async function fetchData() {
       // Fetch saved folders from API.
@@ -23,21 +24,15 @@ export const useNotes = () => {
     fetchData();
   }, []); 
 
+  // === FOLDERS OPERATIONS ===
+
   const handleNewFolder = async (name: string) => {
     // Add new folder to local list.
     const newFolder: Folder = { id: uuidv4(), name };
     setFolders((existingFolders) => [...existingFolders, newFolder]);
 
     // Persist new folder using API.
-    await axios.post(
-      'api/folders',
-      JSON.stringify(newFolder),
-      {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }
-    );
+    await axios.post('/api/folders', newFolder);
   };
   
   const handleDeleteFolder = async (id: string) => {
@@ -81,22 +76,16 @@ export const useNotes = () => {
     }
   };
 
+  // === NOTES OPERATIONS ===
+
   const handleNewNote = async (folderId: string | null = null) => {
     // Add new note to local list.
     const newNote: Note = { id: uuidv4(), title: '', content: '', folderId };
     setNotes((existingNotes) => [...existingNotes, newNote]);
     setSelectedNote(newNote);
 
-    // Persist new (empty) note into the database.
-    await axios.post(
-      'api/notes',
-      JSON.stringify(newNote),
-      {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }
-    );
+    // Persist new (empty) note using API.
+    await axios.post('api/notes', newNote);
   };
 
   const handleSaveNote = (updatedNote: Note) => {
