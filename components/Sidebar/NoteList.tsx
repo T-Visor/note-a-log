@@ -14,13 +14,15 @@ interface NoteListProps {
   selectedNoteId: string | null;
   onSelectNote: (note: Note) => void;
   onSelectNoteForDeletion: (noteId: string, selected: boolean) => void;
+  onDeleteNote: (id: string) => void;  // Add this new prop
 }
 
 export const NoteList: React.FC<NoteListProps> = ({
   notes,
   selectedNoteId,
   onSelectNote,
-  onSelectNoteForDeletion
+  onSelectNoteForDeletion,
+  onDeleteNote,  // Add this new prop
 }) => {
   return (
     <>
@@ -57,7 +59,7 @@ export const NoteList: React.FC<NoteListProps> = ({
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => onSelectNoteForDeletion(note.id, true)}
+                      onClick={() => onDeleteNote(note.id)}
                       className="w-full flex items-center justify-start text-red-600 hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-900/10"
                     >
                       <Trash2 className="h-4 w-4 mr-2" />

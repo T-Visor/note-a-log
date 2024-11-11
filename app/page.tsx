@@ -55,6 +55,7 @@ export default function NotesApp() {
         onConfirmDeleteAll={handleDeleteAllNotes}
         onDeleteSelected={handleDeleteSelectedNotes}
         onMoveNote={handleMoveNote}
+        onDeleteNote={handleDeleteNote}
       />
 
       <div className="flex-1 overflow-auto">

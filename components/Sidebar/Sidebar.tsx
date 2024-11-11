@@ -22,6 +22,7 @@ interface SidebarProps {
   onConfirmDeleteAll: () => void;
   onDeleteSelected: (ids: string[]) => void;
   onMoveNote: (noteId: string, targetFolderId: string | null) => void;
+  onDeleteNote: (id: string) => void;  // Add this new prop
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -39,6 +40,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onConfirmDeleteAll,
   onDeleteSelected,
   onMoveNote,
+  onDeleteNote,  // Add this new prop
 }) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
@@ -120,6 +122,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onRenameFolder={onRenameFolder}
                 onNewNote={onNewNote}
                 onSelectNoteForDeletion={onDeleteSelected}
+                onDeleteNote={onDeleteNote}  // Add this new prop
               />
             ))}
           </div>

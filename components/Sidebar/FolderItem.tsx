@@ -30,6 +30,7 @@ interface FolderItemProps {
   onRenameFolder: (id: string, newName: string) => void;
   onNewNote: (folderId: string) => void;
   onSelectNoteForDeletion: (noteId: string, selected: boolean) => void;
+  onDeleteNote: (id: string) => void;  // Add this new prop
 }
 
 export const FolderItem: React.FC<FolderItemProps> = ({
@@ -43,7 +44,8 @@ export const FolderItem: React.FC<FolderItemProps> = ({
   onDeleteFolder,
   onRenameFolder,
   onNewNote,
-  onSelectNoteForDeletion
+  onSelectNoteForDeletion,
+  onDeleteNote
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editingName, setEditingName] = useState(folder.name);
@@ -164,6 +166,7 @@ export const FolderItem: React.FC<FolderItemProps> = ({
                   selectedNoteIds={selectedNoteIds}
                   onSelectNote={onSelectNote}
                   onSelectNoteForDeletion={onSelectNoteForDeletion}
+                  onDeleteNote={onDeleteNote}  // Add this new prop
                 />
                 {provided.placeholder}
               </div>
