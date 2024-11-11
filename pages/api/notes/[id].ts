@@ -4,6 +4,7 @@ export default function handler(request, response) {
   const { id } = request.query;
 
   if (request.method === 'PUT') {
+    // Update a note
     const { title, content, folderId } = request.body;
 
     try {
@@ -28,8 +29,8 @@ export default function handler(request, response) {
   else if (request.method === 'DELETE') {
     // Delete a note
     try {
-      const stmt = databaseConnection.prepare('DELETE FROM notes WHERE id = ?');
-      const result = stmt.run(id);
+      const statement = databaseConnection.prepare('DELETE FROM notes WHERE id = ?');
+      const result = statement.run(id);
 
       if (result.changes === 0) {
         return response.status(404).json({ error: 'Note not found' });

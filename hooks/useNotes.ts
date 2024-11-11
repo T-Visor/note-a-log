@@ -88,24 +88,62 @@ export const useNotes = () => {
     await axios.post('api/notes', newNote);
   };
 
-  const handleSaveNote = (updatedNote: Note) => {
-    setNotes(notes.map(note => note.id === updatedNote.id ? updatedNote : note));
-    setSelectedNote(updatedNote);
+  const handleSaveNote = async (updatedNote: Note) => {
+    try{
+      // Update the note contents via API.
+      await axios.put(`/api/notes/${updatedNote.id}`, updatedNote);
+
+      // Update local state with the updated note.
+      setNotes((existingNotes) =>
+        existingNotes.map((note) => (note.id === updatedNote.id ? updatedNote : note))
+      );
+      setSelectedNote(updatedNote);
+    }
+    catch (error) {
+      console.error('Error saving note:', error);
+    }
   };
 
-  const handleDeleteNote = (id: string) => {
-    setNotes(notes.filter(note => note.id !== id));
-    setSelectedNote(null);
+  const handleDeleteNote = async (id: string) => {
+    try {
+      // Delete the note via API.
+      await axios.delete(`/api/notes/${id}`);
+
+      // Update local state by removing the deleted note.
+      setNotes(notes.filter(note => note.id !== id));
+      setSelectedNote(null);
+    }
+    catch (error) {
+      console.error('Error deleting note:', error);
+    }
   };
 
-  const handleDeleteSelectedNotes = (ids: string[]) => {
-    setNotes(notes.filter(note => !ids.includes(note.id)));
-    setSelectedNote(null);
+  const handleDeleteSelectedNotes = async (ids: string[]) => {
+    try {
+      // Call handleDeleteNote for each ID and wait for all to complete
+      await Promise.all(ids.map((id) => handleDeleteNote(id)));
+  
+      // After all deletions are completed, update the local notes state
+      setNotes((existingNotes) => existingNotes.filter((note) => !ids.includes(note.id)));
+      setSelectedNote(null);
+    } 
+    catch (error) {
+      console.error('Error deleting selected notes:', error);
+    }
   };
 
-  const handleDeleteAllNotes = () => {
-    setNotes([]);
-    setSelectedNote(null);
+  const handleDeleteAllNotes = async () => {
+    try {
+      // Call handleDeleteNote for each note and wait for all to complete.
+      await Promise.all(notes.map((note) => handleDeleteNote(note.id)));
+
+      // After all deletions are completed, clear the local notes state.
+      setNotes([]);
+      setSelectedNote(null);
+    }
+    catch (error) {
+      console.error('Error deleting all notes:', error);
+    }
   };
 
   const handleMoveNote = (noteId: string, targetFolderId: string | null) => {
