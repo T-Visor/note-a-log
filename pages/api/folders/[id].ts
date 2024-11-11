@@ -1,6 +1,7 @@
 import databaseConnection from '@/lib/database';
+import { NextApiRequest, NextApiResponse } from 'next';
 
-export default function handler(request, response) {
+export default function handler(request: NextApiRequest, response: NextApiResponse) {
   const { id } = request.query;
 
   if (request.method === 'PUT') {

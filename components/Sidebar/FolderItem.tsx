@@ -146,7 +146,7 @@ export const FolderItem: React.FC<FolderItemProps> = ({
           <Button
             onClick={() => onNewNote(folder.id)}
             variant="ghost"
-            size="md"
+            size="icon"
             className="mb-2"
           >
             New Note

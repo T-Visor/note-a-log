@@ -1,6 +1,7 @@
 import databaseConnection from '@/lib/database';
+import { NextApiRequest, NextApiResponse } from 'next';
 
-export default function handler(request, response) {
+export default function handler(request: NextApiRequest, response: NextApiResponse) {
   // Fetch all folders (GET request)
   if (request.method === 'GET') {
     const folders = databaseConnection.prepare('SELECT * FROM folders').all();
