@@ -29,7 +29,6 @@ interface FolderItemProps {
   onDeleteFolder: (id: string) => void;
   onRenameFolder: (id: string, newName: string) => void;
   onNewNote: (folderId: string) => void;
-  onSelectNoteForDeletion: (noteId: string, selected: boolean) => void;
   onDeleteNote: (id: string) => void;  // Add this new prop
 }
 
@@ -38,13 +37,11 @@ export const FolderItem: React.FC<FolderItemProps> = ({
   notes,
   isExpanded,
   selectedNoteId,
-  selectedNoteIds,
   onToggleExpand,
   onSelectNote,
   onDeleteFolder,
   onRenameFolder,
   onNewNote,
-  onSelectNoteForDeletion,
   onDeleteNote
 }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -163,9 +160,7 @@ export const FolderItem: React.FC<FolderItemProps> = ({
                 <NoteList
                   notes={notes.filter(note => note.folderId === folder.id)}
                   selectedNoteId={selectedNoteId}
-                  selectedNoteIds={selectedNoteIds}
                   onSelectNote={onSelectNote}
-                  onSelectNoteForDeletion={onSelectNoteForDeletion}
                   onDeleteNote={onDeleteNote}  // Add this new prop
                 />
                 {provided.placeholder}

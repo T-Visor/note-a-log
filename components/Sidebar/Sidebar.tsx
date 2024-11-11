@@ -121,7 +121,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onDeleteFolder={onDeleteFolder}
                 onRenameFolder={onRenameFolder}
                 onNewNote={onNewNote}
-                onSelectNoteForDeletion={onDeleteSelected}
                 onDeleteNote={onDeleteNote}  // Add this new prop
               />
             ))}

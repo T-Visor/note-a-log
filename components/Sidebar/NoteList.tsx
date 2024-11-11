@@ -13,7 +13,6 @@ interface NoteListProps {
   notes: Note[];
   selectedNoteId: string | null;
   onSelectNote: (note: Note) => void;
-  onSelectNoteForDeletion: (noteId: string, selected: boolean) => void;
   onDeleteNote: (id: string) => void;  // Add this new prop
 }
 
@@ -21,7 +20,6 @@ export const NoteList: React.FC<NoteListProps> = ({
   notes,
   selectedNoteId,
   onSelectNote,
-  onSelectNoteForDeletion,
   onDeleteNote,  // Add this new prop
 }) => {
   return (
