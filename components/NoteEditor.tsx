@@ -119,9 +119,9 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete }) => {
 
         <div className="flex justify-between items-center mt-4 w-full">
           <Button onClick={handleSave}>Save</Button>
-          <div className="text-sm text-muted-foreground">
+          {/*<div className="text-sm text-muted-foreground">
             {content.split(' ').filter(Boolean).length} words
-          </div>
+          </div> */}
         </div>
       </Card>
     </div>
