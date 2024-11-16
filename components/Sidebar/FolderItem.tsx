@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { 
-  Folder, 
-  ChevronRight, 
-  ChevronDown, 
-  Pencil, 
-  Trash2, 
-  MoreVertical 
+import {
+  Folder,
+  ChevronRight,
+  ChevronDown,
+  Pencil,
+  Trash2,
+  MoreVertical,
+  FileText
 } from "lucide-react";
 import { Droppable } from 'react-beautiful-dnd';
 import {
@@ -101,8 +102,8 @@ export const FolderItem: React.FC<FolderItemProps> = ({
             <span className="truncate">{folder.name}</span>
           )}
         </div>
-        <div 
-          className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity" 
+        <div
+          className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity"
           onClick={(e) => e.stopPropagation()}
         >
           <Popover>
@@ -143,19 +144,18 @@ export const FolderItem: React.FC<FolderItemProps> = ({
           <Button
             onClick={() => onNewNote(folder.id)}
             variant="ghost"
-            size="icon"
-            className="mb-2"
+            className="mb-2 flex items-center space-x-2"
           >
-            New Note
+            <FileText className="w-5 h-5" />
+            <span>New Note</span>
           </Button>
           <Droppable droppableId={folder.id}>
             {(provided, snapshot) => (
               <div
                 {...provided.droppableProps}
                 ref={provided.innerRef}
-                className={`p-2 rounded ${
-                  snapshot.isDraggingOver ? 'bg-gray-200 dark:bg-gray-700' : ''
-                }`}
+                className={`p-2 rounded ${snapshot.isDraggingOver ? 'bg-gray-200 dark:bg-gray-700' : ''
+                  }`}
               >
                 <NoteList
                   notes={notes.filter(note => note.folderId === folder.id)}
