@@ -57,7 +57,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete }) => {
         line = line.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" class="text-blue-500 hover:underline">$1</a>');
         // Lists
         if (line.startsWith('- ')) {
-          return `<li class="ml-4">• ${line.slice(2)}</li>`;
+          return `<li class="ml-4"> ${line.slice(2)}</li>`;
         }
         return line ? `<p class="my-1">${line}</p>` : '<br/>';
       })
@@ -104,7 +104,8 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete }) => {
 
         {isPreview ? (
           <div
-            className="min-h-[55vh] p-4 border rounded-md bg-background"
+            className="min-h-[55vh] p-4 border rounded-md bg-background break-words"
+            style={{ whiteSpace: "normal", wordWrap: "break-word" }}
             dangerouslySetInnerHTML={{ __html: renderMarkdown(content) }}
           />
         ) : (
