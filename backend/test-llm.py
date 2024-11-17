@@ -1,12 +1,19 @@
 import ollama
-import database_utils 
+import config
+from database_utils import fetch_table_data_as_dictionary
 
-MODEL_NAME = 'llama3.2'
-PROMPT = None
+def main():
 
-response = ollama.generate(
-    model='llama3.2',
-    prompt='Reply with one word, what color is the sky?'
-)
+    notes_data = fetch_table_data_as_dictionary(config.DATABASE_PATH,
+                                                config.DATABASE_TABLE_WITH_NOTES)
+    print(notes_data)
 
-print(response['response'])
+    #response = ollama.generate(
+    #                model=config.MODEL_NAME,
+    #                prompt='Reply with one word, what color is the sky?'
+    #           )
+
+    #print(response['response'])
+
+if __name__ == '__main__':
+    main()
