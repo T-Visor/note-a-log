@@ -1,4 +1,5 @@
 import ollama
+import database_utils 
 
 MODEL_NAME = 'llama3.2'
 PROMPT = None
