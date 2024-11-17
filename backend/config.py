@@ -6,9 +6,8 @@ MODEL_NAME = 'llama3.2'
 PROMPT_TEMPLATE = """
 Based on the following title and content from a note, suggest a concise category name without an explanation:
 
-title: {note_title}
-content: {note_content}
+title: {{ title }}
+content: {{ content }}
 
 concise category name:
 """
-

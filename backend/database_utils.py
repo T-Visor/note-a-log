@@ -1,14 +1,16 @@
 import sqlite3
 import json
-
-DATABASE_PATH = '../data/notesApp.db'
-DATABASE_TABLE_WITH_NOTES = 'notes'
+from config import (
+    DATABASE_PATH,
+    DATABASE_TABLE_WITH_NOTES
+) 
 
 def main():
     """
         Fetch notes data from database as JSON and print.
     """
     notes_data = fetch_table_data_as_dictionary(DATABASE_PATH, DATABASE_TABLE_WITH_NOTES)
+    print(notes_data)
 
 
 def fetch_table_data_as_dictionary(database_path: str, table_name: str) -> dict:

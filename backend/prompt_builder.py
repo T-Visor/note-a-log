@@ -10,17 +10,16 @@ class PromptBuilder:
         return self.template.render(**kwargs)
 
 # Example usage
-template_str = "Write a story about a {{ animal }} who lives in {{ place }}."
-prompt_builder = PromptBuilder(template_str)
+#template_str = "Write a story about a {{ animal }} who lives in {{ place }}."
+#prompt_builder = PromptBuilder(template_str)
 
 # Dynamic values
-context = {
-    'animal': 'fox',
-    'place': 'the forest'
-}
+#context = {
+#    'animal': 'fox',
+#    'place': 'the forest'
+#}
 
 # Render the prompt
-rendered_prompt = prompt_builder.render(**context)
+#rendered_prompt = prompt_builder.render(**context)
 
-print(rendered_prompt)  # Output: Write a story about a fox who lives in the forest.
-
+#print(rendered_prompt)  # Output: Write a story about a fox who lives in the forest.
