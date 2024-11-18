@@ -118,6 +118,15 @@ export const FolderItem: React.FC<FolderItemProps> = ({
             </PopoverTrigger>
             <PopoverContent className="w-40 p-1">
               <Button
+                onClick={() => onNewNote(folder.id)}
+                variant="ghost"
+                size="sm"
+                className="w-full flex items-center justify-start"
+              >
+                <FileText className="w-4 h-4 mr-2" />
+                <span>New Note</span>
+              </Button>
+              <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsEditing(true)}
@@ -141,14 +150,6 @@ export const FolderItem: React.FC<FolderItemProps> = ({
       </div>
       {isExpanded && (
         <div className="ml-6">
-          <Button
-            onClick={() => onNewNote(folder.id)}
-            variant="ghost"
-            className="mb-2 flex items-center space-x-2"
-          >
-            <FileText className="w-5 h-5" />
-            <span>New Note</span>
-          </Button>
           <Droppable droppableId={folder.id}>
             {(provided, snapshot) => (
               <div
