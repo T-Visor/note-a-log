@@ -47,6 +47,19 @@ export const FolderItem: React.FC<FolderItemProps> = ({
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editingName, setEditingName] = useState(folder.name);
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+
+  const handleNewNote = async (e) => {
+    e.stopPropagation();
+    await onNewNote(folder.id);
+    setIsPopoverOpen(false);  // Close the popover
+    // Small delay to ensure popover closes first
+    setTimeout(() => {
+      if (!isExpanded) {
+        onToggleExpand(folder.id);
+      }
+    }, 100);
+  };
 
   const handleRename = () => {
     const newName = editingName.trim();
@@ -106,7 +119,7 @@ export const FolderItem: React.FC<FolderItemProps> = ({
           className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity"
           onClick={(e) => e.stopPropagation()}
         >
-          <Popover>
+          <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
             <PopoverTrigger asChild>
               <Button
                 variant="ghost"
@@ -118,7 +131,7 @@ export const FolderItem: React.FC<FolderItemProps> = ({
             </PopoverTrigger>
             <PopoverContent className="w-40 p-1">
               <Button
-                onClick={() => onNewNote(folder.id)}
+                onClick={handleNewNote}
                 variant="ghost"
                 size="sm"
                 className="w-full flex items-center justify-start"
