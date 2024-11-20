@@ -16,19 +16,28 @@ def main():
     # Fetch all notes
     notes_data = fetch_table_data_as_dictionary(DATABASE_PATH,
                                                 DATABASE_TABLE_WITH_NOTES)
+
+    note_categories = []
+
     for note in notes_data:
         # Render the prompt.
         context = {
             'title': note['title'],
-            'content': note['content']
+            'content': note['content'],
+            'categories' : note_categories
         }
         full_prompt = prompt_builder.render(**context)
+        print(full_prompt)
 
         response = ollama.generate(
                         model=MODEL_NAME,
                         prompt=full_prompt
                    )
         print(response['response'])
+        note_categories.append(response['response'])
+
+    print(note_categories)
+
 
 if __name__ == '__main__':
     main()
