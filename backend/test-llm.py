@@ -22,10 +22,10 @@ def main():
     folders_data = fetch_table_data_as_dictionary(DATABASE_PATH,
                                                   DATABASE_TABLE_WITH_FOLDERS)
 
-    # Print all available folders (TESTING)
-    [print(folder['name']) for folder in folders_data]
-
+    # Aggregate folder names into a list, as this will be part of a prompt for 
+    # existing note categories.
     note_categories = set()
+    [note_categories.add(folder['name']) for folder in folders_data]
 
     for note in notes_data:
         # Render the prompt.
