@@ -17,7 +17,7 @@ def main():
     notes_data = fetch_table_data_as_dictionary(DATABASE_PATH,
                                                 DATABASE_TABLE_WITH_NOTES)
 
-    note_categories = []
+    note_categories = set()
 
     for note in notes_data:
         # Render the prompt.
@@ -31,10 +31,11 @@ def main():
 
         response = ollama.generate(
                         model=MODEL_NAME,
-                        prompt=full_prompt
+                        prompt=full_prompt,
+                        options={'temperature': 0}  # Adjust the temperature as needed
                    )
         print(response['response'])
-        note_categories.append(response['response'])
+        note_categories.add(response['response'])
 
     print(note_categories)
 
