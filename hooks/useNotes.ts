@@ -22,7 +22,7 @@ export const useNotes = () => {
       setNotes(notesData);
     }
     fetchData();
-  }, []); 
+  }, []);
 
   // === FOLDERS OPERATIONS ===
 
@@ -34,7 +34,8 @@ export const useNotes = () => {
     // Persist new folder using API.
     await axios.post('/api/folders', newFolder);
   };
-  
+
+  /*
   const handleDeleteFolder = async (id: string) => {
     try {
       // Send DELETE request to API.
@@ -50,7 +51,29 @@ export const useNotes = () => {
     } catch (error) {
       console.error(error);
     }
-  }
+  }*/
+  const handleDeleteFolder = async (id: string) => {
+    try {
+      // Get notes associated with the folder to delete them.
+      const associatedNotes = notes.filter((note) => note.folderId === id);
+
+      // Delete each associated note using handleDeleteNote.
+      for (const note of associatedNotes) {
+        await handleDeleteNote(note.id);
+      }
+
+      // Send DELETE request to delete the folder via the API.
+      await axios.delete(`/api/folders/${id}`);
+
+      // Remove the folder referenced by the ID from local folder list after successful deletion.
+      setFolders((existingFolders) =>
+        existingFolders.filter((folder) => folder.id !== id)
+      );
+
+    } catch (error) {
+      console.error('Error deleting folder:', error);
+    }
+  };
 
   const handleRenameFolder = async (id: string, newName: string) => {
     // Validate inputs
@@ -58,13 +81,13 @@ export const useNotes = () => {
       console.warn('Folder name cannot be empty');
       return;
     }
-  
+
     try {
       // Send update request to database.
       await axios.put(`/api/folders/${id}`, {
         name: newName.trim(),
       });
-  
+
       // Update name to local folder after successful update.
       setFolders((prevFolders) =>
         prevFolders.map((folder) =>
@@ -89,7 +112,7 @@ export const useNotes = () => {
   };
 
   const handleSaveNote = async (updatedNote: Note) => {
-    try{
+    try {
       // Update the note contents via API.
       await axios.put(`/api/notes/${updatedNote.id}`, updatedNote);
 
@@ -122,11 +145,11 @@ export const useNotes = () => {
     try {
       // Call handleDeleteNote for each ID and wait for all to complete
       await Promise.all(ids.map((id) => handleDeleteNote(id)));
-  
+
       // After all deletions are completed, update the local notes state
       setNotes((existingNotes) => existingNotes.filter((note) => !ids.includes(note.id)));
       setSelectedNote(null);
-    } 
+    }
     catch (error) {
       console.error('Error deleting selected notes:', error);
     }
