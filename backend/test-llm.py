@@ -2,6 +2,7 @@ import ollama
 from config import (
     DATABASE_PATH, 
     DATABASE_TABLE_WITH_NOTES,
+    DATABASE_TABLE_WITH_FOLDERS,
     MODEL_NAME,
     PROMPT_TEMPLATE
 )
@@ -16,6 +17,13 @@ def main():
     # Fetch all notes
     notes_data = fetch_table_data_as_dictionary(DATABASE_PATH,
                                                 DATABASE_TABLE_WITH_NOTES)
+
+    # Fetch all folders for holding notes
+    folders_data = fetch_table_data_as_dictionary(DATABASE_PATH,
+                                                  DATABASE_TABLE_WITH_FOLDERS)
+
+    # Print all available folders (TESTING)
+    [print(folder['name']) for folder in folders_data]
 
     note_categories = set()
 

@@ -1,5 +1,6 @@
 DATABASE_PATH = '../data/notesApp.db'
 DATABASE_TABLE_WITH_NOTES = 'notes'
+DATABASE_TABLE_WITH_FOLDERS = 'folders' 
 
 MODEL_NAME = 'llama3.2'
 
