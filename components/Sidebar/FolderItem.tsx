@@ -112,8 +112,11 @@ export const FolderItem: React.FC<FolderItemProps> = ({
               onFocus={(e) => e.target.select()}
             />
           ) : (
-            <span className="truncate">{folder.name}</span>
-          )}
+            <span
+            className={`truncate ${folder.name === 'Default' ? 'font-bold' : ''}`}
+          >
+            {folder.name}
+          </span>          )}
         </div>
         <div
           className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity"

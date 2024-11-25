@@ -6,10 +6,10 @@ const databaseConnection = new Database('data/notesApp.db', { verbose: console.l
 databaseConnection.prepare(`
     CREATE TABLE IF NOT EXISTS folders (
       id TEXT PRIMARY KEY,
-      name TEXT NOT NULL
+      name TEXT NOT NULL UNIQUE -- Ensure folder names are unique
     )
   `).run();
-  
+
 databaseConnection.prepare(`
     CREATE TABLE IF NOT EXISTS notes (
       id TEXT PRIMARY KEY,
@@ -19,5 +19,16 @@ databaseConnection.prepare(`
       FOREIGN KEY(folderId) REFERENCES folders(id) ON DELETE SET NULL
     )
   `).run();
+
+// Insert 'default' folder if it doesn't already exist
+const existingDefaultFolder = databaseConnection.prepare(`
+    SELECT COUNT(*) AS count FROM folders WHERE id = 'unassigned'
+  `).get();
+
+if (existingDefaultFolder.count === 0) {
+  databaseConnection.prepare(`
+      INSERT INTO folders (id, name) VALUES ('unassigned', 'Default')
+    `).run();
+}
 
 export default databaseConnection;

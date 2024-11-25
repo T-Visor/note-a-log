@@ -4,8 +4,8 @@ import { NextApiRequest, NextApiResponse } from 'next';
 export default function handler(request: NextApiRequest, response: NextApiResponse) {
   // Fetch all notes (GET request)
   if (request.method === 'GET') {
-    const folders = databaseConnection.prepare('SELECT * FROM notes').all();
-    response.status(200).json(folders);
+    const notes = databaseConnection.prepare('SELECT * FROM notes').all();
+    response.status(200).json(notes);
   }
   // Add a new note (POST request)
   else if (request.method === 'POST') {

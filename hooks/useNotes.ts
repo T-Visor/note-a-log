@@ -18,7 +18,11 @@ export const useNotes = () => {
 
       // Fetch saved notes from API.
       const responseWithNotes = await axios.get('api/notes');
-      const notesData = responseWithNotes.data;
+      const notesData = responseWithNotes.data.map(note => ({
+        ...note,
+        folderId: note.folderId ?? null, // Ensure `null` for `undefined` or missing `folderId`
+      }));      
+      console.log(notesData);
       setNotes(notesData);
     }
     fetchData();

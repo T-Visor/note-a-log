@@ -18,6 +18,9 @@ def main():
     notes_data = fetch_table_data_as_dictionary(DATABASE_PATH,
                                                 DATABASE_TABLE_WITH_NOTES)
 
+    # Only get notes that do not have an assigned folder.
+    uncategorized_notes = [note for note in notes_data if note.get('folderId') is None]
+
     # Fetch all folders for holding notes
     folders_data = fetch_table_data_as_dictionary(DATABASE_PATH,
                                                   DATABASE_TABLE_WITH_FOLDERS)
@@ -27,7 +30,7 @@ def main():
     note_categories = set()
     [note_categories.add(folder['name']) for folder in folders_data]
 
-    for note in notes_data:
+    for note in uncategorized_notes:
         # Render the prompt.
         context = {
             'title': note['title'],
