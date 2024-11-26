@@ -61,15 +61,21 @@ def move_note_to_folder(note_ID: str, folder_name: str):
         if matching_id_as_list:
             matching_id = matching_id_as_list[0]
             print(f'folder name: {folder_name}, id: {matching_id}')
-            query = 'UPDATE notes SET folderId = ? WHERE id = ?'
+            query = 'UPDATE {DATABASE_TABLE_WITH_NOTES} SET folderId = ? WHERE id = ?'
             cursor.execute(query, (matching_id, note_ID))
             database_connection.commit()
             print(f"Note {note_ID} has been moved to folder with ID {matching_id}.")
         # CASE 2: folder doesn't exist, create folder, then move note to folder
         else:
             query = f'INSERT INTO {DATABASE_TABLE_WITH_FOLDERS} (id, name) VALUES (?, ?)'
-            cursor.execute(query, (uuid.uuid4(), folder_name))
+            new_folder_id = uuid.uuid4()
+            cursor.execute(query, (new_folder_id, folder_name))
             database_connection.commit()
+
+            query = 'UPDATE {DATABASE_TABLE_WITH_NOTES} SET folderId = ? WHERE id = ?'
+            cursor.execute(query, (new_folder_id, note_ID))
+            database_connection.commit()
+            print(f"Note {note_ID} has been moved to folder with ID {new_folder_id}.")
 
 
     finally:
