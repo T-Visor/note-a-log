@@ -53,31 +53,33 @@ def move_note_to_folder(note_ID: str, folder_name: str):
 
     try:
         cursor = database_connection.cursor()
-        query = f'SELECT id FROM folders {DATABASE_TABLE_WITH_FOLDERS} WHERE name = ?'
-        cursor.execute(query, (folder_name,))
+
+        # Check if the folder exists
+        select_query = f'SELECT id FROM {DATABASE_TABLE_WITH_FOLDERS} WHERE name = ?'
+        cursor.execute(select_query, (folder_name,))
         matching_id_as_list = cursor.fetchone()
 
-        # CASE 1: folder exists, move note to folder
+        # If the folder exists, get its ID; otherwise, create the folder
         if matching_id_as_list:
-            matching_id = matching_id_as_list[0]
-            print(f'folder name: {folder_name}, id: {matching_id}')
-            query = 'UPDATE {DATABASE_TABLE_WITH_NOTES} SET folderId = ? WHERE id = ?'
-            cursor.execute(query, (matching_id, note_ID))
-            database_connection.commit()
-            print(f"Note {note_ID} has been moved to folder with ID {matching_id}.")
-        # CASE 2: folder doesn't exist, create folder, then move note to folder
+            folder_id = matching_id_as_list[0]
+            print(f"Folder '{folder_name}' exists with ID {folder_id}.")
         else:
-            query = f'INSERT INTO {DATABASE_TABLE_WITH_FOLDERS} (id, name) VALUES (?, ?)'
-            new_folder_id = uuid.uuid4()
-            cursor.execute(query, (new_folder_id, folder_name))
+            folder_id = str(uuid.uuid4())
+            insert_query = f'INSERT INTO {DATABASE_TABLE_WITH_FOLDERS} (id, name) VALUES (?, ?)'
+            cursor.execute(insert_query, (folder_id, folder_name))
             database_connection.commit()
+            print(f"Folder '{folder_name}' created with ID {folder_id}.")
 
-            query = 'UPDATE {DATABASE_TABLE_WITH_NOTES} SET folderId = ? WHERE id = ?'
-            cursor.execute(query, (new_folder_id, note_ID))
-            database_connection.commit()
-            print(f"Note {note_ID} has been moved to folder with ID {new_folder_id}.")
+        # Update the note's folderId
+        update_query = f'UPDATE {DATABASE_TABLE_WITH_NOTES} SET folderId = ? WHERE id = ?'
+        cursor.execute(update_query, (folder_id, note_ID))
+        database_connection.commit()
+        print(f"Note {note_ID} has been moved to folder with ID {folder_id}.")
 
-
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+    except Exception as e:
+        print(f"Error: {e}")
     finally:
         cursor.close()
         database_connection.close()
