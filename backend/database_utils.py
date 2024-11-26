@@ -76,7 +76,7 @@ def move_note_to_folder(note_ID: str, folder_name: str):
             insert_query = f'INSERT INTO {DATABASE_TABLE_WITH_FOLDERS} (id, name) VALUES (?, ?)'
             cursor.execute(insert_query, (folder_id, folder_name))
             database_connection.commit()
-            print(f'Folder '{folder_name}' created with ID {folder_id}.')
+            print(f'Folder "{folder_name}" created with ID {folder_id}.')
 
         # Update the note's folderId
         update_query = f'UPDATE {DATABASE_TABLE_WITH_NOTES} SET folderId = ? WHERE id = ?'

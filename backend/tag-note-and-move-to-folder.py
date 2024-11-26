@@ -5,7 +5,7 @@ from config import (
     MODEL_NAME,
     PROMPT_TEMPLATE
 )
-from database_utils import fetch_table_data_as_dictionary
+from database_utils import fetch_table_data_as_dictionary, move_note_to_folder
 from prompt_builder import PromptBuilder
 
 
@@ -36,9 +36,6 @@ def main():
         }
         full_prompt = prompt_builder.render(**context)
 
-        # Display the rendered prompt
-        #print(full_prompt)
-
         # Prompt the LLM for a category name for the current note.
         response_with_category_name = ollama.generate(
                                         model=MODEL_NAME,
@@ -50,10 +47,10 @@ def main():
         # Add to the list of existing note categories (note folder names)
         note_categories.add(category_name)
     
-        # Update the folder ID to the LLM response
-        note['folderId'] = category_name
+        # Move the note to the folder
+        note['AI_generated_category'] = category_name
+        move_note_to_folder(note['id'], note['AI_generated_category']) 
 
-    print(uncategorized_notes)
     print(note_categories)
 
 
