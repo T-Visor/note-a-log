@@ -10,13 +10,10 @@ def main():
     """
         Fetch notes data from database as JSON and print.
     """
-    notes_data = fetch_table_data_as_dictionary(DATABASE_PATH, DATABASE_TABLE_WITH_NOTES)
-    #notes_data = fetch_table_data_as_dictionary(DATABASE_PATH,
-    #                                            DATABASE_TABLE_WITH_FOLDERS)
-    print(notes_data)
+    move_note_to_folder('1234', 'Programming') 
 
 
-def fetch_table_data_as_dictionary(database_path: str, table_name: str) -> dict:
+def fetch_table_data_as_dictionary(table_name: str) -> dict:
     """
     Connects to an SQLite database, retrieves all rows from a specified table,
     and returns the data as a dictionary (key-value pairs).
@@ -28,11 +25,7 @@ def fetch_table_data_as_dictionary(database_path: str, table_name: str) -> dict:
     Returns:
         dict: dictionary containing the table data.
     """
-    # Validate the table name (ensure it's a valid identifier)
-    if not table_name.isidentifier():
-        raise ValueError(f"Invalid table name: {table_name}")
-
-    database_connection = sqlite3.connect(database_path)
+    database_connection = sqlite3.connect(DATABASE_PATH)
 
     try:
         cursor = database_connection.cursor()
@@ -48,6 +41,34 @@ def fetch_table_data_as_dictionary(database_path: str, table_name: str) -> dict:
         # Return the mapped rows to dictionaries using column names as keys
         table_data_as_dict = [dict(zip(columns, row)) for row in rows]
         return table_data_as_dict
+
+    finally:
+        cursor.close()
+        database_connection.close()
+
+
+def move_note_to_folder(note_ID: str, folder_name: str):
+
+    database_connection = sqlite3.connect(DATABASE_PATH)
+
+    try:
+        cursor = database_connection.cursor()
+        query = f'SELECT id FROM folders {DATABASE_TABLE_WITH_FOLDERS} WHERE name = ?'
+        cursor.execute(query, (folder_name,))
+        matching_id_as_list = cursor.fetchone()
+
+        # CASE 1: folder exists, move note to folder
+        if matching_id_as_list:
+            matching_id = matching_id_as_list[0]
+            print(f'folder name: {folder_name}, id: {matching_id}')
+            query = 'UPDATE notes SET folderId = ? WHERE id = ?'
+            cursor.execute(query, (matching_id, note_ID))
+            database_connection.commit()
+            print(f"Note {note_ID} has been moved to folder with ID {matching_id}.")
+        # CASE 2: folder doesn't exist, create folder, then move note to folder
+        else:
+            print('needs implementation')
+
 
     finally:
         cursor.close()
