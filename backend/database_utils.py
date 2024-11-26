@@ -32,7 +32,7 @@ def fetch_table_data_as_dictionary(table_name: str) -> dict:
         cursor = database_connection.cursor()
 
         # Fetch all rows from the table
-        query = f"SELECT * FROM {table_name}"
+        query = f'SELECT * FROM {table_name}'
         cursor.execute(query)
         rows = cursor.fetchall()
 
@@ -49,6 +49,13 @@ def fetch_table_data_as_dictionary(table_name: str) -> dict:
 
 
 def move_note_to_folder(note_ID: str, folder_name: str):
+    """
+    Moves a note to a specified folder, creating the folder if it doesn't exist.
+
+    Parameters:
+        note_ID (str): ID of the note to move.
+        folder_name (str): Name of the folder to move the note to.
+    """
 
     database_connection = sqlite3.connect(DATABASE_PATH)
 
@@ -69,18 +76,18 @@ def move_note_to_folder(note_ID: str, folder_name: str):
             insert_query = f'INSERT INTO {DATABASE_TABLE_WITH_FOLDERS} (id, name) VALUES (?, ?)'
             cursor.execute(insert_query, (folder_id, folder_name))
             database_connection.commit()
-            print(f"Folder '{folder_name}' created with ID {folder_id}.")
+            print(f'Folder '{folder_name}' created with ID {folder_id}.')
 
         # Update the note's folderId
         update_query = f'UPDATE {DATABASE_TABLE_WITH_NOTES} SET folderId = ? WHERE id = ?'
         cursor.execute(update_query, (folder_id, note_ID))
         database_connection.commit()
-        print(f"Note {note_ID} has been moved to folder with ID {folder_id}.")
+        print(f'Note {note_ID} has been moved to folder with ID {folder_id}.')
 
     except sqlite3.Error as e:
-        print(f"Database error: {e}")
+        print(f'Database error: {e}')
     except Exception as e:
-        print(f"Error: {e}")
+        print(f'Error: {e}')
     finally:
         cursor.close()
         database_connection.close()
