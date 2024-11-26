@@ -1,5 +1,5 @@
 import sqlite3
-import json
+import uuid
 from config import (
     DATABASE_PATH,
     DATABASE_TABLE_WITH_NOTES,
@@ -67,7 +67,9 @@ def move_note_to_folder(note_ID: str, folder_name: str):
             print(f"Note {note_ID} has been moved to folder with ID {matching_id}.")
         # CASE 2: folder doesn't exist, create folder, then move note to folder
         else:
-            print('needs implementation')
+            query = f'INSERT INTO {DATABASE_TABLE_WITH_FOLDERS} (id, name) VALUES (?, ?)'
+            cursor.execute(query, (uuid.uuid4(), folder_name))
+            database_connection.commit()
 
 
     finally:
