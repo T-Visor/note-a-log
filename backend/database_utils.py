@@ -10,7 +10,8 @@ def main():
     """
         Fetch notes data from database as JSON and print.
     """
-    move_note_to_folder('1234', 'Programming') 
+    #move_note_to_folder('e77458de-b24c-463b-a993-1c9af7205544', 'Programming') 
+    # e77458de-b24c-463b-a993-1c9af7205544 Pediatrist
 
 
 def fetch_table_data_as_dictionary(table_name: str) -> dict:
