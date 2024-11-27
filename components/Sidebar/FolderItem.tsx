@@ -113,7 +113,7 @@ export const FolderItem: React.FC<FolderItemProps> = ({
             />
           ) : (
             <span
-            className={`truncate ${folder.name === 'Default' ? 'font-bold' : ''}`}
+            className={`truncate ${folder.name === 'Unassigned' ? 'font-bold' : ''}`}
           >
             {folder.name}
           </span>          )}
