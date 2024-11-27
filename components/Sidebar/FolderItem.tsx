@@ -21,6 +21,7 @@ import { NoteList } from './NoteList';
 
 interface FolderItemProps {
   folder: FolderType;
+  isFirstFolder?: boolean;
   notes: Note[];
   isExpanded: boolean;
   selectedNoteId: string | null;
@@ -35,6 +36,7 @@ interface FolderItemProps {
 
 export const FolderItem: React.FC<FolderItemProps> = ({
   folder,
+  isFirstFolder,
   notes,
   isExpanded,
   selectedNoteId,
@@ -90,7 +92,7 @@ export const FolderItem: React.FC<FolderItemProps> = ({
   return (
     <div className="mb-2">
       <div
-        className="flex items-center justify-between cursor-pointer p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded group"
+        className={`flex items-center justify-between cursor-pointer p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded group ${isFirstFolder ? "font-bold" : ""}`}
         onClick={() => !isEditing && onToggleExpand(folder.id)}
       >
         <div className="flex items-center flex-1">
@@ -112,11 +114,9 @@ export const FolderItem: React.FC<FolderItemProps> = ({
               onFocus={(e) => e.target.select()}
             />
           ) : (
-            <span
-            className={`truncate ${folder.name === 'Unassigned' ? 'font-bold' : ''}`}
-          >
-            {folder.name}
-          </span>          )}
+            <span>
+              {folder.name}
+            </span>)}
         </div>
         <div
           className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity"

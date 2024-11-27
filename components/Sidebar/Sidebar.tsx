@@ -108,10 +108,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <hr className="border-t border-gray-300 dark:border-gray-600 mt-1 mb-4" />
 
           <div className="space-y-2 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 180px)' }}>
-            {folders.map(folder => (
+            {folders.map((folder, index) => (
               <FolderItem
                 key={folder.id}
                 folder={folder}
+                isFirstFolder={index === 0}
                 notes={notes.filter(note => note.folderId === folder.id)}
                 isExpanded={expandedFolders.includes(folder.id)}
                 selectedNoteId={selectedNoteId}
