@@ -8,7 +8,8 @@ import {
   Pencil,
   Trash2,
   MoreVertical,
-  FileText
+  FileText,
+  Wand
 } from "lucide-react";
 import { Droppable } from 'react-beautiful-dnd';
 import {
@@ -133,33 +134,59 @@ export const FolderItem: React.FC<FolderItemProps> = ({
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-40 p-1">
-              <Button
-                onClick={handleNewNote}
-                variant="ghost"
-                size="sm"
-                className="w-full flex items-center justify-start"
-              >
-                <FileText className="w-4 h-4 mr-2" />
-                <span>New Note</span>
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsEditing(true)}
-                className="w-full flex items-center justify-start"
-              >
-                <Pencil className="h-4 w-4 mr-2" />
-                Rename
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onDeleteFolder(folder.id)}
-                className="w-full flex items-center justify-start text-red-600 hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-900/10"
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete
-              </Button>
+              {isFirstFolder ? (
+                <>
+                  <Button
+                    onClick={handleNewNote}
+                    variant="ghost"
+                    size="sm"
+                    className="w-full flex items-center justify-start"
+                  >
+                    <FileText className="w-4 h-4 mr-2" />
+                    <span>New Note</span>
+                  </Button>
+                  <Button
+                    //onClick={handleNewNote}
+                    variant="ghost"
+                    size="sm"
+                    className="w-full flex items-center justify-start"
+                  >
+                    <Wand className="w-4 h-4 mr-2" />
+                    <span className="font-bold">Auto-categorize</span>
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    onClick={handleNewNote}
+                    variant="ghost"
+                    size="sm"
+                    className="w-full flex items-center justify-start"
+                  >
+                    <FileText className="w-4 h-4 mr-2" />
+                    <span>New Note</span>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsEditing(true)}
+                    className="w-full flex items-center justify-start"
+                  >
+                    <Pencil className="h-4 w-4 mr-2" />
+                    Rename
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onDeleteFolder(folder.id)}
+                    className="w-full flex items-center justify-start text-red-600 hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-900/10"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete
+                  </Button>
+                </>
+              )
+              }
             </PopoverContent>
           </Popover>
         </div>
