@@ -59,8 +59,8 @@ export const FolderItem: React.FC<FolderItemProps> = ({
 
   const handleAutoCategorize = () => {
     toast({
-      title: "Auto-Categorize",
-      description: "Sit tight! Your notes are being intelligently categorized",
+      title: "",
+      description: "Sit tight! Your notes  be intelligently categorized",
     })
   }
 
@@ -106,31 +106,35 @@ export const FolderItem: React.FC<FolderItemProps> = ({
     <div className="mb-2">
       <div
         className={`flex items-center justify-between cursor-pointer p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded group ${isFirstFolder ? "font-bold" : ""}`}
-        onClick={() => !isEditing && onToggleExpand(folder.id)}
-      >
-        <div className="flex items-center flex-1">
-          {isExpanded ? (
-            <ChevronDown className="h-4 w-4 mr-2" />
-          ) : (
-            <ChevronRight className="h-4 w-4 mr-2" />
-          )}
-          <Folder className="h-4 w-4 mr-2" />
-          {isEditing ? (
-            <Input
-              value={editingName}
-              onChange={(e) => setEditingName(e.target.value)}
-              onKeyDown={handleKeyDown}
-              onBlur={handleRename}
-              className="h-6 py-0 px-1"
-              autoFocus
-              onClick={(e) => e.stopPropagation()}
-              onFocus={(e) => e.target.select()}
-            />
-          ) : (
-            <span>
-              {folder.name}
-            </span>)}
-        </div>
+        onClick={() => !isEditing && notes.length > 0 && onToggleExpand(folder.id)}
+        >
+<div className="flex items-center flex-1">
+    {notes.length > 0 ? (
+      isExpanded ? (
+        <ChevronDown className="h-4 w-4 mr-2" />
+      ) : (
+        <ChevronRight className="h-4 w-4 mr-2" />
+      )
+    ) : (
+      // Render an invisible placeholder for empty folders
+      <span className="h-4 w-4 mr-2 text-gray-400" />
+    )}
+    <Folder className="h-4 w-4 mr-2" />
+    {isEditing ? (
+      <Input
+        value={editingName}
+        onChange={(e) => setEditingName(e.target.value)}
+        onKeyDown={handleKeyDown}
+        onBlur={handleRename}
+        className="h-6 py-0 px-1"
+        autoFocus
+        onClick={(e) => e.stopPropagation()}
+        onFocus={(e) => e.target.select()}
+      />
+    ) : (
+      <span>{folder.name}</span>
+    )}
+  </div>
         <div
           className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity"
           onClick={(e) => e.stopPropagation()}
@@ -225,7 +229,7 @@ export const FolderItem: React.FC<FolderItemProps> = ({
           </Droppable>
         </div>
       )}
-      <Toaster/>
+      <Toaster />
     </div>
   );
 };
