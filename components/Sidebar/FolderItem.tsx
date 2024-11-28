@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Toaster } from "@/components/ui/toaster"
+import { useToast } from "@/hooks/use-toast"
+
 import {
   Folder,
   ChevronRight,
@@ -51,6 +54,15 @@ export const FolderItem: React.FC<FolderItemProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editingName, setEditingName] = useState(folder.name);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const { toast } = useToast()
+
+
+  const handleAutoCategorize = () => {
+    toast({
+      title: "Auto-Categorize",
+      description: "Sit tight! Your notes are being intelligently categorized",
+    })
+  }
 
   const handleNewNote = async (e) => {
     e.stopPropagation();
@@ -146,7 +158,7 @@ export const FolderItem: React.FC<FolderItemProps> = ({
                     <span>New Note</span>
                   </Button>
                   <Button
-                    //onClick={handleNewNote}
+                    onClick={handleAutoCategorize}
                     variant="ghost"
                     size="sm"
                     className="w-full flex items-center justify-start"
@@ -213,6 +225,7 @@ export const FolderItem: React.FC<FolderItemProps> = ({
           </Droppable>
         </div>
       )}
+      <Toaster/>
     </div>
   );
 };
