@@ -54,9 +54,10 @@ export const FolderItem: React.FC<FolderItemProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editingName, setEditingName] = useState(folder.name);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+
+  // Button click triggers a job to run for an LLM
+  // to move notes to their appropriate folders.
   const { toast } = useToast()
-
-
   const handleAutoCategorize = () => {
     toast({
       title: "AI-enhanced Categorization",
@@ -106,7 +107,7 @@ export const FolderItem: React.FC<FolderItemProps> = ({
     <div className="mb-2">
       <div
         className={`flex items-center justify-between cursor-pointer p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded group ${isFirstFolder ? "font-bold" : ""}`}
-        onClick={() => !isEditing && notes.length > 0 && onToggleExpand(folder.id)}
+        onClick={() => onToggleExpand(folder.id)}
         >
 <div className="flex items-center flex-1">
     {notes.length > 0 ? (
