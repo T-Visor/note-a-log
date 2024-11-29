@@ -59,8 +59,8 @@ export const FolderItem: React.FC<FolderItemProps> = ({
 
   const handleAutoCategorize = () => {
     toast({
-      title: "",
-      description: "Sit tight! Your notes  be intelligently categorized",
+      title: "AI-enhanced Categorization",
+      description: "Sit tight! Your notes are being intelligently categorized",
     })
   }
 
