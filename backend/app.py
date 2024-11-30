@@ -33,4 +33,3 @@ def auto_categorize():
         return {"status": "success", "message": "Notes categorized successfully."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f'An error occurred: {str(e)}')
-

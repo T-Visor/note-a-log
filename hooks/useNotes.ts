@@ -73,9 +73,9 @@ export const useNotes = () => {
       setFolders((existingFolders) =>
         existingFolders.filter((folder) => folder.id !== id)
       );
-
-    } catch (error) {
-      console.error('Error deleting folder:', error);
+    } 
+    catch (error) {
+      console.error("Error deleting folder:", error);
     }
   };
 

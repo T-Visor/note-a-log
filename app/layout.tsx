@@ -1,12 +1,12 @@
-import './globals.css'
-import { Inter } from 'next/font/google'
-import { Providers } from './providers'
+import "./globals.css"
+import { Inter } from "next/font/google"
+import { Providers } from "./providers"
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
-  title: 'Note-a-log',
-  description: 'Offline notes with automated organization.',
+  title: "Note-a-log",
+  description: "Offline notes with automated organization.",
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

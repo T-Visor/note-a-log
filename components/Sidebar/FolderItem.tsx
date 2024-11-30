@@ -1,10 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Toaster } from "@/components/ui/toaster"
 import { useToast } from "@/hooks/use-toast"
-import { useEffect } from 'react';
-
 import {
   Folder,
   ChevronRight,
@@ -15,14 +13,15 @@ import {
   FileText,
   Wand
 } from "lucide-react";
-import { Droppable } from 'react-beautiful-dnd';
+import { Droppable } from "react-beautiful-dnd";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import type { Folder as FolderType, Note } from '@/types';
-import { NoteList } from './NoteList';
+import type { Folder as FolderType, Note } from "@/types";
+import { NoteList } from "./NoteList";
+import axios from "axios";
 
 interface FolderItemProps {
   folder: FolderType;
@@ -59,11 +58,27 @@ export const FolderItem: React.FC<FolderItemProps> = ({
   // Button click triggers a job to run for an LLM
   // to move notes to their appropriate folders.
   const { toast } = useToast()
-  const handleAutoCategorize = () => {
+  const handleAutoCategorize = async () => {
     toast({
-      title: "AI-enhanced Categorization",
-      description: "Sit tight! Your notes are being intelligently categorized",
+      title: "Auto-categorize",
+      description: "Notes from this folder will be organized and moved by AI.",
     })
+
+    try {
+      await axios.get("http://localhost:8000/auto_categorize_notes");
+      toast({
+        title: "Success",
+        description: "Auto-categorization completed successfully.",
+      });
+    }
+    catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Error during auto-categorization for notes"
+      })
+      console.error("Error during auto-categorization for notes:", error);
+    }
   }
 
   const handleNewNote = async (e) => {
@@ -227,8 +242,7 @@ export const FolderItem: React.FC<FolderItemProps> = ({
               <div
                 {...provided.droppableProps}
                 ref={provided.innerRef}
-                className={`p-2 rounded ${snapshot.isDraggingOver ? 'bg-gray-200 dark:bg-gray-700' : ''
-                  }`}
+                className={`p-2 rounded ${snapshot.isDraggingOver ? "bg-gray-200 dark:bg-gray-700" : ""}`}
               >
                 <NoteList
                   notes={notes.filter(note => note.folderId === folder.id)}
