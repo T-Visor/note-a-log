@@ -1,6 +1,4 @@
-transformers
-scikit-learn
-torch
 ollama
-sqlite3
 jinja2
+fastapi
+uvicorn
