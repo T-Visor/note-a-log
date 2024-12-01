@@ -82,7 +82,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       >
         {/* Placeholders for loading animation. */}
         <div className="p-4 space-y-4">
-          <h1 className="flex items-center space-x-2">
+          <h1 className="pt-10 flex items-center space-x-2">
             <strong>Auto-categorizing notes</strong>
             <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
             </h1>
