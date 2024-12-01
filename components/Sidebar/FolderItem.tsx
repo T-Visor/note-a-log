@@ -65,28 +65,37 @@ export const FolderItem: React.FC<FolderItemProps> = ({
   const handleAutoCategorize = async () => {
     toast({
       title: "Auto-categorize",
-      description: "Notes from this folder will be organized and moved by AI.",
-    })
-    setLoading(true);
-
+      description: "Using artificial intelligence.",
+    });
+  
     try {
+      // Wait 1.5 seconds to allow the toast to display
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      setLoading(true); // Set loading state after the delay
+  
+      // Make the API request
       await axios.get("http://localhost:8000/auto_categorize_notes");
+  
+      // Show success toast
       toast({
         title: "Success",
-        description: "Auto-categorization completed successfully.",
+        description: "Completed successfully.",
       });
-    }
+    } 
     catch (error) {
+      // Show error toast
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Error during auto-categorization for notes"
-      })
+        description: "Error ",
+      });
       console.error("Error during auto-categorization for notes:", error);
+    } 
+    finally {
+      setLoading(false); // Ensure loading state is reset regardless of success or failure
     }
-
-    setLoading(false);
-  }
+  };
+  
 
   const handleNewNote = async (e) => {
     e.stopPropagation();
