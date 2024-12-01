@@ -5,7 +5,7 @@ DATABASE_TABLE_WITH_FOLDERS = 'folders'
 MODEL_NAME = 'llama3.1:8b'
 
 PROMPT_TEMPLATE = """
-### Note Categorization
+You are a note categorizor.
 
 Based on the following title and content from a note and potential existing set of
 categories, suggest a concise category name for the note without explanation:
