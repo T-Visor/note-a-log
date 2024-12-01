@@ -85,7 +85,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <h1 className="pt-10 flex items-center space-x-2">
             <strong>Auto-categorizing notes</strong>
             <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-            </h1>
+          </h1>
           <Skeleton className="h-4 w-full" /> {/* Simulates a line of text */}
           <Skeleton className="h-4 w-5/6" />  {/* Simulates a shorter line */}
           <Skeleton className="h-4 w-2/3" />  {/* Simulates a small line */}
