@@ -63,15 +63,11 @@ export const FolderItem: React.FC<FolderItemProps> = ({
   // to move notes to their appropriate folders.
   // TODO: this should eventually be moved to the 'useNotes' file.
   const handleAutoCategorize = async () => {
-    /*toast({
-      title: "Auto-categorize",
-      description: "Using artificial intelligence.",
-    });*/
-  
     try {
-      setLoading(true); // Set loading state after the delay
+      // Initialize loading animation in sidebar
+      setLoading(true);
   
-      // Make the API request
+      // Use API call to organize notes in the sidebar
       await axios.get("http://localhost:8000/auto_categorize_notes");
   
       // Show success toast
@@ -80,7 +76,8 @@ export const FolderItem: React.FC<FolderItemProps> = ({
         description: "Completed successfully.",
       });
 
-      // Refresh the component after the API call completes
+      // Refresh the page after the categorization process is complete
+      // as this displays the updated interface.
       window.location.reload();
     } 
     catch (error) {
@@ -93,7 +90,8 @@ export const FolderItem: React.FC<FolderItemProps> = ({
       console.error("Error during auto-categorization for notes:", error);
     } 
     finally {
-      setLoading(false); // Ensure loading state is reset regardless of success or failure
+      // Ensure loading state is reset regardless of success or failure
+      setLoading(false); 
     }
   };
   
