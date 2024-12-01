@@ -10,9 +10,9 @@ PROMPT_TEMPLATE = """
 Based on the following title and content from a note and potential existing set of
 categories, suggest a concise category name for the note without explanation:
 
-**Title:** {{ title }} (The title of the note)
-**Content:** {{ content }} (The content from the note)
-**Existing Categories:** [{{ categories | join(', ') }}] (Any relevant pre-existing categories)
+**Title:** {{ title }} 
+**Content:** {{ content }} 
+**Existing Categories:** [{{ categories | join(', ') }}] 
 
 **Suggested Category Name:**
 """

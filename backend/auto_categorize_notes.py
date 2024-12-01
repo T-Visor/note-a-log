@@ -22,6 +22,9 @@ def main():
     # Fetch all folders for holding notes
     folders_data = fetch_table_data_as_dictionary(DATABASE_TABLE_WITH_FOLDERS)
 
+    # Remove the 'unassigned' folder.
+    folders_data = [folder_data for folder_data in folders_data if folder_data['id'] != 'unassigned']
+
     # Aggregate folder names into a list, as this will be part of a prompt for 
     # existing note categories.
     note_categories = set()
