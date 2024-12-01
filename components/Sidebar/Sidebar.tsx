@@ -77,13 +77,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     (isLoading ? (
       <div
-        className={`fixed inset-y-0 left-0 w-64 bg-gray-100 dark:bg-gray-800 overflow-hidden transition-transform duration-300 ease-in-out transform ${
-          isVisible ? "translate-x-0" : "-translate-x-full"
-        } md:relative md:translate-x-0 z-10`}
+        className={`fixed inset-y-0 left-0 w-64 bg-gray-100 dark:bg-gray-800 overflow-hidden transition-transform duration-300 ease-in-out transform ${isVisible ? "translate-x-0" : "-translate-x-full"
+          } md:relative md:translate-x-0 z-10`}
       >
         {/* Placeholders for loading animation. */}
         <div className="p-4 space-y-4">
-          <Skeleton className="h-6 w-3/4" />  {/* Simulates a title */}
+          <h1 className="flex items-center space-x-2">
+            <strong>Auto-categorizing notes</strong>
+            <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+            </h1>
           <Skeleton className="h-4 w-full" /> {/* Simulates a line of text */}
           <Skeleton className="h-4 w-5/6" />  {/* Simulates a shorter line */}
           <Skeleton className="h-4 w-2/3" />  {/* Simulates a small line */}
