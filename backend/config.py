@@ -8,11 +8,11 @@ PROMPT_TEMPLATE = """
 ### Note Categorization
 
 Based on the following title and content from a note and potential existing set of
-categories, suggest a concise category name in plain-text for the note without explanation:
+categories, suggest a concise category name for the note without explanation:
 
-**Title:** {{ title }} 
-**Content:** {{ content }} 
-**Existing Categories:** [{{ categories | join(', ') }}] 
+Title: {{ title }} 
+Content: {{ content }} 
+Existing Categories: [{{ categories | join(', ') }}] 
 
-**Suggested Category Name:**
+Suggested Category Name:
 """

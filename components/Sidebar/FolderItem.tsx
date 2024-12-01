@@ -63,14 +63,12 @@ export const FolderItem: React.FC<FolderItemProps> = ({
   // to move notes to their appropriate folders.
   // TODO: this should eventually be moved to the 'useNotes' file.
   const handleAutoCategorize = async () => {
-    toast({
+    /*toast({
       title: "Auto-categorize",
       description: "Using artificial intelligence.",
-    });
+    });*/
   
     try {
-      // Wait 1.5 seconds to allow the toast to display
-      await new Promise((resolve) => setTimeout(resolve, 1500));
       setLoading(true); // Set loading state after the delay
   
       // Make the API request
