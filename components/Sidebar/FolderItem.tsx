@@ -22,6 +22,7 @@ import {
 import type { Folder as FolderType, Note } from "@/types";
 import { NoteList } from "./NoteList";
 import axios from "axios";
+import { useSidebarContext } from "./SidebarContext";
 
 interface FolderItemProps {
   folder: FolderType;
@@ -55,6 +56,8 @@ export const FolderItem: React.FC<FolderItemProps> = ({
   const [editingName, setEditingName] = useState(folder.name);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const { toast } = useToast() // toast notification pop-up
+  const { setLoading } = useSidebarContext();
+  setLoading(false);
 
   // Button click triggers a job to run for an LLM
   // to move notes to their appropriate folders.
@@ -64,6 +67,7 @@ export const FolderItem: React.FC<FolderItemProps> = ({
       title: "Auto-categorize",
       description: "Notes from this folder will be organized and moved by AI.",
     })
+    setLoading(true);
 
     try {
       await axios.get("http://localhost:8000/auto_categorize_notes");
@@ -80,6 +84,8 @@ export const FolderItem: React.FC<FolderItemProps> = ({
       })
       console.error("Error during auto-categorization for notes:", error);
     }
+
+    setLoading(false);
   }
 
   const handleNewNote = async (e) => {

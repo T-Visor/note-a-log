@@ -7,6 +7,7 @@ import { SidebarHeader } from './SidebarHeader';
 import { FolderItem } from './FolderItem';
 import DeleteAllDialogue from "./DeleteAllDialogue";
 import { Skeleton } from "@/components/ui/skeleton"
+import { useSidebarContext } from "./SidebarContext";
 
 interface SidebarProps {
   folders: FolderType[];
@@ -46,6 +47,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
   const [newFolderName, setNewFolderName] = useState('');
+  const { isLoading } = useSidebarContext();
 
   const handleCreateFolder = () => {
     if (newFolderName.trim()) {
@@ -71,9 +73,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       setExpandedFolders(prev => [...prev, destinationFolderId]);
     }
   };
-
-  // For now this is just used to test the loading animation.
-  const isLoading = false;
 
   return (
     (isLoading ? (

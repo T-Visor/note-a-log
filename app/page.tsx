@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Sidebar } from "@/components/Sidebar/Sidebar";
+import { SidebarProvider } from "@/components/Sidebar/SidebarContext";
 import NoteEditor from "@/components/NoteEditor";
 import { useNotes } from "@/hooks/useNotes";
 
@@ -40,23 +41,25 @@ export default function NotesApp() {
 
   return (
     <div className="flex md:flex-row h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 relative">
-      <Sidebar
-        folders={folders}
-        notes={filteredNotes}
-        selectedNoteId={selectedNote?.id || null}
-        isVisible={isSidebarVisible}
-        onSelectNote={setSelectedNote}
-        onNewNote={handleNewNote}
-        onNewFolder={handleNewFolder}
-        onDeleteFolder={handleDeleteFolder}
-        onRenameFolder={handleRenameFolder}
-        onSearch={handleSearch}
-        onToggleVisibility={toggleSidebar}
-        onConfirmDeleteAll={handleDeleteAllNotes}
-        onDeleteSelected={handleDeleteSelectedNotes}
-        onMoveNote={handleMoveNote}
-        onDeleteNote={handleDeleteNote}
-      />
+      <SidebarProvider>
+        <Sidebar
+          folders={folders}
+          notes={filteredNotes}
+          selectedNoteId={selectedNote?.id || null}
+          isVisible={isSidebarVisible}
+          onSelectNote={setSelectedNote}
+          onNewNote={handleNewNote}
+          onNewFolder={handleNewFolder}
+          onDeleteFolder={handleDeleteFolder}
+          onRenameFolder={handleRenameFolder}
+          onSearch={handleSearch}
+          onToggleVisibility={toggleSidebar}
+          onConfirmDeleteAll={handleDeleteAllNotes}
+          onDeleteSelected={handleDeleteSelectedNotes}
+          onMoveNote={handleMoveNote}
+          onDeleteNote={handleDeleteNote}
+        />
+      </SidebarProvider>
 
       <div className="flex-1 overflow-auto">
         <div className="max-w-4xl mx-auto px-4 py-8 h-full">
