@@ -81,6 +81,9 @@ export const FolderItem: React.FC<FolderItemProps> = ({
         title: "Success",
         description: "Completed successfully.",
       });
+
+      // Refresh the component after the API call completes
+      window.location.reload();
     } 
     catch (error) {
       // Show error toast
