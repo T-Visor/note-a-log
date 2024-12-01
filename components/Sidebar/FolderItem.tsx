@@ -54,10 +54,11 @@ export const FolderItem: React.FC<FolderItemProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editingName, setEditingName] = useState(folder.name);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const { toast } = useToast() // toast notification pop-up
 
   // Button click triggers a job to run for an LLM
   // to move notes to their appropriate folders.
-  const { toast } = useToast()
+  // TODO: this should eventually be moved to the 'useNotes' file.
   const handleAutoCategorize = async () => {
     toast({
       title: "Auto-categorize",

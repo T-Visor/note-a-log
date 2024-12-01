@@ -39,23 +39,6 @@ export const useNotes = () => {
     await axios.post('/api/folders', newFolder);
   };
 
-  /*
-  const handleDeleteFolder = async (id: string) => {
-    try {
-      // Send DELETE request to API.
-      await axios.delete(`/api/folders/${id}`)
-
-      // Remove the folder referenced by the ID from local folder list after successful deletion.
-      setFolders((existingFolders) => existingFolders.filter((folder) => folder.id !== id));
-
-      // Set the folderIDs for any notes which were associated with the deleted folder to null.
-      setNotes((existingNotes) => 
-        existingNotes.map((note) => (note.folderId === id ? { ...note, folderId: null} : note))
-      );
-    } catch (error) {
-      console.error(error);
-    }
-  }*/
   const handleDeleteFolder = async (id: string) => {
     try {
       // Get notes associated with the folder to delete them.
