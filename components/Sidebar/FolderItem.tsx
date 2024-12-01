@@ -77,7 +77,7 @@ export const FolderItem: React.FC<FolderItemProps> = ({
       });
 
       // Refresh the page after the categorization process is complete
-      // as this displays the updated interface.
+      // as this displays the updated interface
       window.location.reload();
     } 
     catch (error) {
