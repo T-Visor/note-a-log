@@ -85,7 +85,7 @@ export const FolderItem: React.FC<FolderItemProps> = ({
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Error ",
+        description: "Couldn't auto-categorize notes. Check logs",
       });
       console.error("Error during auto-categorization for notes:", error);
     } 
