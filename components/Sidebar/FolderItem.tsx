@@ -232,7 +232,7 @@ export const FolderItem: React.FC<FolderItemProps> = ({
                     className="w-full flex items-center justify-start"
                   >
                     <Pencil className="h-4 w-4 mr-2" />
-                    Rename
+                    Rename Folder
                   </Button>
                   <Button
                     variant="ghost"
@@ -241,7 +241,7 @@ export const FolderItem: React.FC<FolderItemProps> = ({
                     className="w-full flex items-center justify-start text-red-600 hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-900/10"
                   >
                     <Trash2 className="h-4 w-4 mr-2" />
-                    Delete
+                    Delete Folder
                   </Button>
                 </>
               )

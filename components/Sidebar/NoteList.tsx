@@ -61,7 +61,7 @@ export const NoteList: React.FC<NoteListProps> = ({
                       className="w-full flex items-center justify-start text-red-600 hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-900/10"
                     >
                       <Trash2 className="h-4 w-4 mr-2" />
-                      Delete
+                      Delete Note
                     </Button>
                   </PopoverContent>
                 </Popover>
