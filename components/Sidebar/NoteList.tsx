@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 import { Button } from "@/components/ui/button";
 import { MoreVertical, Trash2, FolderUp } from "lucide-react";
@@ -7,6 +7,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { Command, CommandInput, CommandList, CommandItem } from "@/components/ui/command";
 import type { Note } from '@/types';
 import { useNotes } from "@/hooks/useNotes";
 
@@ -14,17 +15,24 @@ interface NoteListProps {
   notes: Note[];
   selectedNoteId: string | null;
   onSelectNote: (note: Note) => void;
-  onDeleteNote: (id: string) => void;  // Add this new prop
+  onDeleteNote: (id: string) => void;
 }
 
 export const NoteList: React.FC<NoteListProps> = ({
   notes,
   selectedNoteId,
   onSelectNote,
-  onDeleteNote,  // Add this new prop
+  onDeleteNote,
 }) => {
-
   const { folders } = useNotes();
+  const [currentNote, setCurrentNote] = useState<Note | null>(null); // Track the current note being moved
+
+  const handleMoveNote = (folderId: string) => {
+    if (currentNote) {
+      console.log(`Moving note "${currentNote.title}" to folder "${folderId}"`);
+      setCurrentNote(null); // Close the pop-over after moving
+    }
+  };
 
   return (
     <>
@@ -35,9 +43,9 @@ export const NoteList: React.FC<NoteListProps> = ({
               ref={provided.innerRef}
               {...provided.draggableProps}
               {...provided.dragHandleProps}
-              className={`flex items-center justify-between cursor-pointer p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded group ${selectedNoteId === note.id ? 'bg-gray-200 dark:bg-gray-700' : ''
-                } ${snapshot.isDragging ? 'opacity-50' : ''
-                }`}
+              className={`flex items-center justify-between cursor-pointer p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded group ${
+                selectedNoteId === note.id ? 'bg-gray-200 dark:bg-gray-700' : ''
+              } ${snapshot.isDragging ? 'opacity-50' : ''}`}
               onClick={() => onSelectNote(note)}
             >
               <span className="truncate flex-1 mr-2">{note.title || 'Untitled'}</span>
@@ -56,15 +64,34 @@ export const NoteList: React.FC<NoteListProps> = ({
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-40 p-1">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => console.log("implement me")}
-                      className="w-full flex items-center justify-start"
-                    >
-                      <FolderUp className="h-4 w-4 mr-2" />
-                      Move Note
-                    </Button>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setCurrentNote(note)}
+                          className="w-full flex items-center justify-start"
+                        >
+                          <FolderUp className="h-4 w-4 mr-2" />
+                          Move Note
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-80 p-4 border rounded-md shadow-lg">
+                        <Command>
+                          <CommandInput placeholder="Search folders..." className="mb-2" />
+                          <CommandList>
+                            {folders.map((folder) => (
+                              <CommandItem
+                                key={folder.id}
+                                onSelect={() => handleMoveNote(folder.id)}
+                              >
+                                {folder.name}
+                              </CommandItem>
+                            ))}
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                     <Button
                       variant="ghost"
                       size="sm"
