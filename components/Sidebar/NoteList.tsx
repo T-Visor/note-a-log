@@ -84,7 +84,11 @@ export const NoteList: React.FC<NoteListProps> = ({
                             {folders.map((folder) => (
                               <CommandItem
                                 key={folder.id}
-                                onSelect={() => currentNote && handleMoveNote(currentNote.id, folder.id)}
+                                onSelect={() => {
+                                  currentNote && handleMoveNote(currentNote.id, folder.id);
+                                  setCurrentNote(null);
+                                  window.location.reload();
+                                }}
                               >
                                 {folder.name}
                               </CommandItem>
