@@ -24,15 +24,16 @@ export const NoteList: React.FC<NoteListProps> = ({
   onSelectNote,
   onDeleteNote,
 }) => {
-  const { folders } = useNotes();
+  const { folders, handleMoveNote } = useNotes();
   const [currentNote, setCurrentNote] = useState<Note | null>(null); // Track the current note being moved
 
-  const handleMoveNote = (folderId: string) => {
+  // TODO: remove this after testing
+  /*const handleMoveNote = (folderId: string) => {
     if (currentNote) {
       console.log(`Moving note "${currentNote.title}" to folder "${folderId}"`);
       setCurrentNote(null); // Close the pop-over after moving
     }
-  };
+  };*/
 
   return (
     <>
@@ -83,7 +84,7 @@ export const NoteList: React.FC<NoteListProps> = ({
                             {folders.map((folder) => (
                               <CommandItem
                                 key={folder.id}
-                                onSelect={() => handleMoveNote(folder.id)}
+                                onSelect={() => currentNote && handleMoveNote(currentNote.id, folder.id)}
                               >
                                 {folder.name}
                               </CommandItem>
