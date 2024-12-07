@@ -139,11 +139,11 @@ export const FolderItem: React.FC<FolderItemProps> = ({
   Handles the case where a user deletes the last note in a folder.
   This will automatically close the folder once it becomes empty.
   */
-  /*useEffect(() => {
+  useEffect(() => {
     if (notes.length === 0 && isExpanded) {
       onToggleExpand(folder.id);
     }
-  }, [notes.length, isExpanded, folder.id]);*/
+  }, [notes.length]);
 
   return (
     <div className="mb-2">
