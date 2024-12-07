@@ -1,13 +1,14 @@
 import React from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 import { Button } from "@/components/ui/button";
-import { MoreVertical, Trash2 } from "lucide-react";
+import { MoreVertical, Trash2, FolderUp } from "lucide-react";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
 import type { Note } from '@/types';
+import { useNotes } from "@/hooks/useNotes";
 
 interface NoteListProps {
   notes: Note[];
@@ -22,6 +23,9 @@ export const NoteList: React.FC<NoteListProps> = ({
   onSelectNote,
   onDeleteNote,  // Add this new prop
 }) => {
+
+  const { folders } = useNotes();
+
   return (
     <>
       {notes.map((note, index) => (
@@ -31,15 +35,13 @@ export const NoteList: React.FC<NoteListProps> = ({
               ref={provided.innerRef}
               {...provided.draggableProps}
               {...provided.dragHandleProps}
-              className={`flex items-center justify-between cursor-pointer p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded group ${
-                selectedNoteId === note.id ? 'bg-gray-200 dark:bg-gray-700' : ''
-              } ${
-                snapshot.isDragging ? 'opacity-50' : ''
-              }`}
+              className={`flex items-center justify-between cursor-pointer p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded group ${selectedNoteId === note.id ? 'bg-gray-200 dark:bg-gray-700' : ''
+                } ${snapshot.isDragging ? 'opacity-50' : ''
+                }`}
               onClick={() => onSelectNote(note)}
             >
               <span className="truncate flex-1 mr-2">{note.title || 'Untitled'}</span>
-              <div 
+              <div
                 className="opacity-0 group-hover:opacity-100 transition-opacity"
                 onClick={(e) => e.stopPropagation()}
               >
@@ -54,6 +56,15 @@ export const NoteList: React.FC<NoteListProps> = ({
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-40 p-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => console.log("implement me")}
+                      className="w-full flex items-center justify-start"
+                    >
+                      <FolderUp className="h-4 w-4 mr-2" />
+                      Move Note
+                    </Button>
                     <Button
                       variant="ghost"
                       size="sm"
