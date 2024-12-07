@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Note, Folder } from '@/types';
 import axios from 'axios'
+import { useSidebarContext } from "@/components/Sidebar/SidebarContext";
 
 export const useNotes = () => {
   const [folders, setFolders] = useState<Folder[]>([]);
   const [notes, setNotes] = useState<Note[]>([]);
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+  const { updateCounter } = useSidebarContext();
 
   // Load folders/notes during start-up.
   useEffect(() => {
@@ -26,7 +28,7 @@ export const useNotes = () => {
       setNotes(notesData);
     }
     fetchData();
-  }, []);
+  }, [updateCounter]);
 
   // === FOLDERS OPERATIONS ===
 

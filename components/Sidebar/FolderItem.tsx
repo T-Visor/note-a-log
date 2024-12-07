@@ -56,7 +56,7 @@ export const FolderItem: React.FC<FolderItemProps> = ({
   const [editingName, setEditingName] = useState(folder.name);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const { toast } = useToast() // toast notification pop-up
-  const { setLoading } = useSidebarContext();
+  const { setLoading, forceUpdate } = useSidebarContext();
   setLoading(false);
 
   // Button click triggers a job to run for an LLM
@@ -78,7 +78,8 @@ export const FolderItem: React.FC<FolderItemProps> = ({
 
       // Refresh the page after the categorization process is complete
       // as this displays the updated interface
-      window.location.reload();
+      //window.location.reload();
+      forceUpdate();
     } 
     catch (error) {
       // Show error toast

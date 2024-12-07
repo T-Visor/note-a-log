@@ -10,6 +10,7 @@ import {
 import { Command, CommandInput, CommandList, CommandItem } from "@/components/ui/command";
 import type { Note } from '@/types';
 import { useNotes } from "@/hooks/useNotes";
+import { useSidebarContext } from "./SidebarContext";
 
 interface NoteListProps {
   notes: Note[];
@@ -26,6 +27,7 @@ export const NoteList: React.FC<NoteListProps> = ({
 }) => {
   const { folders, handleMoveNote } = useNotes();
   const [currentNote, setCurrentNote] = useState<Note | null>(null); // Track the current note being moved
+  const { forceUpdate } = useSidebarContext();
 
   // TODO: remove this after testing
   /*const handleMoveNote = (folderId: string) => {
@@ -87,7 +89,7 @@ export const NoteList: React.FC<NoteListProps> = ({
                                 onSelect={() => {
                                   currentNote && handleMoveNote(currentNote.id, folder.id);
                                   setCurrentNote(null);
-                                  window.location.reload();
+                                  forceUpdate();
                                 }}
                               >
                                 {folder.name}

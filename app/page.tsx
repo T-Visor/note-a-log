@@ -31,7 +31,7 @@ function NotesAppContent() {
     handleMoveNote,
   } = useNotes();
 
-  const { isLoading } = useSidebarContext(); // Now safely within SidebarProvider
+  const { isLoading, updateCounter } = useSidebarContext(); // Now safely within SidebarProvider
   const [searchQuery, setSearchQuery] = useState('');
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
 
