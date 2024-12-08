@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { MDXEditor } from '@mdxeditor/editor';
-import { 
-  toolbarPlugin, 
-  headingsPlugin, 
-  listsPlugin, 
-  quotePlugin, 
-  linkPlugin, 
+import {
+  toolbarPlugin,
+  headingsPlugin,
+  listsPlugin,
+  quotePlugin,
+  linkPlugin,
   markdownShortcutPlugin,
   frontmatterPlugin,
   codeBlockPlugin,
@@ -66,27 +66,15 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete }) => {
   return (
     <div className="flex flex-col h-full w-full max-w-3xl mx-auto mt-5 md:mt-0">
       {/* Title Input */}
-      <Input 
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder="Note Title"
-        className="mb-4"
-      />
-
-      {/* Action Buttons */}
-      <div className="flex justify-between mb-4">
-        <div className="flex space-x-2">
-          <Button 
-            variant="destructive" 
-            size="sm" 
-            onClick={() => onDelete(note.id)}
-          >
-            <Trash2 className="mr-2 h-4 w-4" /> 
-            Delete
-          </Button>
-        </div>
-        <Button 
-          size="sm" 
+      <div className="flex items-center justify-between mb-4">
+        <Input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Note Title"
+          className="flex-grow mr-4" /* Ensures the input takes available space */
+        />
+        <Button
+          size="sm"
           onClick={handleSave}
         >
           Save
@@ -128,7 +116,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete }) => {
         ]}
         className="flex-1 border rounded-md"
         contentEditableClassName="prose dark:prose-invert p-4 min-h-[300px] text-gray-900 dark:text-white"
-/>
+      />
     </div>
   );
 };
