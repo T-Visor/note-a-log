@@ -66,6 +66,8 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete }) => {
   }, [handleKeyDown]);
 
   return (
+    /* The explicit check for the dark theme ensures that the 'dark-theme' class
+       is applied to enable proper theming for the MDXEditor component. */
     <div
       className={`flex flex-col h-full w-full max-w-3xl mx-auto mt-5 md:mt-0 ${
         theme === "dark" ? "dark" : ""
