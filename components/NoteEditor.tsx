@@ -104,16 +104,16 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete }) => {
           toolbarPlugin({
             toolbarContents: () => (
               <>
-                <Separator />
+                {/* <Separator /> */}
                 <BoldItalicUnderlineToggles />
                 <Separator />
                 {/* <BlockTypeSelect /> */}
                 {/* <Separator /> */}
                 <ListsToggle />
-                <Separator />
-                <CreateLink />
-                <Separator />
-                <CodeToggle />
+                {/* <Separator /> */}
+                {/* <CreateLink /> */}
+                {/* <Separator /> */}
+                {/* <CodeToggle /> */}
               </>
             )
           }),
