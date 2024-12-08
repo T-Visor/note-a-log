@@ -98,7 +98,6 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete }) => {
       <MDXEditor
         key={editorKey} // Force re-render on note change
         markdown={content}
-        //onChange={(markdown) => setContent(markdown)}
         onChange={handleContentChange}
         plugins={[
           toolbarPlugin({
@@ -107,8 +106,8 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete }) => {
                 {/* <Separator /> */}
                 <BoldItalicUnderlineToggles />
                 <Separator />
-                {/* <BlockTypeSelect /> */}
-                {/* <Separator /> */}
+                <BlockTypeSelect />
+                <Separator />
                 <ListsToggle />
                 {/* <Separator /> */}
                 {/* <CreateLink /> */}
