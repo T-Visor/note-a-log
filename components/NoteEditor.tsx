@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTheme } from "next-themes";
 import { MDXEditor } from '@mdxeditor/editor';
 import {
   toolbarPlugin,
@@ -36,6 +37,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete }) => {
   const [title, setTitle] = useState(note.title);
   const [content, setContent] = useState(note.content);
   const [editorKey, setEditorKey] = useState(0); // Key for forcing re-render of MDXEditor
+  const { theme } = useTheme(); // Access the current theme
 
   // Update local state when note changes
   useEffect(() => {
@@ -64,7 +66,11 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete }) => {
   }, [handleKeyDown]);
 
   return (
-    <div className="flex flex-col h-full w-full max-w-3xl mx-auto mt-5 md:mt-0">
+    <div
+      className={`flex flex-col h-full w-full max-w-3xl mx-auto mt-5 md:mt-0 ${
+        theme === "dark" ? "dark" : ""
+      }`}
+    >
       {/* Title Input */}
       <div className="flex items-center justify-between mb-4">
         <Input
@@ -114,10 +120,10 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete }) => {
           codeMirrorPlugin(),
           tablePlugin(),
         ]}
-        className="flex-1 border rounded-md"
+        className="flex-1 border rounded-md dark:dark-theme"
         contentEditableClassName="prose dark:prose-invert p-4 min-h-[300px] text-gray-900 dark:text-white"
       />
-    </div>
+      </div>
   );
 };
 
