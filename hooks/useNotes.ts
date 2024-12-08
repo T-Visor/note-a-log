@@ -24,7 +24,6 @@ export const useNotes = () => {
         ...note,
         folderId: note.folderId ?? null, // Ensure `null` for `undefined` or missing `folderId`
       }));      
-      console.log(notesData);
       setNotes(notesData);
     }
     fetchData();
