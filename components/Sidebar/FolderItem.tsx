@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Toaster } from "@/components/ui/toaster"
 import { useToast } from "@/hooks/use-toast"
 import {
   Folder,
@@ -66,10 +65,10 @@ export const FolderItem: React.FC<FolderItemProps> = ({
     try {
       // Initialize loading animation in sidebar
       setLoading(true);
-  
+
       // Use API call to organize notes in the sidebar
       await axios.get("http://localhost:8000/auto_categorize_notes");
-  
+
       // Show success toast
       toast({
         title: "Success",
@@ -80,7 +79,7 @@ export const FolderItem: React.FC<FolderItemProps> = ({
       // as this displays the updated interface
       //window.location.reload();
       forceUpdate();
-    } 
+    }
     catch (error) {
       // Show error toast
       toast({
@@ -89,13 +88,13 @@ export const FolderItem: React.FC<FolderItemProps> = ({
         description: "Couldn't auto-categorize notes. Check logs",
       });
       console.error("Error during auto-categorization for notes:", error);
-    } 
+    }
     finally {
       // Ensure loading state is reset regardless of success or failure
-      setLoading(false); 
+      setLoading(false);
     }
   };
-  
+
 
   const handleNewNote = async (e) => {
     e.stopPropagation();
@@ -272,7 +271,6 @@ export const FolderItem: React.FC<FolderItemProps> = ({
           </Droppable>
         </div>
       )}
-      <Toaster />
     </div>
   );
 };
