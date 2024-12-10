@@ -24,6 +24,7 @@ import {
 import type { Note } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useToast } from "@/hooks/use-toast"
 import '@mdxeditor/editor/style.css';
 
 interface NoteEditorProps {
@@ -37,6 +38,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete }) => {
   const [content, setContent] = useState(note.content);
   const [editorKey, setEditorKey] = useState(0); // Key for forcing re-render of MDXEditor
   const { theme } = useTheme(); // Access the current theme
+  const { toast } = useToast() // toast notification pop-up
 
   // Debounced handler added here to fix the "slow rendering" issue
   // with the note editor interface.
@@ -47,6 +49,9 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete }) => {
   // Save note handler
   const handleSave = () => {
     onSave({ ...note, title, content });
+    toast({
+      title: "Note saved!",
+    });
   };
 
   // Keyboard save shortcut
