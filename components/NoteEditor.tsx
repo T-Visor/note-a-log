@@ -26,6 +26,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from "@/hooks/use-toast"
 import '@mdxeditor/editor/style.css';
+import { Save } from 'lucide-react'
 
 interface NoteEditorProps {
   note: Note;
@@ -95,7 +96,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete }) => {
           size="sm"
           onClick={handleSave}
         >
-          Save
+          <Save className="h-4 w-4"/>
         </Button>
       </div>
 
