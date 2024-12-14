@@ -8,7 +8,9 @@ PROMPT_TEMPLATE = """
 You are a note categorizer, help me stay organized.
 
 Based on the following title and content from a note and potential existing set of
-categories, select or generate a new category without explanation:
+categories, select or generate a new category without explanation.
+
+When selecting an existing category, output it in plaintext. Put newly generated categories in asterisks.
 
 Title: {{ title }} 
 Content: {{ content }} 

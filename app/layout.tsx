@@ -12,6 +12,18 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <style>
+          {`
+            html, body {
+              height: auto;
+              margin: 0;
+              padding: 0;
+              overflow: hidden; /* Prevent scrollbars unless needed */
+            }
+          `}
+        </style>
+      </head>
       <body>
         <Providers classname={inter.className}>{children}</Providers>
       </body>
