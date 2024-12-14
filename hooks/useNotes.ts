@@ -101,14 +101,23 @@ export const useNotes = () => {
 
   const handleSaveNote = async (updatedNote: Note) => {
     try {
+      // Find the current note to preserve its folderId
+      const currentNote = notes.find(note => note.id === updatedNote.id);
+      
+      // Create a new note object that preserves the current folderId
+      const noteToSave = {
+        ...updatedNote,
+        folderId: currentNote?.folderId ?? null
+      };
+  
       // Update the note contents via API.
-      await axios.put(`/api/notes/${updatedNote.id}`, updatedNote);
-
-      // Update local state with the updated note.
+      await axios.put(`/api/notes/${updatedNote.id}`, noteToSave);
+  
+      // Update local state with the updated note
       setNotes((existingNotes) =>
-        existingNotes.map((note) => (note.id === updatedNote.id ? updatedNote : note))
+        existingNotes.map((note) => (note.id === updatedNote.id ? noteToSave : note))
       );
-      setSelectedNote(updatedNote);
+      setSelectedNote(noteToSave);
     }
     catch (error) {
       console.error('Error saving note:', error);
