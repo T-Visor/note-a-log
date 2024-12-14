@@ -32,13 +32,30 @@ export const useNotes = () => {
   // === FOLDERS OPERATIONS ===
 
   const handleNewFolder = async (name: string) => {
+    // Check if folder with the same name already exists.
+    const existingFolder = folders.find((folder) => folder.name === name);
+    if (existingFolder) {
+      alert("Folder name must be unique.");
+      return;
+    }
+  
     // Add new folder to local list.
     const newFolder: Folder = { id: uuidv4(), name };
     setFolders((existingFolders) => [...existingFolders, newFolder]);
-
+  
     // Persist new folder using API.
-    await axios.post('/api/folders', newFolder);
-  };
+    try {
+      await axios.post('/api/folders', newFolder);
+    } catch (error) {
+      // Handle error from API if needed
+      console.error('Error saving the folder:', error);
+      // Optionally, you could remove the folder from the local state if API fails
+      setFolders((existingFolders) =>
+        existingFolders.filter((folder) => folder.id !== newFolder.id)
+      );
+      throw error; // Rethrow error if necessary
+    }
+  };  
 
   const handleDeleteFolder = async (id: string) => {
     try {
