@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import { Button } from "@/components/ui/button";
-import { Menu, X, GripVertical, ChevronLeft, PanelRightClose } from "lucide-react";
+import { Menu, X, GripVertical, PanelRightOpen, PanelRightClose } from "lucide-react";
 import type { Note, Folder as FolderType } from '@/types';
 import { SidebarHeader } from './SidebarHeader';
 import { FolderItem } from './FolderItem';
@@ -27,7 +27,7 @@ interface SidebarProps {
   onDeleteNote: (id: string) => void;
 }
 
-const MIN_SIDEBAR_WIDTH = 200;
+const MIN_SIDEBAR_WIDTH = 325;
 const MAX_SIDEBAR_WIDTH = 600;
 const COLLAPSED_WIDTH = 0;
 
@@ -52,7 +52,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
   const [newFolderName, setNewFolderName] = useState('');
   const { isLoading } = useSidebarContext();
-  const [sidebarWidth, setSidebarWidth] = useState(256);
+  const [sidebarWidth, setSidebarWidth] = useState(MIN_SIDEBAR_WIDTH);
   const [isResizing, setIsResizing] = useState(false);
   const [isDesktopCollapsed, setIsDesktopCollapsed] = useState(false);
 
@@ -152,12 +152,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
         onClick={toggleDesktopSidebar}
         variant="ghost"
         size="icon"
-        className="hidden md:flex absolute top-4 left-4 z-20"
+        className="hidden md:flex absolute top-3.5 left-4 z-20"
       >
         {isDesktopCollapsed ? (
-          <PanelRightClose className="h-4 w-4"/>
+          <PanelRightClose className="h-5 w-5"/>
         ) : (
-          <ChevronLeft className="h-4 w-4" />
+          <PanelRightOpen className="h-5 w-5"/>
         )}
       </Button>
 
