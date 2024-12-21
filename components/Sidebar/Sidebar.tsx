@@ -182,18 +182,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
             onSearch={onSearch}
           />
 
-          <DeleteAllDialogue
+          {/*<DeleteAllDialogue
             isOpen={isDeleteDialogOpen}
             setIsOpen={setIsDeleteDialogOpen}
             onConfirm={() => {
               onConfirmDeleteAll();
               setIsDeleteDialogOpen(false);
             }}
-          />
+          /> */}
 
           <hr className="border-t border-gray-300 dark:border-gray-600 mt-1 mb-4" />
 
-          <div className="space-y-2 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 40vh)' }}>
+          <div className="space-y-2 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 30vh)' }}>
             {folders.map((folder, index) => (
               <FolderItem
                 key={folder.id}
