@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import { Button } from "@/components/ui/button";
-import { Menu, X, GripVertical } from "lucide-react";
+import { Menu, X, GripVertical, ChevronLeft, PanelRightClose } from "lucide-react";
 import type { Note, Folder as FolderType } from '@/types';
 import { SidebarHeader } from './SidebarHeader';
 import { FolderItem } from './FolderItem';
@@ -29,6 +29,7 @@ interface SidebarProps {
 
 const MIN_SIDEBAR_WIDTH = 200;
 const MAX_SIDEBAR_WIDTH = 600;
+const COLLAPSED_WIDTH = 0;
 
 export const Sidebar: React.FC<SidebarProps> = ({
   folders,
@@ -51,8 +52,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
   const [newFolderName, setNewFolderName] = useState('');
   const { isLoading } = useSidebarContext();
-  const [sidebarWidth, setSidebarWidth] = useState(256); // Default width (64 * 4 = 256px)
+  const [sidebarWidth, setSidebarWidth] = useState(256);
   const [isResizing, setIsResizing] = useState(false);
+  const [isDesktopCollapsed, setIsDesktopCollapsed] = useState(false);
 
   const handleCreateFolder = () => {
     if (newFolderName.trim()) {
@@ -108,12 +110,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   }, [isResizing, resize, stopResizing]);
 
+  const toggleDesktopSidebar = () => {
+    setIsDesktopCollapsed(!isDesktopCollapsed);
+  };
+
   if (isLoading) {
     return (
       <div
         style={{ width: `${sidebarWidth}px` }}
-        className={`fixed inset-y-0 left-0 bg-gray-100 dark:bg-gray-800 overflow-hidden transition-transform duration-300 ease-in-out transform ${isVisible ? "translate-x-0" : "-translate-x-full"
-          } md:relative md:translate-x-0 z-10`}
+        className={`fixed inset-y-0 left-0 bg-gray-100 dark:bg-gray-800 overflow-hidden transition-transform duration-300 ease-in-out transform ${
+          isVisible ? "translate-x-0" : "-translate-x-full"
+        } md:relative md:translate-x-0 z-10`}
       >
         <div className="p-4 space-y-4">
           <h1 className="pt-10 flex items-center space-x-2">
@@ -130,6 +137,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
+      {/* Mobile menu button */}
       <Button
         onClick={onToggleVisibility}
         variant="ghost"
@@ -139,10 +147,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <Menu className="h-4 w-4" />
       </Button>
 
+      {/* Desktop collapse/expand button */}
+      <Button
+        onClick={toggleDesktopSidebar}
+        variant="ghost"
+        size="icon"
+        className="hidden md:flex absolute top-4 left-4 z-20"
+      >
+        {isDesktopCollapsed ? (
+          <PanelRightClose className="h-4 w-4"/>
+        ) : (
+          <ChevronLeft className="h-4 w-4" />
+        )}
+      </Button>
+
       <div
-        style={{ width: `${sidebarWidth}px` }}
-        className={`fixed inset-y-0 left-0 bg-gray-100 dark:bg-gray-800 overflow-hidden transition-transform duration-300 ease-in-out transform ${isVisible ? 'translate-x-0' : '-translate-x-full'
-          } md:relative md:translate-x-0 z-10`}
+        style={{ 
+          width: isDesktopCollapsed ? COLLAPSED_WIDTH : `${sidebarWidth}px`,
+          transition: 'width 300ms ease-in-out'
+        }}
+        className={`fixed inset-y-0 left-0 bg-gray-100 dark:bg-gray-800 overflow-hidden transform ${
+          isVisible ? 'translate-x-0' : '-translate-x-full'
+        } md:relative md:translate-x-0 z-10`}
       >
         <div className="p-4">
           <Button onClick={onToggleVisibility} variant="ghost" size="icon" className="mb-4 w-full md:hidden">
@@ -189,14 +215,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Resize Handle */}
-        <div
-          className="absolute right-0 top-0 bottom-0 w-1 cursor-ew-resize hover:bg-gray-300 dark:hover:bg-gray-600"
-          onMouseDown={startResizing}
-        >
-          <div className="absolute top-1/2 right-0 transform -translate-y-1/2">
-            <GripVertical className="w-4 h-4 text-gray-400" />
+        {!isDesktopCollapsed && (
+          <div
+            className="absolute right-0 top-0 bottom-0 w-1 cursor-ew-resize hover:bg-gray-300 dark:hover:bg-gray-600"
+            onMouseDown={startResizing}
+          >
+            <div className="absolute top-1/2 right-0 transform -translate-y-1/2">
+              <GripVertical className="w-4 h-4 text-gray-400" />
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </DragDropContext>
   );
