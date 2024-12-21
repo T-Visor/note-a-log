@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, GripVertical } from "lucide-react";
 import type { Note, Folder as FolderType } from '@/types';
 import { SidebarHeader } from './SidebarHeader';
 import { FolderItem } from './FolderItem';
@@ -24,8 +24,11 @@ interface SidebarProps {
   onConfirmDeleteAll: () => void;
   onDeleteSelected: (ids: string[]) => void;
   onMoveNote: (noteId: string, targetFolderId: string | null) => void;
-  onDeleteNote: (id: string) => void;  // Add this new prop
+  onDeleteNote: (id: string) => void;
 }
+
+const MIN_SIDEBAR_WIDTH = 200;
+const MAX_SIDEBAR_WIDTH = 600;
 
 export const Sidebar: React.FC<SidebarProps> = ({
   folders,
@@ -42,12 +45,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onConfirmDeleteAll,
   onDeleteSelected,
   onMoveNote,
-  onDeleteNote,  // Add this new prop
+  onDeleteNote,
 }) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
   const [newFolderName, setNewFolderName] = useState('');
   const { isLoading } = useSidebarContext();
+  const [sidebarWidth, setSidebarWidth] = useState(256); // Default width (64 * 4 = 256px)
+  const [isResizing, setIsResizing] = useState(false);
 
   const handleCreateFolder = () => {
     if (newFolderName.trim()) {
@@ -74,80 +79,125 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   };
 
-  return (
-    (isLoading ? (
+  const startResizing = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
+  }, []);
+
+  const stopResizing = useCallback(() => {
+    setIsResizing(false);
+  }, []);
+
+  const resize = useCallback((e: MouseEvent) => {
+    if (isResizing) {
+      const newWidth = e.clientX;
+      if (newWidth >= MIN_SIDEBAR_WIDTH && newWidth <= MAX_SIDEBAR_WIDTH) {
+        setSidebarWidth(newWidth);
+      }
+    }
+  }, [isResizing]);
+
+  useEffect(() => {
+    if (isResizing) {
+      document.addEventListener('mousemove', resize);
+      document.addEventListener('mouseup', stopResizing);
+      return () => {
+        document.removeEventListener('mousemove', resize);
+        document.removeEventListener('mouseup', stopResizing);
+      };
+    }
+  }, [isResizing, resize, stopResizing]);
+
+  if (isLoading) {
+    return (
       <div
-        className={`fixed inset-y-0 left-0 w-64 bg-gray-100 dark:bg-gray-800 overflow-hidden transition-transform duration-300 ease-in-out transform ${isVisible ? "translate-x-0" : "-translate-x-full"
+        style={{ width: `${sidebarWidth}px` }}
+        className={`fixed inset-y-0 left-0 bg-gray-100 dark:bg-gray-800 overflow-hidden transition-transform duration-300 ease-in-out transform ${isVisible ? "translate-x-0" : "-translate-x-full"
           } md:relative md:translate-x-0 z-10`}
       >
-        {/* Placeholders for loading animation. */}
         <div className="p-4 space-y-4">
           <h1 className="pt-10 flex items-center space-x-2">
             <strong>Auto-categorizing notes</strong>
             <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
           </h1>
-          <Skeleton className="h-4 w-full" /> {/* Simulates a line of text */}
-          <Skeleton className="h-4 w-5/6" />  {/* Simulates a shorter line */}
-          <Skeleton className="h-4 w-2/3" />  {/* Simulates a small line */}
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-5/6" />
+          <Skeleton className="h-4 w-2/3" />
         </div>
-      </div>) :
-      <DragDropContext onDragEnd={onDragEnd}>
-        <Button
-          onClick={onToggleVisibility}
-          variant="ghost"
-          size="icon"
-          className={`md:hidden absolute top-4 left-4 z-20 ${isVisible ? 'hidden' : ''}`}
-        >
-          <Menu className="h-4 w-4" />
-        </Button>
+      </div>
+    );
+  }
 
-        <div className={`fixed inset-y-0 left-0 w-64 bg-gray-100 dark:bg-gray-800 overflow-hidden transition-transform duration-300 ease-in-out transform ${isVisible ? 'translate-x-0' : '-translate-x-full'
-          } md:relative md:translate-x-0 z-10`}>
-          <div className="p-4">
-            <Button onClick={onToggleVisibility} variant="ghost" size="icon" className="mb-4 w-full md:hidden">
-              <X className="h-4 w-4" />
-            </Button>
+  return (
+    <DragDropContext onDragEnd={onDragEnd}>
+      <Button
+        onClick={onToggleVisibility}
+        variant="ghost"
+        size="icon"
+        className={`md:hidden absolute top-4 left-4 z-20 ${isVisible ? 'hidden' : ''}`}
+      >
+        <Menu className="h-4 w-4" />
+      </Button>
 
-            <SidebarHeader
-              newFolderName={newFolderName}
-              onNewFolderNameChange={setNewFolderName}
-              onCreateFolder={handleCreateFolder}
-              onSearch={onSearch}
-            />
+      <div
+        style={{ width: `${sidebarWidth}px` }}
+        className={`fixed inset-y-0 left-0 bg-gray-100 dark:bg-gray-800 overflow-hidden transition-transform duration-300 ease-in-out transform ${isVisible ? 'translate-x-0' : '-translate-x-full'
+          } md:relative md:translate-x-0 z-10`}
+      >
+        <div className="p-4">
+          <Button onClick={onToggleVisibility} variant="ghost" size="icon" className="mb-4 w-full md:hidden">
+            <X className="h-4 w-4" />
+          </Button>
 
-            <DeleteAllDialogue
-              isOpen={isDeleteDialogOpen}
-              setIsOpen={setIsDeleteDialogOpen}
-              onConfirm={() => {
-                onConfirmDeleteAll();
-                setIsDeleteDialogOpen(false);
-              }}
-            />
+          <SidebarHeader
+            newFolderName={newFolderName}
+            onNewFolderNameChange={setNewFolderName}
+            onCreateFolder={handleCreateFolder}
+            onSearch={onSearch}
+          />
 
-            <hr className="border-t border-gray-300 dark:border-gray-600 mt-1 mb-4" />
+          <DeleteAllDialogue
+            isOpen={isDeleteDialogOpen}
+            setIsOpen={setIsDeleteDialogOpen}
+            onConfirm={() => {
+              onConfirmDeleteAll();
+              setIsDeleteDialogOpen(false);
+            }}
+          />
 
-            <div className="space-y-2 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 40vh)' }}>
-              {folders.map((folder, index) => (
-                <FolderItem
-                  key={folder.id}
-                  folder={folder}
-                  isFirstFolder={index === 0}
-                  notes={notes.filter(note => note.folderId === folder.id)}
-                  isExpanded={expandedFolders.includes(folder.id)}
-                  selectedNoteId={selectedNoteId}
-                  selectedNoteIds={[]}
-                  onToggleExpand={toggleFolderExpansion}
-                  onSelectNote={onSelectNote}
-                  onDeleteFolder={onDeleteFolder}
-                  onRenameFolder={onRenameFolder}
-                  onNewNote={onNewNote}
-                  onDeleteNote={onDeleteNote}  // Add this new prop
-                />
-              ))}
-            </div>
+          <hr className="border-t border-gray-300 dark:border-gray-600 mt-1 mb-4" />
+
+          <div className="space-y-2 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 40vh)' }}>
+            {folders.map((folder, index) => (
+              <FolderItem
+                key={folder.id}
+                folder={folder}
+                isFirstFolder={index === 0}
+                notes={notes.filter(note => note.folderId === folder.id)}
+                isExpanded={expandedFolders.includes(folder.id)}
+                selectedNoteId={selectedNoteId}
+                selectedNoteIds={[]}
+                onToggleExpand={toggleFolderExpansion}
+                onSelectNote={onSelectNote}
+                onDeleteFolder={onDeleteFolder}
+                onRenameFolder={onRenameFolder}
+                onNewNote={onNewNote}
+                onDeleteNote={onDeleteNote}
+              />
+            ))}
           </div>
         </div>
-      </DragDropContext>
-    )
+
+        {/* Resize Handle */}
+        <div
+          className="absolute right-0 top-0 bottom-0 w-1 cursor-ew-resize hover:bg-gray-300 dark:hover:bg-gray-600"
+          onMouseDown={startResizing}
+        >
+          <div className="absolute top-1/2 right-0 transform -translate-y-1/2">
+            <GripVertical className="w-4 h-4 text-gray-400" />
+          </div>
+        </div>
+      </div>
+    </DragDropContext>
   );
 };
