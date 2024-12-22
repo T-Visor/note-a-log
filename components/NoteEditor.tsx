@@ -90,7 +90,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete }) => {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Note Title"
-          className="text-md flex-grow mr-4 dark:border-gray-600 border" /* Ensures the input takes available space */
+          className="text-md flex-grow mr-4 border-gray-300 dark:border-gray-600 border" /* Ensures the input takes available space */
         />
         <Button
           size="sm"
@@ -132,7 +132,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete }) => {
           codeMirrorPlugin(),
           tablePlugin(),
         ]}
-        className="flex-1 rounded-md border dark:border-gray-600 dark:dark-theme overflow-auto"
+        className="flex-1 rounded-md border border-gray-300 dark:border-gray-600 dark:dark-theme overflow-auto"
         contentEditableClassName="prose dark:prose-invert p-4 min-h-[300px] text-gray-900 dark:text-white"
       />
     </div>

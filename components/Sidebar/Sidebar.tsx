@@ -191,7 +191,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             }}
           /> */}
 
-          <hr className="border-t border-gray-300 dark:border-gray-600 mt-1 mb-4" />
+          <hr className="border-t border-gray-400 dark:border-gray-600 mt-1 mb-4" />
 
           <div className="space-y-2 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 30vh)' }}>
             {folders.map((folder, index) => (
