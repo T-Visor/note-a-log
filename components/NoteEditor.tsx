@@ -90,7 +90,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete }) => {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Note Title"
-          className="flex-grow mr-4 dark:border-gray-600 border" /* Ensures the input takes available space */
+          className="text-md flex-grow mr-4 dark:border-gray-600 border" /* Ensures the input takes available space */
         />
         <Button
           size="sm"
