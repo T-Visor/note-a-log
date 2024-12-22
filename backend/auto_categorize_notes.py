@@ -43,7 +43,7 @@ def main():
         response_with_category_name = ollama.generate(
                                         model=MODEL_NAME,
                                         prompt=full_prompt,
-                                        options={'temperature': 0}  
+                                        options={'temperature': 0.2}  
                                       )
         category_name = response_with_category_name['response']
 
