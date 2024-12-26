@@ -96,7 +96,7 @@ export const FolderItem: React.FC<FolderItemProps> = ({
   };
 
 
-  const handleNewNote = async (e) => {
+  const handleNewNote = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     await onNewNote(folder.id);
     setIsPopoverOpen(false);  // Close the popover
