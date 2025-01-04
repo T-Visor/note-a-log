@@ -8,7 +8,7 @@ import { useNotes } from "@/hooks/useNotes";
 import { Toaster } from "@/components/ui/toaster"
 
 // This de-structuring is necessary to effectively use the 'useSidebarContext' hook.
-export const NotesApp = () => {
+const NotesApp = () => {
   return (
     <SidebarProvider>
       <NotesAppContent />
@@ -102,3 +102,5 @@ const NotesAppContent = () => {
     </div>
   );
 }
+
+export default NotesApp;
