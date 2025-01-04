@@ -7,7 +7,8 @@ import NoteEditor from "@/components/NoteEditor";
 import { useNotes } from "@/hooks/useNotes";
 import { Toaster } from "@/components/ui/toaster"
 
-export default function NotesApp() {
+// This de-structuring is necessary to effectively use the 'useSidebarContext' hook.
+export const NotesApp = () => {
   return (
     <SidebarProvider>
       <NotesAppContent />
@@ -15,7 +16,7 @@ export default function NotesApp() {
   );
 }
 
-function NotesAppContent() {
+const NotesAppContent = () => {
   const {
     folders,
     notes,
@@ -32,7 +33,7 @@ function NotesAppContent() {
     handleMoveNote,
   } = useNotes();
 
-  const { isLoading, updateCounter } = useSidebarContext(); // Now safely within SidebarProvider
+  const { isLoading } = useSidebarContext();
   const [searchQuery, setSearchQuery] = useState('');
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
 
@@ -57,7 +58,7 @@ function NotesAppContent() {
         </div>
       );
     }
-    if (selectedNote) {
+    else if (selectedNote) {
       return (
         <NoteEditor
           note={selectedNote}
@@ -66,12 +67,13 @@ function NotesAppContent() {
         />
       );
     }
-
-    return (
-      <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400 p-4 text-center">
-        No note selected
-      </div>
-    );
+    else {
+      return (
+        <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400 p-4 text-center">
+          No note selected
+        </div>
+      );
+    }
   })();
 
   return (
