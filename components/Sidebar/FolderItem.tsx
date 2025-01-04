@@ -68,6 +68,7 @@ export const FolderItem: React.FC<FolderItemProps> = ({
 
       // Use API call to organize notes in the sidebar
       await axios.get("http://localhost:8000/auto_categorize_notes");
+      //await axios.get("http://0.0.0.0:8000/auto_categorize_notes");
 
       // Show success toast
       toast({
