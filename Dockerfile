@@ -1,23 +1,29 @@
-# Use an official Node.js runtime as a parent image
-FROM node:18
-
-# Set the working directory in the container
+# Use Node.js image for building the application
+FROM node:18 AS builder
 WORKDIR /app
-
-# Copy the package.json and package-lock.json (or yarn.lock) first to leverage Docker's cache
 COPY ./package.json ./package-lock.json ./
-
-# Install dependencies (including Shadcn or any other dependencies)
-RUN npm install
-
-# Copy the entire project to the container
+RUN npm ci
+# Rebuild better-sqlite3 to match the container's Node.js version
+RUN npm rebuild better-sqlite3
 COPY . .
-
-# Build the Next.js app
 RUN npm run build
 
-# Expose port 3000 for Next.js
-EXPOSE 3000
+# Production-ready image
+FROM node:18 AS production
+WORKDIR /app
+# Copy only the necessary files from the builder stage
+COPY --from=builder /app/package.json /app/package-lock.json ./
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
 
-# Command to start the Next.js server
+# Install production dependencies and rebuild better-sqlite3
+RUN npm ci --only=production && \
+    npm rebuild better-sqlite3
+
+# Create the data directory
+RUN mkdir -p data
+
+# Expose port 3000
+EXPOSE 3000
+# Command to start the server
 CMD ["npm", "start"]
