@@ -118,9 +118,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     return (
       <div
         style={{ width: `${sidebarWidth}px` }}
-        className={`fixed inset-y-0 left-0 bg-gray-100 dark:bg-gray-800 overflow-hidden transition-transform duration-300 ease-in-out transform ${
-          isVisible ? "translate-x-0" : "-translate-x-full"
-        } md:relative md:translate-x-0 z-10`}
+        className={`fixed inset-y-0 left-0 bg-gray-100 dark:bg-gray-800 overflow-hidden transition-transform duration-300 ease-in-out transform ${isVisible ? "translate-x-0" : "-translate-x-full"
+          } md:relative md:translate-x-0 z-10`}
       >
         <div className="p-4 space-y-4">
           <h1 className="pt-10 flex items-center space-x-2">
@@ -134,55 +133,54 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
     );
   }
+  else {
+    return (
+      <DragDropContext onDragEnd={onDragEnd}>
+        {/* Mobile menu button */}
+        <Button
+          onClick={onToggleVisibility}
+          variant="ghost"
+          size="icon"
+          className={`md:hidden absolute top-4 left-4 z-20 ${isVisible ? 'hidden' : ''}`}
+        >
+          <Menu className="h-4 w-4" />
+        </Button>
 
-  return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      {/* Mobile menu button */}
-      <Button
-        onClick={onToggleVisibility}
-        variant="ghost"
-        size="icon"
-        className={`md:hidden absolute top-4 left-4 z-20 ${isVisible ? 'hidden' : ''}`}
-      >
-        <Menu className="h-4 w-4" />
-      </Button>
+        {/* Desktop collapse/expand button */}
+        <Button
+          onClick={toggleDesktopSidebar}
+          variant="ghost"
+          size="icon"
+          className="hidden md:flex absolute top-3.5 left-4 z-20"
+        >
+          {isDesktopCollapsed ? (
+            <PanelRightClose className="h-5 w-5" />
+          ) : (
+            <PanelRightOpen className="h-5 w-5" />
+          )}
+        </Button>
 
-      {/* Desktop collapse/expand button */}
-      <Button
-        onClick={toggleDesktopSidebar}
-        variant="ghost"
-        size="icon"
-        className="hidden md:flex absolute top-3.5 left-4 z-20"
-      >
-        {isDesktopCollapsed ? (
-          <PanelRightClose className="h-5 w-5"/>
-        ) : (
-          <PanelRightOpen className="h-5 w-5"/>
-        )}
-      </Button>
+        <div
+          style={{
+            width: isDesktopCollapsed ? COLLAPSED_WIDTH : `${sidebarWidth}px`,
+            transition: 'width 300ms ease-in-out'
+          }}
+          className={`fixed inset-y-0 left-0 bg-gray-100 dark:bg-gray-800 overflow-hidden transform ${isVisible ? 'translate-x-0' : '-translate-x-full'
+            } md:relative md:translate-x-0 z-10`}
+        >
+          <div className="p-4">
+            <Button onClick={onToggleVisibility} variant="ghost" size="icon" className="mb-4 w-full md:hidden">
+              <X className="h-4 w-4" />
+            </Button>
 
-      <div
-        style={{ 
-          width: isDesktopCollapsed ? COLLAPSED_WIDTH : `${sidebarWidth}px`,
-          transition: 'width 300ms ease-in-out'
-        }}
-        className={`fixed inset-y-0 left-0 bg-gray-100 dark:bg-gray-800 overflow-hidden transform ${
-          isVisible ? 'translate-x-0' : '-translate-x-full'
-        } md:relative md:translate-x-0 z-10`}
-      >
-        <div className="p-4">
-          <Button onClick={onToggleVisibility} variant="ghost" size="icon" className="mb-4 w-full md:hidden">
-            <X className="h-4 w-4" />
-          </Button>
+            <SidebarHeader
+              newFolderName={newFolderName}
+              onNewFolderNameChange={setNewFolderName}
+              onCreateFolder={handleCreateFolder}
+              onSearch={onSearch}
+            />
 
-          <SidebarHeader
-            newFolderName={newFolderName}
-            onNewFolderNameChange={setNewFolderName}
-            onCreateFolder={handleCreateFolder}
-            onSearch={onSearch}
-          />
-
-          {/*<DeleteAllDialogue
+            {/*<DeleteAllDialogue
             isOpen={isDeleteDialogOpen}
             setIsOpen={setIsDeleteDialogOpen}
             onConfirm={() => {
@@ -191,41 +189,42 @@ export const Sidebar: React.FC<SidebarProps> = ({
             }}
           /> */}
 
-          <hr className="border-t border-gray-400 dark:border-gray-600 mt-1 mb-4" />
+            <hr className="border-t border-gray-400 dark:border-gray-600 mt-1 mb-1" />
 
-          <div className="space-y-2 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 30vh)' }}>
-            {folders.map((folder, index) => (
-              <FolderItem
-                key={folder.id}
-                folder={folder}
-                isFirstFolder={index === 0}
-                notes={notes.filter(note => note.folderId === folder.id)}
-                isExpanded={expandedFolders.includes(folder.id)}
-                selectedNoteId={selectedNoteId}
-                selectedNoteIds={[]}
-                onToggleExpand={toggleFolderExpansion}
-                onSelectNote={onSelectNote}
-                onDeleteFolder={onDeleteFolder}
-                onRenameFolder={onRenameFolder}
-                onNewNote={onNewNote}
-                onDeleteNote={onDeleteNote}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Resize Handle */}
-        {!isDesktopCollapsed && (
-          <div
-            className="absolute right-0 top-0 bottom-0 w-1 cursor-ew-resize hover:bg-gray-300 dark:hover:bg-gray-600"
-            onMouseDown={startResizing}
-          >
-            <div className="absolute top-1/2 right-0 transform -translate-y-1/2">
-              <GripVertical className="w-4 h-4 text-gray-400" />
+            <div className="space-y-1 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 30vh)' }}>
+              {folders.map((folder, index) => (
+                <FolderItem
+                  key={folder.id}
+                  folder={folder}
+                  isFirstFolder={index === 0}
+                  notes={notes.filter(note => note.folderId === folder.id)}
+                  isExpanded={expandedFolders.includes(folder.id)}
+                  selectedNoteId={selectedNoteId}
+                  selectedNoteIds={[]}
+                  onToggleExpand={toggleFolderExpansion}
+                  onSelectNote={onSelectNote}
+                  onDeleteFolder={onDeleteFolder}
+                  onRenameFolder={onRenameFolder}
+                  onNewNote={onNewNote}
+                  onDeleteNote={onDeleteNote}
+                />
+              ))}
             </div>
           </div>
-        )}
-      </div>
-    </DragDropContext>
-  );
+
+          {/* Resize Handle */}
+          {!isDesktopCollapsed && (
+            <div
+              className="absolute right-0 top-0 bottom-0 w-1 cursor-ew-resize hover:bg-gray-300 dark:hover:bg-gray-600"
+              onMouseDown={startResizing}
+            >
+              <div className="absolute top-1/2 right-0 transform -translate-y-1/2">
+                <GripVertical className="w-4 h-4 text-gray-400" />
+              </div>
+            </div>
+          )}
+        </div>
+      </DragDropContext>
+    );
+  }
 };
