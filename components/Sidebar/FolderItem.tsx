@@ -151,7 +151,7 @@ export const FolderItem: React.FC<FolderItemProps> = ({
         className={`flex items-center justify-between cursor-pointer p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded group ${isFirstFolder ? "font-bold" : ""}`}
         onClick={() => onToggleExpand(folder.id)}
       >
-        <div className="flex items-center flex-1">
+        <div className="flex items-center flex-1 overflow-hidden">
           {(() => {
             if (notes.length > 0 && isExpanded) {
               return <ChevronDown className="h-4 w-4 mr-2" />;
@@ -170,13 +170,13 @@ export const FolderItem: React.FC<FolderItemProps> = ({
               onChange={(e) => setEditingName(e.target.value)}
               onKeyDown={handleKeyDown}
               onBlur={handleRename}
-              className="h-6 py-0 px-1"
+              className="h-6 py-0 px-1 text-sm"
               autoFocus
               onClick={(e) => e.stopPropagation()}
               onFocus={(e) => e.target.select()}
             />
           ) : (
-            <span>{folder.name}</span>
+            <span className="truncate w-0 flex-1">{folder.name}</span>
           )}
         </div>
         <div
