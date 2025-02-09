@@ -1,25 +1,13 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useDebouncedCallback } from 'use-debounce';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useTheme } from "next-themes";
 import { MDXEditor } from '@mdxeditor/editor';
 import {
-  toolbarPlugin,
   headingsPlugin,
   listsPlugin,
-  quotePlugin,
   linkPlugin,
   markdownShortcutPlugin,
   frontmatterPlugin,
-  codeBlockPlugin,
-  codeMirrorPlugin,
   tablePlugin,
-  UndoRedo,
-  BoldItalicUnderlineToggles,
-  ListsToggle,
-  Separator,
-  CreateLink,
-  BlockTypeSelect,
-  CodeToggle
 } from '@mdxeditor/editor';
 import type { Note } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -37,99 +25,81 @@ interface NoteEditorProps {
 const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete }) => {
   const [title, setTitle] = useState(note.title);
   const [content, setContent] = useState(note.content);
-  const [editorKey, setEditorKey] = useState(0); // Key for forcing re-render of MDXEditor
-  const { theme } = useTheme(); // Access the current theme
-  const { toast } = useToast() // toast notification pop-up
+  const latestContentRef = useRef(note.content);
+  const [editorKey, setEditorKey] = useState(0);
+  const { theme } = useTheme();
+  const { toast } = useToast();
+  const [isSaving, setIsSaving] = useState(false);
 
-  // Debounced handler added here to fix the "slow rendering" issue
-  // with the note editor interface.
-  const handleContentChange = useDebouncedCallback((markdown) => {
+  // Handle content changes
+  const handleContentChange = useCallback((markdown: string) => {
+    latestContentRef.current = markdown;
     setContent(markdown);
-  }, 300);
+  }, []);
 
   // Save note handler
-  const handleSave = () => {
-    onSave({ ...note, title, content });
-    toast({
-      title: "Note saved!",
-    });
-  };
-
-  // Keyboard save shortcut
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (e.ctrlKey && e.key === 's') {
-      e.preventDefault();
-      handleSave();
+  const handleSave = useCallback(async () => {
+    try {
+      setIsSaving(true);
+      await onSave({ 
+        ...note, 
+        title, 
+        content: latestContentRef.current
+      });
+      toast({
+        title: "Note saved!",
+      });
+    } catch (error) {
+      toast({
+        title: "Error saving note",
+        description: "Please try again",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSaving(false);
     }
-  }, [title, content, handleSave]);
-
-  // Add keyboard event listener
-  useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleKeyDown]);
+  }, [note, title, onSave, toast]);
 
   // Update local state when note changes
   useEffect(() => {
     setTitle(note.title);
     setContent(note.content);
-    setEditorKey((prevKey) => prevKey + 1); // Force MDXEditor to re-render
+    latestContentRef.current = note.content;
+    setEditorKey((prevKey) => prevKey + 1);
   }, [note]);
 
-
   return (
-    /* The explicit check for the dark theme ensures that the 'dark-theme' class
-       is applied to enable proper theming for the MDXEditor component. */
     <div
-      className={`flex flex-col h-full w-full max-w-3xl mx-auto mt-5 md:mt-0 ${theme === "dark" ? "dark" : ""
-        }`}
+      className={`flex flex-col h-full w-full max-w-3xl mx-auto mt-5 md:mt-0 ${
+        theme === "dark" ? "dark" : ""
+      }`}
     >
-      {/* Title Input */}
       <div className="flex items-center justify-between mb-4">
         <Input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Note Title"
-          className="text-md flex-grow mr-4 border-gray-300 dark:border-gray-600 border" /* Ensures the input takes available space */
+          className="text-md flex-grow mr-4 border-gray-300 dark:border-gray-600 border"
         />
         <Button
           size="sm"
           onClick={handleSave}
+          disabled={isSaving}
         >
-          <Save className="h-4 w-4"/>
+          <Save className={`h-4 w-4 ${isSaving ? 'animate-spin' : ''}`} />
         </Button>
       </div>
 
-      {/* MDX Editor */}
       <MDXEditor
-        key={editorKey} // Force re-render on note change
+        key={editorKey}
         markdown={content}
         onChange={handleContentChange}
         plugins={[
-          toolbarPlugin({
-            toolbarContents: () => (
-              <>
-                {/* <Separator /> */}
-                <BoldItalicUnderlineToggles />
-                <Separator />
-                <BlockTypeSelect />
-                <Separator />
-                <ListsToggle />
-                {/* <Separator /> */}
-                {/* <CreateLink /> */}
-                {/* <Separator /> */}
-                {/* <CodeToggle /> */}
-              </>
-            )
-          }),
           headingsPlugin(),
           listsPlugin(),
-          quotePlugin(),
           linkPlugin(),
           markdownShortcutPlugin(),
           frontmatterPlugin(),
-          codeBlockPlugin(),
-          codeMirrorPlugin(),
           tablePlugin(),
         ]}
         className="flex-1 rounded-md border border-gray-300 dark:border-gray-600 dark:dark-theme overflow-auto"

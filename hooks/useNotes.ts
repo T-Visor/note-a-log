@@ -126,28 +126,47 @@ export const useNotes = () => {
     }
   };
 
-  const handleSaveNote = async (updatedNote: Note) => {
+  const handleSaveNote = async (updatedNote: Note): Promise<void> => {
     try {
-      // Find the current note to preserve its folderId
-      const currentNote = notes.find(note => note.id === updatedNote.id);
+      // Update notes using the previous state to avoid closure issues
+      setNotes((existingNotes) => {
+        const currentNote = existingNotes.find(note => note.id === updatedNote.id);
+        
+        if (!currentNote) {
+          throw new Error(`Note with id ${updatedNote.id} not found`);
+        }
+  
+        const noteToSave = {
+          ...updatedNote,
+          folderId: currentNote.folderId
+        };
+  
+        // Make API call
+        // Using Promise here since we're inside a state update
+        void axios.put(`/api/notes/${updatedNote.id}`, noteToSave)
+          .catch((error: Error) => {
+            // Revert the state change on API failure
+            setNotes(existingNotes);
+            setSelectedNote(currentNote);
+            throw error; // Re-throw to be caught by outer catch block
+          });
+  
+        // Update local state optimistically
+        setSelectedNote(noteToSave);
+        
+        // Return new notes array
+        return existingNotes.map((note) => 
+          note.id === updatedNote.id ? noteToSave : note
+        );
+      });
+    } catch (error) {
+      // Properly type and handle the error
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : 'An unknown error occurred while saving the note';
       
-      // Create a new note object that preserves the current folderId
-      const noteToSave = {
-        ...updatedNote,
-        folderId: currentNote?.folderId ?? null
-      };
-  
-      // Update the note contents via API.
-      await axios.put(`/api/notes/${updatedNote.id}`, noteToSave);
-  
-      // Update local state with the updated note
-      setNotes((existingNotes) =>
-        existingNotes.map((note) => (note.id === updatedNote.id ? noteToSave : note))
-      );
-      setSelectedNote(noteToSave);
-    }
-    catch (error) {
-      console.error('Error saving note:', error);
+      console.error('Error saving note:', errorMessage);
+      throw error; // Propagate error to calling component
     }
   };
 
