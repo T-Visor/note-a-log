@@ -13,5 +13,5 @@ docker build --no-cache -t my-nextjs-app .
 docker run -d --network note-a-log-network --env-file .env.docker -p 127.0.0.1:3000:3000 -p 127.0.0.1:8000:8000 -v notesAppData:/app/data --name note-a-log my-nextjs-app
 
 # Run Ollama
-docker run -d --network note-a-log-network -v ollama:/root/.ollama -p 11434:11434 --name ollama ollama/ollama
+docker run -d --network note-a-log-network -v ollama:/root/.ollama -p 127.0.0.1:11434:11434 --name ollama ollama/ollama
 docker exec ollama ollama pull llama3.1:8b-instruct-q3_K_S
