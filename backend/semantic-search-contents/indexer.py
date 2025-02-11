@@ -9,6 +9,11 @@ from haystack_integrations.components.embedders.fastembed import (
     FastembedSparseTextEmbedder,
     FastembedSparseDocumentEmbedder
 )
+from config import (
+    QDRANT_CONFIG,
+    FASTEMBED_DENSE_MODEL,
+    FASTEMBED_SPARSE_MODEL
+)
 
 class Indexer:
     def __init__(self, embedding_dim: int = 384, 
@@ -21,16 +26,11 @@ class Indexer:
         :param recreate_index: Whether to recreate the index.
         :param use_sparse_embeddings: Whether to use sparse embeddings.
         """
-        self.document_store = QdrantDocumentStore(
-            ':memory:',
-            recreate_index=recreate_index,
-            use_sparse_embeddings=use_sparse_embeddings,
-            embedding_dim=embedding_dim
-        )
+        self.document_store = QdrantDocumentStore(**QDRANT_CONFIG)
 
         self.pipeline = Pipeline()
-        self.pipeline.add_component('sparse_doc_embedder', FastembedSparseDocumentEmbedder(model='prithvida/Splade_PP_en_v1'))
-        self.pipeline.add_component('dense_doc_embedder', FastembedDocumentEmbedder(model='BAAI/bge-small-en-v1.5'))
+        self.pipeline.add_component('sparse_doc_embedder', FastembedSparseDocumentEmbedder(model=FASTEMBED_SPARSE_MODEL))
+        self.pipeline.add_component('dense_doc_embedder', FastembedDocumentEmbedder(model=FASTEMBED_DENSE_MODEL))
         self.pipeline.add_component('writer', DocumentWriter(document_store=self.document_store, policy=DuplicatePolicy.OVERWRITE))
 
         self.pipeline.connect('sparse_doc_embedder', 'dense_doc_embedder')

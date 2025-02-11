@@ -5,6 +5,11 @@ from haystack_integrations.components.embedders.fastembed import (
     FastembedTextEmbedder,
     FastembedSparseTextEmbedder
 )
+from config import (
+    QDRANT_CONFIG,
+    FASTEMBED_DENSE_MODEL,
+    FASTEMBED_SPARSE_MODEL
+)
 
 class Retriever:
     def __init__(self, document_store: QdrantDocumentStore):
@@ -17,9 +22,9 @@ class Retriever:
         self.pipeline = Pipeline()
 
         # Adding embedding components
-        self.pipeline.add_component('sparse_text_embedder', FastembedSparseTextEmbedder(model='prithvida/Splade_PP_en_v1'))
+        self.pipeline.add_component('sparse_text_embedder', FastembedSparseTextEmbedder(model=FASTEMBED_SPARSE_MODEL))
         self.pipeline.add_component('dense_text_embedder', FastembedTextEmbedder(
-            model='BAAI/bge-small-en-v1.5',
+            model=FASTEMBED_DENSE_MODEL,
             prefix='Identify the passage most semantically similar to: ')
         )
 
@@ -52,7 +57,7 @@ if __name__ == '__main__':
     from haystack_integrations.document_stores.qdrant import QdrantDocumentStore
     
     # Initialize document store (should be shared with the indexing pipeline)
-    document_store = QdrantDocumentStore(':memory:', recreate_index=False, use_sparse_embeddings=True, embedding_dim=384)
+    document_store = QdrantDocumentStore(**QDRANT_CONFIG)
 
     retriever = Retriever(document_store)
 
