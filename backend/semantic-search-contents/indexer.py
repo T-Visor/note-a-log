@@ -1,12 +1,9 @@
 from haystack import Document, Pipeline
 from haystack.components.writers import DocumentWriter
-from haystack_integrations.components.retrievers.qdrant import QdrantHybridRetriever
 from haystack_integrations.document_stores.qdrant import QdrantDocumentStore
 from haystack.document_stores.types import DuplicatePolicy
 from haystack_integrations.components.embedders.fastembed import (
-    FastembedTextEmbedder,
     FastembedDocumentEmbedder,
-    FastembedSparseTextEmbedder,
     FastembedSparseDocumentEmbedder
 )
 from config import (
