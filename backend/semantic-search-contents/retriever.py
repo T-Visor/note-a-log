@@ -58,7 +58,9 @@ class Retriever:
 if __name__ == "__main__":
     retriever = Retriever()
 
-    query_text = "Who supports fastembed?"
+    #query_text = "On 15,000 mile interval: oil change, tire rotation, check engine filter, lubricate hinges, change drain plug washer"
+    query_text = "Lumenative is going to take off one day!"
+
     retrieved_docs = retriever.query(query_text)
 
     print(f"Query: {query_text}")

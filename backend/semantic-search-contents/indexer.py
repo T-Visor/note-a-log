@@ -47,10 +47,30 @@ if __name__ == '__main__':
     indexer = Indexer()
 
     documents = [
-        Document(content='My name is Wolfgang and I live in Berlin'),
-        Document(content='I saw a black horse running'),
-        Document(content='Germany has many big cities'),
-        Document(content='fastembed is supported by and maintained by Qdrant.'),
+        Document(content="""Get the following items:
+                            5w-30 oil
+                            Wix 57002 oil filter
+                            Manual transmission fluid 75w80 (GL-4)
+                            Oil filter wrench
+                            fluid film with gas mask
+                            impact gun
+                            CAC ID
+                         """),
+        Document(content='Name: Lumenative (towards a bright future of innovation). Product name: Note-a-log (Amanuensis)'),
+        Document(content="""Pasta
+Ribs
+Chicken and veggies
+Fried chicken
+"""),
+        Document(content="""Strawberries (5)
+Cake mix (2 cups)
+whipped cream (make sure dairy-free)
+"""),
+        Document(content="""Considering buying cake mix with gluten-free mixture. I am interested in getting the confetti variant.
+"""),
+        Document(content="""Follow-up with Hampton Inn for 1 night refund which was promised
+Follow-up with Chipotle regarding messed-up order.
+"""),
     ]
 
     indexer.index_documents(documents)
