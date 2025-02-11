@@ -1,9 +1,20 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Card } from '@/components/ui/card';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useTheme } from "next-themes";
+import { MDXEditor } from '@mdxeditor/editor';
+import {
+  headingsPlugin,
+  listsPlugin,
+  linkPlugin,
+  markdownShortcutPlugin,
+  frontmatterPlugin,
+  tablePlugin,
+} from '@mdxeditor/editor';
+import type { Note } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Trash2, Eye, Code } from 'lucide-react';
-import type { Note } from '@/types';
+import { useToast } from "@/hooks/use-toast"
+import '@mdxeditor/editor/style.css';
+import { Save } from 'lucide-react'
 
 interface NoteEditorProps {
   note: Note;
@@ -14,116 +25,86 @@ interface NoteEditorProps {
 const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete }) => {
   const [title, setTitle] = useState(note.title);
   const [content, setContent] = useState(note.content);
-  const [isPreview, setIsPreview] = useState(false);
+  const latestContentRef = useRef(note.content);
+  const [editorKey, setEditorKey] = useState(0);
+  const { theme } = useTheme();
+  const { toast } = useToast();
+  const [isSaving, setIsSaving] = useState(false);
 
+  // Handle content changes
+  const handleContentChange = useCallback((markdown: string) => {
+    latestContentRef.current = markdown;
+    setContent(markdown);
+  }, []);
+
+  // Save note handler
+  const handleSave = useCallback(async () => {
+    try {
+      setIsSaving(true);
+      await onSave({ 
+        ...note, 
+        title, 
+        content: latestContentRef.current
+      });
+      toast({
+        title: "Note saved!",
+      });
+    } catch (error) {
+      toast({
+        title: "Error saving note",
+        description: "Please try again",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  }, [note, title, onSave, toast]);
+
+  // Update local state when note changes
   useEffect(() => {
     setTitle(note.title);
     setContent(note.content);
+    latestContentRef.current = note.content;
+    setEditorKey((prevKey) => prevKey + 1);
   }, [note]);
 
-  const handleSave = () => {
-    onSave({ ...note, title, content });
-  };
-
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (e.ctrlKey && e.key === 's') {
-      e.preventDefault();
-      handleSave();
-    }
-  }, [title, content]);
-
-  useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleKeyDown]);
-
-  const renderMarkdown = (text: string): string => {
-    // Convert basic markdown to HTML
-    return text
-      .split('\n')
-      .map((line) => {
-        // Headers
-        if (line.startsWith('# ')) {
-          return `<h1 class="text-2xl font-bold my-2">${line.slice(2)}</h1>`;
-        }
-        if (line.startsWith('## ')) {
-          return `<h2 class="text-xl font-bold my-2">${line.slice(3)}</h2>`;
-        }
-        // Bold
-        line = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-        // Italic
-        line = line.replace(/\*(.*?)\*/g, '<em>$1</em>');
-        // Links
-        line = line.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" class="text-blue-500 hover:underline">$1</a>');
-        // Lists
-        if (line.startsWith('- ')) {
-          return `<li class="ml-4"> ${line.slice(2)}</li>`;
-        }
-        return line ? `<p class="my-1">${line}</p>` : '<br/>';
-      })
-      .join('');
-  };
-
   return (
-    <div className="flex flex-col h-full w-full max-w-3xl mx-auto mt-5 md:mt-0">
-      <Card className="p-4">
-        <div className="flex flex-row justify-between items-center mb-4 w-full">
-          <div className="flex-grow mr-2">
-            <Input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Note title"
-              className="w-full"
-            />
-          </div>
-          <div className="flex-shrink-0">
-            <Button variant="outline" size="icon" onClick={() => onDelete(note.id)}>
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+    <div
+      className={`flex flex-col h-full w-full max-w-3xl mx-auto mt-5 md:mt-0 ${
+        theme === "dark" ? "dark" : ""
+      }`}
+    >
+      <div className="flex items-center justify-between mb-4">
+        <Input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Note Title"
+          className="text-md flex-grow mr-4 border-gray-300 dark:border-gray-600 border"
+        />
+        <Button
+          size="sm"
+          onClick={handleSave}
+          disabled={isSaving}
+        >
+          <Save className={`h-4 w-4 ${isSaving ? 'animate-spin' : ''}`} />
+        </Button>
+      </div>
 
-        <div className="flex gap-2 mb-2">
-          <Button
-            variant={!isPreview ? "default" : "outline"}
-            size="sm"
-            onClick={() => setIsPreview(false)}
-          >
-            <Code className="h-4 w-4 mr-2" />
-            Edit
-          </Button>
-          <Button
-            variant={isPreview ? "default" : "outline"}
-            size="sm"
-            onClick={() => setIsPreview(true)}
-          >
-            <Eye className="h-4 w-4 mr-2" />
-            Preview
-          </Button>
-        </div>
-
-        {isPreview ? (
-          <div
-            className="min-h-[55vh] p-4 border rounded-md bg-background break-words"
-            style={{ whiteSpace: "normal", wordWrap: "break-word" }}
-            dangerouslySetInnerHTML={{ __html: renderMarkdown(content) }}
-          />
-        ) : (
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="w-full min-h-[55vh] p-4 border rounded-md bg-background resize-none focus:outline-none focus:ring-2 focus:ring-ring"
-            placeholder="Write your markdown here..."
-          />
-        )}
-
-        <div className="flex justify-between items-center mt-4 w-full">
-          <Button onClick={handleSave}>Save</Button>
-          {/*<div className="text-sm text-muted-foreground">
-            {content.split(' ').filter(Boolean).length} words
-          </div> */}
-        </div>
-      </Card>
+      <MDXEditor
+        key={editorKey}
+        markdown={content}
+        onChange={handleContentChange}
+        plugins={[
+          headingsPlugin(),
+          listsPlugin(),
+          linkPlugin(),
+          markdownShortcutPlugin(),
+          frontmatterPlugin(),
+          tablePlugin(),
+        ]}
+        className="flex-1 rounded-md border border-gray-300 dark:border-gray-600 dark:dark-theme overflow-auto"
+        contentEditableClassName="prose dark:prose-invert p-4 min-h-[300px] text-gray-900 dark:text-white"
+      />
     </div>
   );
 };

@@ -2,17 +2,19 @@ DATABASE_PATH = '../data/notesApp.db'
 DATABASE_TABLE_WITH_NOTES = 'notes'
 DATABASE_TABLE_WITH_FOLDERS = 'folders' 
 
-MODEL_NAME = 'llama3.1:8b'
+MODEL_NAME = 'llama3.1:8b-instruct-q3_K_S'
 
 PROMPT_TEMPLATE = """
-You are a note categorizor.
+You are a note categorizer. Help me organize my notes by selecting a category based on the title and content.
 
-Based on the following title and content from a note and potential existing set of
-categories, suggest a concise category name for the note without explanation:
+Use these guidelines:
 
-Title: {{ title }} 
-Content: {{ content }} 
-Existing Categories: [{{ categories | join(', ') }}] 
+Choose an existing category from the list if it fits.
+If none of the existing categories fit, generate a new one. Make sure the new category is brief and clear.
+Provide only the category name — no explanation.
+Title: {{ title }}
+Content: {{ content }}
+Existing Categories: [{{ categories | join(', ') }}]
 
-Suggested Category Name:
+Category:
 """

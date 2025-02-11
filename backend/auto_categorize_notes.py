@@ -1,4 +1,7 @@
 import ollama
+import os
+from ollama import Client
+from dotenv import load_dotenv
 from config import (
     DATABASE_TABLE_WITH_NOTES,
     DATABASE_TABLE_WITH_FOLDERS,
@@ -10,9 +13,15 @@ from prompt_builder import PromptBuilder
 
 
 def main():
+    # Set value for Ollama API base URL 
+    load_dotenv()
+    ollama_client = Client(
+        host=os.getenv('OLLAMA_BASE_URL', 'http://localhost:11434')
+    )
+
     # Initialize prompt builder
     prompt_builder = PromptBuilder(PROMPT_TEMPLATE)
-    
+
     # Fetch all notes
     notes_data = fetch_table_data_as_dictionary(DATABASE_TABLE_WITH_NOTES)
 
@@ -40,10 +49,10 @@ def main():
         full_prompt = prompt_builder.render(**context)
 
         # Prompt the LLM for a category name for the current note.
-        response_with_category_name = ollama.generate(
+        response_with_category_name = ollama_client.generate(
                                         model=MODEL_NAME,
                                         prompt=full_prompt,
-                                        options={'temperature': 0}  
+                                        options={'temperature': 0.2}  
                                       )
         category_name = response_with_category_name['response']
 

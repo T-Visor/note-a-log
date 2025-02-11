@@ -1,15 +1,22 @@
 import React, { useState } from 'react';
+import { Note } from '@/types'
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Trash2, Eye, Code } from 'lucide-react';
 
-const SimpleMarkdownEditor = ({ note, onSave, onDelete }) => {
+interface SimpleMarkdownEditorProps {
+  note: Note;
+  onSave: (note: Note) => void;
+  onDelete: (id: string) => void;
+}
+
+export const SimpleMarkdownEditor: React.FC<SimpleMarkdownEditorProps> = ({ note, onSave, onDelete }) => {
   const [title, setTitle] = useState(note.title);
   const [content, setContent] = useState(note.content);
   const [isPreview, setIsPreview] = useState(false);
 
-  const renderMarkdown = (text) => {
+  const renderMarkdown = (text: string) => {
     // Convert basic markdown to HTML
     return text
       .split('\n')
@@ -96,5 +103,3 @@ const SimpleMarkdownEditor = ({ note, onSave, onDelete }) => {
     </Card>
   );
 };
-
-export default SimpleMarkdownEditor;

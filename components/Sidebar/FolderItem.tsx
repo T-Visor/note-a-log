@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Toaster } from "@/components/ui/toaster"
 import { useToast } from "@/hooks/use-toast"
 import {
   Folder,
@@ -56,7 +55,7 @@ export const FolderItem: React.FC<FolderItemProps> = ({
   const [editingName, setEditingName] = useState(folder.name);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const { toast } = useToast() // toast notification pop-up
-  const { setLoading } = useSidebarContext();
+  const { setLoading, forceUpdate } = useSidebarContext();
   setLoading(false);
 
   // Button click triggers a job to run for an LLM
@@ -66,10 +65,11 @@ export const FolderItem: React.FC<FolderItemProps> = ({
     try {
       // Initialize loading animation in sidebar
       setLoading(true);
-  
+
       // Use API call to organize notes in the sidebar
       await axios.get("http://localhost:8000/auto_categorize_notes");
-  
+      //await axios.get("http://0.0.0.0:8000/auto_categorize_notes");
+
       // Show success toast
       toast({
         title: "Success",
@@ -78,8 +78,9 @@ export const FolderItem: React.FC<FolderItemProps> = ({
 
       // Refresh the page after the categorization process is complete
       // as this displays the updated interface
-      window.location.reload();
-    } 
+      //window.location.reload();
+      forceUpdate();
+    }
     catch (error) {
       // Show error toast
       toast({
@@ -88,15 +89,15 @@ export const FolderItem: React.FC<FolderItemProps> = ({
         description: "Couldn't auto-categorize notes. Check logs",
       });
       console.error("Error during auto-categorization for notes:", error);
-    } 
+    }
     finally {
       // Ensure loading state is reset regardless of success or failure
-      setLoading(false); 
+      setLoading(false);
     }
   };
-  
 
-  const handleNewNote = async (e) => {
+
+  const handleNewNote = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     await onNewNote(folder.id);
     setIsPopoverOpen(false);  // Close the popover
@@ -138,19 +139,19 @@ export const FolderItem: React.FC<FolderItemProps> = ({
   Handles the case where a user deletes the last note in a folder.
   This will automatically close the folder once it becomes empty.
   */
-  /*useEffect(() => {
+  useEffect(() => {
     if (notes.length === 0 && isExpanded) {
       onToggleExpand(folder.id);
     }
-  }, [notes.length, isExpanded, folder.id]);*/
+  }, [notes.length]);
 
   return (
-    <div className="mb-2">
+    <div className="mb-1">
       <div
-        className={`flex items-center justify-between cursor-pointer p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded group ${isFirstFolder ? "font-bold" : ""}`}
+        className={`flex items-center justify-between cursor-pointer p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded group ${isFirstFolder ? "font-bold" : ""}`}
         onClick={() => onToggleExpand(folder.id)}
       >
-        <div className="flex items-center flex-1">
+        <div className="flex items-center flex-1 overflow-hidden">
           {(() => {
             if (notes.length > 0 && isExpanded) {
               return <ChevronDown className="h-4 w-4 mr-2" />;
@@ -169,13 +170,13 @@ export const FolderItem: React.FC<FolderItemProps> = ({
               onChange={(e) => setEditingName(e.target.value)}
               onKeyDown={handleKeyDown}
               onBlur={handleRename}
-              className="h-6 py-0 px-1"
+              className="h-6 py-0 px-1 text-sm dark:focus:ring-0 border-gray-300 focus:ring-0 dark:border-gray-600"
               autoFocus
               onClick={(e) => e.stopPropagation()}
               onFocus={(e) => e.target.select()}
             />
           ) : (
-            <span>{folder.name}</span>
+            <span className="truncate w-0 flex-1">{folder.name}</span>
           )}
         </div>
         <div
@@ -271,7 +272,6 @@ export const FolderItem: React.FC<FolderItemProps> = ({
           </Droppable>
         </div>
       )}
-      <Toaster />
     </div>
   );
 };

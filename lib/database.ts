@@ -20,12 +20,17 @@ databaseConnection.prepare(`
     )
   `).run();
 
-// Insert 'default' folder if it doesn't already exist
-const existingDefaultFolder = databaseConnection.prepare(`
-    SELECT COUNT(*) AS count FROM folders WHERE id = 'unassigned'
-  `).get();
+// Define the result type explicitly
+interface FolderCount {
+  count: number;
+}
 
-if (existingDefaultFolder.count === 0) {
+// Insert 'default' folder if it doesn't already exist
+const defaultFolderCount = databaseConnection.prepare(`
+    SELECT COUNT(*) AS count FROM folders WHERE id = 'unassigned'
+  `).get() as FolderCount; // Type assertion here
+
+if (defaultFolderCount.count === 0) {
   databaseConnection.prepare(`
       INSERT INTO folders (id, name) VALUES ('unassigned', 'Default')
     `).run();

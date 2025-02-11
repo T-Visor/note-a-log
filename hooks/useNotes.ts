@@ -1,58 +1,78 @@
-import { useState, useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { Note, Folder } from '@/types';
-import axios from 'axios'
+import axios from "axios"
+import { useState, useEffect } from "react";
+import { v4 as uuidv4 } from "uuid";
+import { Note, Folder } from "@/types";
+import { useSidebarContext } from "@/components/Sidebar/SidebarContext";
 
 export const useNotes = () => {
   const [folders, setFolders] = useState<Folder[]>([]);
   const [notes, setNotes] = useState<Note[]>([]);
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+  const { updateCounter } = useSidebarContext();
 
-  // Load folders/notes during start-up.
+  // Load folders/notes during start-up
   useEffect(() => {
     async function fetchData() {
-      // Fetch saved folders from API.
+      // Fetch saved folders from API
       const responseWithFolders = await axios.get('api/folders');
       const foldersData = responseWithFolders.data;
       setFolders(foldersData);
 
-      // Fetch saved notes from API.
+      // Fetch saved notes from API
       const responseWithNotes = await axios.get('api/notes');
-      const notesData = responseWithNotes.data.map(note => ({
+      const notesData = responseWithNotes.data.map((note: Note) => ({
         ...note,
         folderId: note.folderId ?? null, // Ensure `null` for `undefined` or missing `folderId`
       }));      
-      console.log(notesData);
       setNotes(notesData);
     }
     fetchData();
-  }, []);
+  }, [updateCounter]);
 
   // === FOLDERS OPERATIONS ===
 
   const handleNewFolder = async (name: string) => {
-    // Add new folder to local list.
+    // Ensure the folder name is unique
+    const existingFolder = folders.find((folder) => folder.name === name);
+    if (existingFolder) {
+      alert("Folder name must be unique.");
+      return;
+    }
+  
+    // Create a new folder with a unique ID
     const newFolder: Folder = { id: uuidv4(), name };
+  
+    // Update local state with the new folder
     setFolders((existingFolders) => [...existingFolders, newFolder]);
-
-    // Persist new folder using API.
-    await axios.post('/api/folders', newFolder);
+  
+    try {
+      // Persist the new folder to the backend
+      await axios.post('/api/folders', newFolder);
+    } 
+    catch (error) {
+      // Log error and revert state if API fails
+      console.error('Error saving the folder:', error);
+      setFolders((existingFolders) =>
+        existingFolders.filter((folder) => folder.id !== newFolder.id)
+      );
+      throw error;
+    }
   };
 
   const handleDeleteFolder = async (id: string) => {
     try {
-      // Get notes associated with the folder to delete them.
+      // Get notes associated with the folder to delete them
       const associatedNotes = notes.filter((note) => note.folderId === id);
 
-      // Delete each associated note using handleDeleteNote.
+      // Delete each associated note using the hook 'handleDeleteNote'
       for (const note of associatedNotes) {
         await handleDeleteNote(note.id);
       }
 
-      // Send DELETE request to delete the folder via the API.
+      // Send DELETE request to delete the folder via the API
       await axios.delete(`/api/folders/${id}`);
 
-      // Remove the folder referenced by the ID from local folder list after successful deletion.
+      // Remove the folder referenced by the ID from local folder list after successful deletion
       setFolders((existingFolders) =>
         existingFolders.filter((folder) => folder.id !== id)
       );
@@ -63,25 +83,26 @@ export const useNotes = () => {
   };
 
   const handleRenameFolder = async (id: string, newName: string) => {
-    // Validate inputs
+    // Ensure non-empty folder name
     if (!newName.trim()) {
       console.warn('Folder name cannot be empty');
       return;
     }
 
     try {
-      // Send update request to database.
+      // Persist updated folder name to the backend
       await axios.put(`/api/folders/${id}`, {
         name: newName.trim(),
       });
 
-      // Update name to local folder after successful update.
+      // Update local state with new folder name
       setFolders((prevFolders) =>
         prevFolders.map((folder) =>
           folder.id === id ? { ...folder, name: newName.trim() } : folder
         )
       );
-    } catch (error) {
+    } 
+    catch (error) {
       console.error(error);
     }
   };
@@ -89,28 +110,63 @@ export const useNotes = () => {
   // === NOTES OPERATIONS ===
 
   const handleNewNote = async (folderId: string | null = null) => {
-    // Add new note to local list.
+    // Create new empty note
     const newNote: Note = { id: uuidv4(), title: '', content: '', folderId };
-    setNotes((existingNotes) => [...existingNotes, newNote]);
-    setSelectedNote(newNote);
 
-    // Persist new (empty) note using API.
-    await axios.post('api/notes', newNote);
-  };
-
-  const handleSaveNote = async (updatedNote: Note) => {
     try {
-      // Update the note contents via API.
-      await axios.put(`/api/notes/${updatedNote.id}`, updatedNote);
+      // Persist new (empty) note to the backend
+      await axios.post('api/notes', newNote);
 
-      // Update local state with the updated note.
-      setNotes((existingNotes) =>
-        existingNotes.map((note) => (note.id === updatedNote.id ? updatedNote : note))
-      );
-      setSelectedNote(updatedNote);
+      // Update local state with new note
+      setNotes((existingNotes) => [...existingNotes, newNote]);
+      setSelectedNote(newNote);
     }
     catch (error) {
-      console.error('Error saving note:', error);
+      console.error(error);
+    }
+  };
+
+  const handleSaveNote = async (updatedNote: Note): Promise<void> => {
+    try {
+      // Update notes using the previous state to avoid closure issues
+      setNotes((existingNotes) => {
+        const currentNote = existingNotes.find(note => note.id === updatedNote.id);
+        
+        if (!currentNote) {
+          throw new Error(`Note with id ${updatedNote.id} not found`);
+        }
+  
+        const noteToSave = {
+          ...updatedNote,
+          folderId: currentNote.folderId
+        };
+  
+        // Make API call
+        // Using Promise here since we're inside a state update
+        void axios.put(`/api/notes/${updatedNote.id}`, noteToSave)
+          .catch((error: Error) => {
+            // Revert the state change on API failure
+            setNotes(existingNotes);
+            setSelectedNote(currentNote);
+            throw error; // Re-throw to be caught by outer catch block
+          });
+  
+        // Update local state optimistically
+        setSelectedNote(noteToSave);
+        
+        // Return new notes array
+        return existingNotes.map((note) => 
+          note.id === updatedNote.id ? noteToSave : note
+        );
+      });
+    } catch (error) {
+      // Properly type and handle the error
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : 'An unknown error occurred while saving the note';
+      
+      console.error('Error saving note:', errorMessage);
+      throw error; // Propagate error to calling component
     }
   };
 
@@ -157,7 +213,6 @@ export const useNotes = () => {
   };
 
   const handleMoveNote = async (noteId: string, targetFolderId: string | null) => {
-
     // Get the note associated with noteId.
     const noteBeingMoved = notes.find((note) => note.id === noteId);
 

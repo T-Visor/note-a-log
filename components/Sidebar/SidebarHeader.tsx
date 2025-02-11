@@ -42,7 +42,7 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
             }
           }}
           placeholder="New folder name"
-          className="mr-2"
+          className="mr-2 border-gray-300 dark:border-gray-600"
         />
         <Button onClick={onCreateFolder}>
           <Folder className="h-4 w-4" />
