@@ -1,5 +1,6 @@
 QDRANT_CONFIG = {
-    'path': ':memory:',  # Use in-memory storage (change to a file path for persistence)
+    'url': 'http://localhost:6333',
+    'index': 'Test',
     'recreate_index': False,  # Prevent overwriting existing data
     'use_sparse_embeddings': True,  # Enable sparse embeddings
     'embedding_dim': 384  # Set embedding dimension
