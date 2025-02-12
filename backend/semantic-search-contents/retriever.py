@@ -65,5 +65,5 @@ if __name__ == "__main__":
 
     print(f"Query: {query_text}")
     for doc in retrieved_docs:
-        print(f"Retrieved Document: {doc.content}, Score: {doc.score}")
+        print(f"Retrieved Document: {doc.meta}, Score: {doc.score}")
 
