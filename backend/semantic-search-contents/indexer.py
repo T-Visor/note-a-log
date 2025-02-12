@@ -54,20 +54,22 @@ if __name__ == '__main__':
                             Oil filter wrench
                             fluid film with gas mask
                             impact gun
-                            CAC ID
-                         """),
-        Document(content='Name: Lumenative (towards a bright future of innovation). Product name: Note-a-log (Amanuensis)'),
+                            CAC ID""",
+                meta={'folder': 'Automotive Maintenance'}),
+        Document(content='Name: Lumenative (towards a bright future of innovation). Product name: Note-a-log (Amanuensis)',
+                meta={'folder': 'Business Ideas'}),
         Document(content="""Pasta
 Ribs
 Chicken and veggies
 Fried chicken
-"""),
+""", meta={'folder': 'Meal Prepping'}),
         Document(content="""Strawberries (5)
 Cake mix (2 cups)
 whipped cream (make sure dairy-free)
-"""),
+""", meta={'folder': 'Meal Prepping'}),
         Document(content="""Considering buying cake mix with gluten-free mixture. I am interested in getting the confetti variant.
-"""),
+""",
+meta={'folder': 'Meal Prepping'}),
         Document(content="""Follow-up with Hampton Inn for 1 night refund which was promised
 Follow-up with Chipotle regarding messed-up order.
 """),

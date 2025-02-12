@@ -59,7 +59,7 @@ if __name__ == "__main__":
     retriever = Retriever()
 
     #query_text = "On 15,000 mile interval: oil change, tire rotation, check engine filter, lubricate hinges, change drain plug washer"
-    query_text = "Lumenative is going to take off one day!"
+    query_text = "Trip to Europe, make sure to pack socks and get a plane ticket"
 
     retrieved_docs = retriever.query(query_text)
 
