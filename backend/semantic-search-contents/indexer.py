@@ -26,8 +26,8 @@ class Indexer:
         self.document_store = QdrantDocumentStore(**QDRANT_CONFIG)
 
         self.pipeline = Pipeline()
-        self.pipeline.add_component('sparse_doc_embedder', FastembedSparseDocumentEmbedder(model=FASTEMBED_SPARSE_MODEL))
-        self.pipeline.add_component('dense_doc_embedder', FastembedDocumentEmbedder(model=FASTEMBED_DENSE_MODEL))
+        self.pipeline.add_component('sparse_doc_embedder', FastembedSparseDocumentEmbedder(model=FASTEMBED_SPARSE_MODEL, meta_fields_to_embed=['folder']))
+        self.pipeline.add_component('dense_doc_embedder', FastembedDocumentEmbedder(model=FASTEMBED_DENSE_MODEL, meta_fields_to_embed=['folder']))
         self.pipeline.add_component('writer', DocumentWriter(document_store=self.document_store, policy=DuplicatePolicy.OVERWRITE))
 
         self.pipeline.connect('sparse_doc_embedder', 'dense_doc_embedder')
@@ -72,8 +72,7 @@ whipped cream (make sure dairy-free)
 meta={'folder': 'Meal Prepping'}),
         Document(content="""Follow-up with Hampton Inn for 1 night refund which was promised
 Follow-up with Chipotle regarding messed-up order.
-"""),
-    ]
+                 """, meta={'folder': 'Customer service issues'})]
 
     indexer.index_documents(documents)
 
