@@ -3,10 +3,10 @@ QDRANT_CONFIG = {
     'index': 'Test',
     'recreate_index': False,  # Prevent overwriting existing data
     'use_sparse_embeddings': True,  # Enable sparse embeddings
-    'embedding_dim': 384  # Set embedding dimension
+    'embedding_dim': 768  # Set embedding dimension
 }
 
 FASTEMBED_SPARSE_MODEL = 'prithvida/Splade_PP_en_v1'
-FASTEMBED_DENSE_MODEL = 'BAAI/bge-small-en-v1.5'
+FASTEMBED_DENSE_MODEL = 'BAAI/bge-base-en-v1.5'
 FASTEMBED_CACHE_DIRECTORY = './models'
 METADATA_FIELDS_TO_EMBED = ['folder']
