@@ -8,7 +8,8 @@ from haystack_integrations.components.embedders.fastembed import (
 from config import (
     QDRANT_CONFIG,
     FASTEMBED_DENSE_MODEL,
-    FASTEMBED_SPARSE_MODEL
+    FASTEMBED_SPARSE_MODEL,
+    FASTEMBED_CACHE_DIRECTORY
 )
 
 class Retriever:
@@ -23,9 +24,10 @@ class Retriever:
         self.pipeline = Pipeline()
 
         # Adding embedding components
-        self.pipeline.add_component("sparse_text_embedder", FastembedSparseTextEmbedder(model=FASTEMBED_SPARSE_MODEL))
+        self.pipeline.add_component("sparse_text_embedder", FastembedSparseTextEmbedder(model=FASTEMBED_SPARSE_MODEL, cache_dir=FASTEMBED_CACHE_DIRECTORY))
         self.pipeline.add_component("dense_text_embedder", FastembedTextEmbedder(
             model=FASTEMBED_DENSE_MODEL,
+            cache_dir=FASTEMBED_CACHE_DIRECTORY,
             prefix="Identify the passage most semantically similar to: ")
         )
 
