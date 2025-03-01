@@ -14,10 +14,14 @@ from config import (
         METADATA_FIELDS_TO_EMBED
         )
 
+PIPELINE = {
+    "SPARSE_EMBEDDER": "sparse_document_embedder",
+    "DENSE_EMBEDDER": "dense_document_embedder",
+    "DOCUMENT_WRITER": "document_writer"
+}
+
 class Indexer:
-    def __init__(self, embedding_dim: int = 768, 
-                 recreate_index: bool = False, 
-                 use_sparse_embeddings: bool = True):
+    def __init__(self):
         """
         Initializes the Qdrant-based document indexing pipeline.
 
@@ -28,20 +32,20 @@ class Indexer:
         self.document_store = QdrantDocumentStore(**QDRANT_CONFIG)
 
         self.pipeline = Pipeline()
-        self.pipeline.add_component('sparse_doc_embedder', 
+        self.pipeline.add_component(PIPELINE['SPARSE_EMBEDDER'], 
                                     FastembedSparseDocumentEmbedder(model=FASTEMBED_SPARSE_MODEL, 
-                                                                    cache_dir=FASTEMBED_CACHE_DIRECTORY, 
-                                                                    meta_fields_to_embed=METADATA_FIELDS_TO_EMBED))
-        self.pipeline.add_component('dense_doc_embedder', 
+                                                                              cache_dir=FASTEMBED_CACHE_DIRECTORY, 
+                                                                              meta_fields_to_embed=METADATA_FIELDS_TO_EMBED))
+        self.pipeline.add_component(PIPELINE['DENSE_EMBEDDER'], 
                                     FastembedDocumentEmbedder(model=FASTEMBED_DENSE_MODEL, 
-                                                              cache_dir=FASTEMBED_CACHE_DIRECTORY, 
-                                                              meta_fields_to_embed=METADATA_FIELDS_TO_EMBED))
-        self.pipeline.add_component('writer', 
+                                                                        cache_dir=FASTEMBED_CACHE_DIRECTORY, 
+                                                                        meta_fields_to_embed=METADATA_FIELDS_TO_EMBED))
+        self.pipeline.add_component(PIPELINE['DOCUMENT_WRITER'], 
                                     DocumentWriter(document_store=self.document_store, 
-                                                   policy=DuplicatePolicy.OVERWRITE))
+                                                             policy=DuplicatePolicy.OVERWRITE))
 
-        self.pipeline.connect('sparse_doc_embedder', 'dense_doc_embedder')
-        self.pipeline.connect('dense_doc_embedder', 'writer')
+        self.pipeline.connect(PIPELINE['SPARSE_EMBEDDER'], PIPELINE['DENSE_EMBEDDER'])
+        self.pipeline.connect(PIPELINE['DENSE_EMBEDDER'], PIPELINE['DOCUMENT_WRITER'])
 
     def index_documents(self, documents: list):
         """
@@ -49,10 +53,9 @@ class Indexer:
 
         :param documents: List of `Document` objects to index.
         """
-        results = self.pipeline.run({'sparse_doc_embedder': {'documents': documents}},
-                          include_outputs_from={'sparse_doc_embedder'})
-        print(results)
-        print(f'Indexed {len(documents)} documents successfully.')
+        results = self.pipeline.run({PIPELINE['SPARSE_EMBEDDER']: {'documents': documents}},
+                                                    include_outputs_from={PIPELINE['SPARSE_EMBEDDER']})
+        return results
 
 
     def embed_note_as_haystack_Document(self, note_folder: str, note_title: str, note_contents: str) -> None:
@@ -70,7 +73,10 @@ class Indexer:
         note_to_embed.meta = {'folder': note_folder, 'title': note_title}
 
         # Embed the note information
-        self.index_documents([note_to_embed])
+        results = self.index_documents([note_to_embed])
+
+        # Display the ID of the embedded document
+        print(results[PIPELINE['SPARSE_EMBEDDER']]['documents'][0].id)
 
 
 if __name__ == '__main__':
