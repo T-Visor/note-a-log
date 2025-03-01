@@ -49,7 +49,9 @@ class Indexer:
 
         :param documents: List of `Document` objects to index.
         """
-        self.pipeline.run({'sparse_doc_embedder': {'documents': documents}})
+        results = self.pipeline.run({'sparse_doc_embedder': {'documents': documents}},
+                          include_outputs_from={'sparse_doc_embedder'})
+        print(results)
         print(f'Indexed {len(documents)} documents successfully.')
 
 
