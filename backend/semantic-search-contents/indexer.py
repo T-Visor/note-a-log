@@ -104,6 +104,7 @@ class Indexer:
         :param note_folder: Folder path where the note is stored.
         :param note_title: Title of the note.
         :param note_contents: The textual content of the note.
+
         :return: The document ID of the embedded note.
         """
         # Create a Haystack Document object with note metadata

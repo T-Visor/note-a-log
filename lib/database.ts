@@ -16,6 +16,7 @@ databaseConnection.prepare(`
       title TEXT,
       content TEXT,
       folderId TEXT,
+      embeddingsId TEXT,
       FOREIGN KEY(folderId) REFERENCES folders(id) ON DELETE SET NULL
     )
   `).run();
