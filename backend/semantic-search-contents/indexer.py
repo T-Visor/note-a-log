@@ -10,7 +10,8 @@ from config import (
     QDRANT_CONFIG,
     FASTEMBED_DENSE_MODEL,
     FASTEMBED_SPARSE_MODEL,
-    FASTEMBED_CACHE_DIRECTORY
+    FASTEMBED_CACHE_DIRECTORY,
+    METADATA_FIELDS_TO_EMBED
 )
 
 class Indexer:
@@ -27,9 +28,17 @@ class Indexer:
         self.document_store = QdrantDocumentStore(**QDRANT_CONFIG)
 
         self.pipeline = Pipeline()
-        self.pipeline.add_component('sparse_doc_embedder', FastembedSparseDocumentEmbedder(model=FASTEMBED_SPARSE_MODEL, cache_dir=FASTEMBED_CACHE_DIRECTORY, meta_fields_to_embed=['folder']))
-        self.pipeline.add_component('dense_doc_embedder', FastembedDocumentEmbedder(model=FASTEMBED_DENSE_MODEL, cache_dir=FASTEMBED_CACHE_DIRECTORY, meta_fields_to_embed=['folder']))
-        self.pipeline.add_component('writer', DocumentWriter(document_store=self.document_store, policy=DuplicatePolicy.OVERWRITE))
+        self.pipeline.add_component('sparse_doc_embedder', 
+                                    FastembedSparseDocumentEmbedder(model=FASTEMBED_SPARSE_MODEL, 
+                                                                    cache_dir=FASTEMBED_CACHE_DIRECTORY, 
+                                                                    meta_fields_to_embed=METADATA_FIELDS_TO_EMBED))
+        self.pipeline.add_component('dense_doc_embedder', 
+                                    FastembedDocumentEmbedder(model=FASTEMBED_DENSE_MODEL, 
+                                                              cache_dir=FASTEMBED_CACHE_DIRECTORY, 
+                                                              meta_fields_to_embed=METADATA_FIELDS_TO_EMBED))
+        self.pipeline.add_component('writer', 
+                                    DocumentWriter(document_store=self.document_store, 
+                                                   policy=DuplicatePolicy.OVERWRITE))
 
         self.pipeline.connect('sparse_doc_embedder', 'dense_doc_embedder')
         self.pipeline.connect('dense_doc_embedder', 'writer')
@@ -56,9 +65,9 @@ if __name__ == '__main__':
                             fluid film with gas mask
                             impact gun
                             CAC ID""",
-                meta={'folder': 'Automotive Maintenance'}),
+                 meta={'folder': 'Automotive Maintenance', 'title': '30,0000 Maintenance'}),
         Document(content='Name: Lumenative (towards a bright future of innovation). Product name: Note-a-log (Amanuensis)',
-                meta={'folder': 'Business Ideas'}),
+                 meta={'folder': 'Business Ideas', 'title': 'Company Idea'}),
         Document(content="""Pasta
 Ribs
 Chicken and veggies
