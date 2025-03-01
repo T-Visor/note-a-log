@@ -23,7 +23,7 @@ PIPELINE = {
 class Indexer:
     def __init__(self):
         """
-        Initializes the Qdrant-based document indexing pipeline.
+        Initializes the a vector database indexing pipeline using Qdrant.
 
         :param embedding_dim: Dimension of the embeddings.
         :param recreate_index: Whether to recreate the index.
@@ -47,6 +47,7 @@ class Indexer:
         self.pipeline.connect(PIPELINE['SPARSE_EMBEDDER'], PIPELINE['DENSE_EMBEDDER'])
         self.pipeline.connect(PIPELINE['DENSE_EMBEDDER'], PIPELINE['DOCUMENT_WRITER'])
 
+
     def index_documents(self, documents: list):
         """
         Indexes a list of documents in the Qdrant document store.
@@ -58,14 +59,14 @@ class Indexer:
         return results
 
 
-    def embed_note_as_haystack_Document(self, note_folder: str, note_title: str, note_contents: str) -> None:
+    def embed_note_information(self, note_folder: str, note_title: str, note_contents: str) -> None:
         """
-        Embeds a note as a Haystack `Document` object and indexes it.
+        Embeds a note into a vector database.
 
         :param note_folder: The folder where the note is stored.
         :param note_title: The title of the note.
         :param note_contents: The textual content of the note.
-        :return: None
+        :return: Document ID of embedded note
         """
         # Populate the haystack Document with the information from the note
         note_to_embed = Document()
@@ -75,8 +76,8 @@ class Indexer:
         # Embed the note information
         results = self.index_documents([note_to_embed])
 
-        # Display the ID of the embedded document
-        print(results[PIPELINE['SPARSE_EMBEDDER']]['documents'][0].id)
+        # Return the ID of the embedded document
+        return results[PIPELINE['SPARSE_EMBEDDER']]['documents'][0].id
 
 
 if __name__ == '__main__':
@@ -112,5 +113,6 @@ Follow-up with Chipotle regarding messed-up order.
 
     #indexer.index_documents(documents)
 
-    indexer.embed_note_as_haystack_Document('Test Folder', 'Test Title', 'Hello this is a test')
+    document_id = indexer.embed_note_information('Test Folder', 'Test Title', 'Hello this is a test')
 
+    print(document_id)
