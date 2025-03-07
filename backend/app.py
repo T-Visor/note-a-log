@@ -1,11 +1,17 @@
 import auto_categorize_notes
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from indexer import Indexer
+from retriever import Retriever
+
+EMBEDDING_RETRIEVER = Retriever()
+NOTES_INDEXER = Indexer()
 
 app = FastAPI(
     title='Note-a-log AI Services',
     description='Provides GenAI capabilities for the Note-a-log app.',
 )
+
 
 # CORS Configuration
 origins = [
@@ -34,4 +40,12 @@ def auto_categorize():
         auto_categorize_notes.main()
         return {"status": "success", "message": "Notes categorized successfully."}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f'An error occurred: {str(e)}')
+        raise httpException(status_code=500, detail=f'An error occurred: {str(e)}')
+
+@app.post('/embed_note_contents')
+def embed_note_contents(note_title: str, note_contents: str):
+    try: 
+        embeddings_ID = NOTES_INDEXER.embed_note_information(note_title, note_contents)
+        return {"status": "success", "message": embeddings_ID}
+    except Exception as e:
+        raise httpException(status_code=500, detail=f'An error occurred: {str(e)}')

@@ -1,9 +1,24 @@
+# Database 
 DATABASE_PATH = '../data/notesApp.db'
 DATABASE_TABLE_WITH_NOTES = 'notes'
 DATABASE_TABLE_WITH_FOLDERS = 'folders' 
 
-MODEL_NAME = 'llama3.1:8b-instruct-q3_K_S'
+# Embeddings Database
+QDRANT_CONFIG = {
+    'url': 'http://localhost:6333',
+    'index': 'Test',
+    'recreate_index': False,  # Prevent overwriting existing data
+    'use_sparse_embeddings': True,  # Enable sparse embeddings
+    'embedding_dim': 768  # Set embedding dimension
+}
+QDRANT_TOP_K_RESULTS = 3
+FASTEMBED_SPARSE_MODEL = 'prithvida/Splade_PP_en_v1'
+FASTEMBED_DENSE_MODEL = 'BAAI/bge-base-en-v1.5'
+FASTEMBED_CACHE_DIRECTORY = './models'
+METADATA_FIELDS_TO_EMBED = ['folder', 'title']
 
+# Language model
+MODEL_NAME = 'llama3.1:8b-instruct-q3_K_S'
 PROMPT_TEMPLATE = """
 You are a note categorizer. Help me organize my notes by selecting a category based on the title and content.
 
@@ -18,7 +33,6 @@ Existing Categories: [{{ categories | join(', ') }}]
 
 Category:
 """
-
 PROMPT_TEMPLATE_WITH_SEMANTIC_SEARCH_RESULTS = """
 You are a content categorizer. Help me organize content by selecting the most appropriate category.
 
