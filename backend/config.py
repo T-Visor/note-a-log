@@ -18,3 +18,25 @@ Existing Categories: [{{ categories | join(', ') }}]
 
 Category:
 """
+
+PROMPT_TEMPLATE_WITH_SEMANTIC_SEARCH_RESULTS = """
+You are a content categorizer. Help me organize content by selecting the most appropriate category.
+
+Content to categorize:
+Title: {{ title }}
+Content: {{ content }}
+
+Most similar existing content:
+{% for result in search_results %}
+- Similar item ({{ result.score|round(2) }}): Category "{{ result.meta.folder }}", Content: "{{ result.content|truncate(80) }}"
+{% endfor %}
+
+Existing Categories: [{{ categories | join(', ') }}]
+
+Instructions:
+1. Choose an existing category if it fits well
+2. Create a new category only if necessary (keep it brief)
+3. Return ONLY the category name without explanation
+
+Category:
+"""
