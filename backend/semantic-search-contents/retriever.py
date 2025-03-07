@@ -65,8 +65,9 @@ if __name__ == "__main__":
 
     retrieved_docs = retriever.query(query_text)
 
-    print(f"Query: {query_text}")
+    print(f"Query: {query_text}\n")
 
+    print('Semantic search results:')
     count = 1
     for doc in retrieved_docs:
         print(f"{count}. Score: {doc.score:.2f}\n   Category: {doc.meta['folder']}\n   Content: \"{doc.content[:100]}...\"\n")
