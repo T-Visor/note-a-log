@@ -7,6 +7,7 @@ from haystack_integrations.components.embedders.fastembed import (
 )
 from config import (
     QDRANT_CONFIG,
+    QDRANT_TOP_K_RESULTS,
     FASTEMBED_DENSE_MODEL,
     FASTEMBED_SPARSE_MODEL,
     FASTEMBED_CACHE_DIRECTORY
@@ -32,19 +33,19 @@ class Retriever:
         )
 
         # Adding the retriever
-        self.pipeline.add_component("retriever", QdrantHybridRetriever(document_store=self.document_store))
+        self.pipeline.add_component("retriever", QdrantHybridRetriever(document_store=self.document_store,
+                                                                                       top_k=QDRANT_TOP_K_RESULTS))
 
         # Connecting components
         self.pipeline.connect("sparse_text_embedder.sparse_embedding", "retriever.query_sparse_embedding")
         self.pipeline.connect("dense_text_embedder.embedding", "retriever.query_embedding")
 
 
-    def query(self, text: str, top_k: int = 10):
+    def query(self, text: str):
         """
         Runs the retrieval pipeline on a given query.
 
         :param text: Query text for retrieval.
-        :param top_k: Number of top results to return.
         :return: List of retrieved documents.
         """
         results = self.pipeline.run({
@@ -52,7 +53,7 @@ class Retriever:
             "sparse_text_embedder": {"text": text}
         })
 
-        documents = results["retriever"]["documents"][:top_k]
+        documents = results["retriever"]["documents"]
         return documents
 
 
@@ -62,9 +63,8 @@ if __name__ == "__main__":
 
     #query_text = "On 15,000 mile interval: oil change, tire rotation, check engine filter, lubricate hinges, change drain plug washer"
     query_text = "Go to Wegmans grocery store on Tuesday"
-    top_k = 3
 
-    retrieved_docs = retriever.query(query_text, top_k)
+    retrieved_docs = retriever.query(query_text)
 
     print(f"Query: {query_text}\n")
 

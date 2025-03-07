@@ -5,6 +5,7 @@ QDRANT_CONFIG = {
     'use_sparse_embeddings': True,  # Enable sparse embeddings
     'embedding_dim': 768  # Set embedding dimension
 }
+QDRANT_TOP_K_RESULTS = 3
 
 FASTEMBED_SPARSE_MODEL = 'prithvida/Splade_PP_en_v1'
 FASTEMBED_DENSE_MODEL = 'BAAI/bge-base-en-v1.5'
