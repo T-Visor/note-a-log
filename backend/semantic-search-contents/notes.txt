@@ -3,10 +3,12 @@
 
 Update functions in 'useNotes.tsx' file:
 - handleNewNote() needs to add an empty document ID when creating note record
-- handleSaveNote() needs to call embedding API to store embedding
+- handleSaveNote() needs to call embedding API to store embedding. 
+   - if an embedding doesn't exist (document ID is blank), just create a new embedding
+   - else, update the embedding using the document ID
 - handleDeleteNote() needs to call embedding API to delete embedding
 
 When the auto-categorize function is called:
-- Embed the current note, do a semantic search, and return the top 5 results
+- Embed the current note, do a semantic search, and return the top 3 to 5 results
 - For each result from the semantic search, loop through the document IDs and retrieve their scores and query notes db for the folder of that note
 - Present the results to the LLM with a modified prompt to determine where the new note should be categorized.
