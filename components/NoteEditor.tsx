@@ -48,6 +48,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete }) => {
       });
       toast({
         title: "Note saved!",
+        duration: 2000
       });
     } catch (error) {
       toast({
