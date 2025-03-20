@@ -1,4 +1,5 @@
-- Create pipeline to index a note and return the document ID
+- Create pipeline to index a note and return the document ID (COMPLETE)
+  - Integrate embedding logic into API endpoint
 - Store the returned document ID into the notes database
 
 Update functions in 'useNotes.tsx' file:

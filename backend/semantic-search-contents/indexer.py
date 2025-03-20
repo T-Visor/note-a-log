@@ -13,10 +13,7 @@ from config import (
     FASTEMBED_CACHE_DIRECTORY,
     METADATA_FIELDS_TO_EMBED
 )
-from markdown_it import MarkdownIt
-from mdit_plain.renderer import RendererPlain
-
-
+from markdown_to_plain import strip_markdown
 
 # Define pipeline component names as constants
 PIPELINE_COMPONENTS = {
@@ -101,18 +98,6 @@ class Indexer:
         return results
     
 
-    def _strip_markdown(self, md_text: str) -> str:
-        """
-        Convert a Markdown string to plain text by stripping Markdown-specific characters.
-
-        :param md_text: The Markdown-formatted string.
-        :return: A plain text string with Markdown formatting removed.
-        """
-        parser = MarkdownIt(renderer_cls=RendererPlain)
-        plain_text = parser.render(md_text)
-        return plain_text
-
-
     def embed_note_information(self, note_folder: str, note_title: str, note_contents: str) -> str:
         """
         Embeds a note and indexes it into the vector database.
@@ -125,7 +110,7 @@ class Indexer:
         """
         # Create a Haystack Document object with note metadata
         note_to_embed = Document(
-            content=self._strip_markdown(note_contents),
+            content=strip_markdown(note_contents),
             meta={'folder': note_folder, 'title': note_title}
         )
 
