@@ -13,6 +13,10 @@ from config import (
     FASTEMBED_CACHE_DIRECTORY,
     METADATA_FIELDS_TO_EMBED
 )
+from markdown_it import MarkdownIt
+from mdit_plain.renderer import RendererPlain
+
+
 
 # Define pipeline component names as constants
 PIPELINE_COMPONENTS = {
@@ -95,6 +99,18 @@ class Indexer:
             include_outputs_from={PIPELINE_COMPONENTS['SPARSE_EMBEDDER']}
         )
         return results
+    
+
+    def _strip_markdown(self, md_text: str) -> str:
+        """
+        Convert a Markdown string to plain text by stripping Markdown-specific characters.
+
+        :param md_text: The Markdown-formatted string.
+        :return: A plain text string with Markdown formatting removed.
+        """
+        parser = MarkdownIt(renderer_cls=RendererPlain)
+        plain_text = parser.render(md_text)
+        return plain_text
 
 
     def embed_note_information(self, note_folder: str, note_title: str, note_contents: str) -> str:
@@ -109,7 +125,7 @@ class Indexer:
         """
         # Create a Haystack Document object with note metadata
         note_to_embed = Document(
-            content=note_contents,
+            content=self._strip_markdown(note_contents),
             meta={'folder': note_folder, 'title': note_title}
         )
 
@@ -151,8 +167,8 @@ whipped cream (make sure dairy-free)
 Follow-up with Chipotle regarding messed-up order.
                  """, meta={'folder': 'Customer service issues'})]
 
-    #indexer.index_documents(documents)
+    indexer.index_documents(documents)
 
-    document_id = indexer.embed_note_information('Test Folder', 'Test Title', 'Hello this is a test')
+    #document_id = indexer.embed_note_information('Test Folder', 'Test Title', 'Hello this is a test')
 
-    print(document_id)
+    #print(document_id)
