@@ -3,12 +3,12 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from indexer import Indexer
 from retriever import Retriever
-from haystack_integrations.document_stores.qdrant import QdrantDocumentStore
-from config import QDRANT_CONFIG
+from indexer import Indexer
+from embeddings_manager import EmbeddingsManager
 
 EMBEDDING_RETRIEVER = Retriever()
 NOTES_INDEXER = Indexer()
-QDRANT_DOCUMENT_STORE = QdrantDocumentStore(**QDRANT_CONFIG)
+EMBEDDINGS_MANAGER = EmbeddingsManager()
 
 app = FastAPI(
     title='Note-a-log AI Services',
@@ -45,22 +45,25 @@ def auto_categorize():
         raise HTTPException(status_code=500, detail=f'An error occurred: {str(e)}')
 
 @app.post('/create_initial_note_embeddings')
-def create_initial_note_embeddings(note_title: str, note_contents: str):
+def create_initial_note_embeddings(note_contents: str):
     try: 
-        embeddings_ID = NOTES_INDEXER.embed_note_information(note_title, note_contents)
+        embeddings_ID = NOTES_INDEXER.embed_note_information(note_contents)
         return {"status": "success", "message": embeddings_ID}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f'An error occurred: {str(e)}')
 
 @app.post('/update_note_embeddings')
-def update_note_embeddings(embeddings_ID: str, note_title: str, note_contents: str):
+def update_note_embeddings(embeddings_ID: str, note_contents: str):
     try: 
-        embeddings_ID = NOTES_INDEXER.embed_note_information(note_title, note_contents)
+        EMBEDDINGS_MANAGER.update_embedding(embeddings_ID, note_contents)
         return {"status": "success", "message": embeddings_ID}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f'An error occurred: {str(e)}')
 
-@app.get('get_document')
-def get_document(embeddings_ID: str):
-    document = QDRANT_DOCUMENT_STORE.get_documents_by_id([embeddings_ID])
-    return {"status": "success", "message": document}
+@app.post('/delete_note_embeddings')
+def delete_note_embeddings(embeddings_ID: str):
+    try: 
+        EMBEDDINGS_MANAGER.delete_embedding(embeddings_ID)
+        return {"status": "success", "message": embeddings_ID}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f'An error occurred: {str(e)}')

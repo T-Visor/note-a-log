@@ -13,6 +13,7 @@ from config import (
     FASTEMBED_CACHE_DIRECTORY,
     METADATA_FIELDS_TO_EMBED
 )
+from markdown_to_plain import strip_markdown
 
 # Define pipeline component names as constants
 PIPELINE_COMPONENTS = {
@@ -95,21 +96,19 @@ class Indexer:
             include_outputs_from={PIPELINE_COMPONENTS['SPARSE_EMBEDDER']}
         )
         return results
+    
 
-
-    def embed_note_information(self, note_title: str, note_contents: str) -> str:
+    def embed_note_information(self, note_contents: str) -> str:
         """
         Embeds a note and indexes it into the vector database.
 
-        :param note_title: Title of the note.
         :param note_contents: The textual content of the note.
 
         :return: The document ID of the embedded note.
         """
         # Create a Haystack Document object with note metadata
         note_to_embed = Document(
-            content=note_contents,
-            meta={'title': note_title}
+            content=strip_markdown(note_contents)
         )
 
         # Embed and store the note
@@ -117,3 +116,41 @@ class Indexer:
 
         # Retrieve and return the document ID after embedding
         return results[PIPELINE_COMPONENTS['SPARSE_EMBEDDER']]['documents'][0].id
+
+
+if __name__ == '__main__':
+    indexer = Indexer()
+
+    documents = [
+            Document(content="""Get the following items:
+                            5w-30 oil
+                            Wix 57002 oil filter
+                            Manual transmission fluid 75w80 (GL-4)
+                            Oil filter wrench
+                            fluid film with gas mask
+                            impact gun
+                            CAC ID""",
+                     meta={'folder': 'Automotive Maintenance', 'title': '30,0000 Maintenance'}),
+            Document(content='Name: Lumenative (towards a bright future of innovation). Product name: Note-a-log (Amanuensis)',
+                     meta={'folder': 'Business Ideas', 'title': 'Company Idea'}),
+            Document(content="""Pasta
+Ribs
+Chicken and veggies
+Fried chicken
+                     """, meta={'folder': 'Meal Prepping'}),
+            Document(content="""Strawberries (5)
+Cake mix (2 cups)
+whipped cream (make sure dairy-free)
+                     """, meta={'folder': 'Meal Prepping'}),
+            Document(content="""Considering buying cake mix with gluten-free mixture. I am interested in getting the confetti variant.
+                     """,
+                     meta={'folder': 'Meal Prepping'}),
+            Document(content="""Follow-up with Hampton Inn for 1 night refund which was promised
+Follow-up with Chipotle regarding messed-up order.
+                 """, meta={'folder': 'Customer service issues'})]
+
+    indexer.index_documents(documents)
+
+    #document_id = indexer.embed_note_information('Test Folder', 'Test Title', 'Hello this is a test')
+
+    #print(document_id)

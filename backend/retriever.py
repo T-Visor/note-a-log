@@ -13,7 +13,6 @@ from config import (
     FASTEMBED_CACHE_DIRECTORY
 )
 
-
 class Retriever:
     def __init__(self):
         """
@@ -56,3 +55,22 @@ class Retriever:
 
         documents = results["retriever"]["documents"]
         return documents
+
+
+# Example Usage
+if __name__ == "__main__":
+    retriever = Retriever()
+
+    #query_text = "On 15,000 mile interval: oil change, tire rotation, check engine filter, lubricate hinges, change drain plug washer"
+    query_text = "Go to Wegmans grocery store on Tuesday"
+
+    retrieved_docs = retriever.query(query_text)
+
+    print(f"Query: {query_text}\n")
+
+    print('Semantic search results:')
+    count = 1
+    for doc in retrieved_docs:
+        print(f"{count}. Score: {doc.score:.2f}\n   Category: {doc.meta['folder']}\n   Content: \"{doc.content[:100]}...\"\n")
+        count += 1
+
