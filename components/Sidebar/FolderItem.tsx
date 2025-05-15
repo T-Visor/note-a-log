@@ -60,7 +60,7 @@ export const FolderItem: React.FC<FolderItemProps> = ({
   useEffect(() => {
     setLoading(false);
   }, []);
-  
+
 
   // Button click triggers a job to run for an LLM
   // to move notes to their appropriate folders.
@@ -156,18 +156,7 @@ export const FolderItem: React.FC<FolderItemProps> = ({
         onClick={() => onToggleExpand(folder.id)}
       >
         <div className="flex items-center flex-1 overflow-hidden">
-          {(() => {
-            if (notes.length > 0 && isExpanded) {
-              return <ChevronDown className="h-4 w-4 mr-2" />;
-            }
-            else if (notes.length > 0 && !isExpanded) {
-              return <ChevronRight className="h-4 w-4 mr-2" />;
-            }
-            else {
-              return <span className="h-4 w-4 mr-2 text-gray-400" />;
-            }
-          })()}
-          <Folder className="h-4 w-4 mr-2" />
+          <Folder className="h-4 w-4 mr-4" />
           {isEditing ? (
             <Input
               value={editingName}
@@ -182,6 +171,17 @@ export const FolderItem: React.FC<FolderItemProps> = ({
           ) : (
             <span className="truncate w-0 flex-1">{folder.name}</span>
           )}
+          {(() => {
+            if (notes.length > 0 && isExpanded) {
+              return <ChevronDown className="h-4 w-4 mr-2" />;
+            }
+            else if (notes.length > 0 && !isExpanded) {
+              return <ChevronRight className="h-4 w-4 mr-2" />;
+            }
+            else {
+              return <span className="h-4 w-4 mr-2 text-gray-400" />;
+            }
+          })()}
         </div>
         <div
           className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity"
