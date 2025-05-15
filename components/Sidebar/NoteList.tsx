@@ -72,7 +72,7 @@ export const NoteList: React.FC<NoteListProps> = ({
                           <CommandItem
                             key={folder.id}
                             onSelect={() => {
-                              currentNote && handleMoveNote(currentNote.id, folder.id);
+                              currentNote && handleMoveNote(currentNote, folder.id);
                               setCurrentNote(null);
                               forceUpdate();
                             }}

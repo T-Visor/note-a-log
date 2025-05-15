@@ -212,31 +212,27 @@ export const useNotes = () => {
     }
   };
 
-  const handleMoveNote = async (noteId: string, targetFolderId: string | null) => {
-    // Get the note associated with noteId.
-    const noteBeingMoved = notes.find((note) => note.id === noteId);
-
-    // Double-check ensuring the note exists.
-    if (!noteBeingMoved) {
-      console.error('Note not found');
-      return;
+  const handleMoveNote = async (note: Note, targetFolderId: string | null) => {
+    const updatedNote = { ...note, folderId: targetFolderId };
+  
+    setNotes((existingNotes) =>
+      existingNotes.map((n) => n.id === note.id ? updatedNote : n)
+    );
+  
+    if (selectedNote?.id === note.id) {
+      setSelectedNote(updatedNote);
     }
-
+  
     try {
-      // Update the note contents via API.
-      await axios.put(`/api/notes/${noteId}`, { ...noteBeingMoved, folderId: targetFolderId });
-
-      // Update local state to reflect the move.
+      await axios.put(`/api/notes/${note.id}`, updatedNote);
+    } catch (error) {
+      console.error('Error moving note:', error);
+      // Optionally revert
       setNotes((existingNotes) =>
-        existingNotes.map((note) =>
-          note.id === noteId ? { ...note, folderId: targetFolderId } : note
-        )
+        existingNotes.map((n) => n.id === note.id ? note : n)
       );
     }
-    catch (error) {
-      console.error('Error moving note:', error);
-    }
-  };
+  };  
 
   return {
     folders,
