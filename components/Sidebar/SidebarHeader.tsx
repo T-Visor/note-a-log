@@ -1,8 +1,7 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Sun, Moon, Folder, Search } from "lucide-react";
-import { useTheme } from "next-themes";
+import { Folder, Search } from "lucide-react";
 
 interface SidebarHeaderProps {
   newFolderName: string;
@@ -17,19 +16,10 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
   onCreateFolder,
   onSearch,
 }) => {
-  const { theme, setTheme } = useTheme();
 
   return (
     <div>
       <div className="flex justify-center items-center mb-4 space-x-3">
-        <Button
-          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-          variant="outline"
-          size="icon"
-          className="w-8 h-8 rounded-full"
-        >
-          {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-        </Button>
         <Button variant="ghost">
           <Search className="h-5 w-5"/>
         </Button>

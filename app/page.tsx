@@ -6,6 +6,10 @@ import { SidebarProvider, useSidebarContext } from "@/components/Sidebar/Sidebar
 import NoteEditor from "@/components/NoteEditor";
 import { useNotes } from "@/hooks/useNotes";
 import { Toaster } from "@/components/ui/toaster"
+import { Button } from "@/components/ui/button"
+import { useTheme } from "next-themes";
+import { Sun, Moon } from "lucide-react";
+
 
 // This de-structuring is necessary to effectively use the 'useSidebarContext' hook.
 const NotesApp = () => {
@@ -33,6 +37,7 @@ const NotesAppContent = () => {
     handleMoveNote,
   } = useNotes();
 
+  const { theme, setTheme } = useTheme();
   const { isLoading } = useSidebarContext();
   const [searchQuery, setSearchQuery] = useState('');
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
@@ -78,6 +83,15 @@ const NotesAppContent = () => {
 
   return (
     <div className="flex md:flex-row h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 relative">
+      <Button
+        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        variant="ghost"
+        size="icon"
+        className="hidden md:flex absolute top-4 right-6 z-20"
+      >
+        {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+      </Button>
+
       <Sidebar
         folders={folders}
         notes={filteredNotes}
