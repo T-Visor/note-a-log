@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Folder, Search } from "lucide-react";
+import { Folder, Search, NotebookPen } from "lucide-react";
 
 interface SidebarHeaderProps {
   newFolderName: string;
@@ -19,9 +19,12 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
 
   return (
     <div>
-      <div className="flex justify-center items-center mb-4 space-x-3">
+      <div className="flex justify-end items-center mb-4">
         <Button variant="ghost">
           <Search className="h-5 w-5"/>
+        </Button>
+        <Button variant="ghost">
+          <NotebookPen className="h-5 w-5"/>
         </Button>
       </div>
 
