@@ -21,7 +21,7 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
 
   return (
     <div>
-      <div className="flex justify-center mb-4">
+      <div className="flex justify-center items-center mb-4 space-x-3">
         <Button
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
           variant="outline"
@@ -29,6 +29,9 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
           className="w-8 h-8 rounded-full"
         >
           {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+        </Button>
+        <Button variant="ghost">
+          <Search className="h-5 w-5"/>
         </Button>
       </div>
 
