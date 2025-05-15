@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { Draggable } from 'react-beautiful-dnd';
 import { Button } from "@/components/ui/button";
 import { MoreVertical, Trash2, FolderUp } from "lucide-react";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@/components/ui/popover";
 import { Command, CommandInput, CommandList, CommandItem } from "@/components/ui/command";
 import type { Note } from '@/types';
 import { useNotes } from "@/hooks/useNotes";
@@ -26,93 +25,78 @@ export const NoteList: React.FC<NoteListProps> = ({
   onDeleteNote,
 }) => {
   const { folders, handleMoveNote } = useNotes();
-  const [currentNote, setCurrentNote] = useState<Note | null>(null); // Track the current note being moved
+  const [currentNote, setCurrentNote] = useState<Note | null>(null);
   const { forceUpdate } = useSidebarContext();
-
-  // TODO: remove this after testing
-  /*const handleMoveNote = (folderId: string) => {
-    if (currentNote) {
-      console.log(`Moving note "${currentNote.title}" to folder "${folderId}"`);
-      setCurrentNote(null); // Close the pop-over after moving
-    }
-  };*/
 
   return (
     <>
-      {notes.map((note, index) => (
-        <Draggable key={note.id} draggableId={note.id} index={index}>
-          {(provided, snapshot) => (
-            <div
-              ref={provided.innerRef}
-              {...provided.draggableProps}
-              {...provided.dragHandleProps}
-              className={`flex items-center justify-between cursor-pointer p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded group ${selectedNoteId === note.id ? 'bg-gray-200 dark:bg-gray-700' : ''
-                } ${snapshot.isDragging ? 'opacity-50' : ''}`}
-              onClick={() => onSelectNote(note)}
-            >
-              <span className="truncate flex-1 mr-2">{note.title || 'Untitled'}</span>
-              <div
-                className="opacity-0 group-hover:opacity-100 transition-opacity"
-                onClick={(e) => e.stopPropagation()}
-              >
+      {notes.map((note) => (
+        <div
+          key={note.id}
+          className={`flex items-center justify-between cursor-pointer p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded group ${selectedNoteId === note.id ? 'bg-gray-200 dark:bg-gray-700' : ''}`}
+          onClick={() => onSelectNote(note)}
+        >
+          <span className="truncate flex-1 mr-2">{note.title || 'Untitled'}</span>
+          <div
+            className="opacity-0 group-hover:opacity-100 transition-opacity"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                >
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-40 p-1">
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
                       variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
+                      size="sm"
+                      onClick={() => setCurrentNote(note)}
+                      className="w-full flex items-center justify-start"
                     >
-                      <MoreVertical className="h-4 w-4" />
+                      <FolderUp className="h-4 w-4 mr-2" />
+                      Move Note
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-40 p-1">
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setCurrentNote(note)}
-                          className="w-full flex items-center justify-start"
-                        >
-                          <FolderUp className="h-4 w-4 mr-2" />
-                          Move Note
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-80 p-4 border rounded-md shadow-lg">
-                        <Command>
-                          <CommandInput placeholder="Search folders..." className="mb-2" />
-                          <CommandList>
-                            {folders.map((folder) => (
-                              <CommandItem
-                                key={folder.id}
-                                onSelect={() => {
-                                  currentNote && handleMoveNote(currentNote.id, folder.id);
-                                  setCurrentNote(null);
-                                  forceUpdate();
-                                }}
-                              >
-                                {folder.name}
-                              </CommandItem>
-                            ))}
-                          </CommandList>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onDeleteNote(note.id)}
-                      className="w-full flex items-center justify-start text-red-600 hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-900/10"
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Delete Note
-                    </Button>
+                  <PopoverContent className="w-80 p-4 border rounded-md shadow-lg">
+                    <Command>
+                      <CommandInput placeholder="Search folders..." className="mb-2" />
+                      <CommandList>
+                        {folders.map((folder) => (
+                          <CommandItem
+                            key={folder.id}
+                            onSelect={() => {
+                              currentNote && handleMoveNote(currentNote.id, folder.id);
+                              setCurrentNote(null);
+                              forceUpdate();
+                            }}
+                          >
+                            {folder.name}
+                          </CommandItem>
+                        ))}
+                      </CommandList>
+                    </Command>
                   </PopoverContent>
                 </Popover>
-              </div>
-            </div>
-          )}
-        </Draggable>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onDeleteNote(note.id)}
+                  className="w-full flex items-center justify-start text-red-600 hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-900/10"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete Note
+                </Button>
+              </PopoverContent>
+            </Popover>
+          </div>
+        </div>
       ))}
     </>
   );

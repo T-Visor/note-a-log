@@ -1,11 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import { Button } from "@/components/ui/button";
 import { Menu, X, GripVertical, PanelRightOpen, PanelRightClose } from "lucide-react";
 import type { Note, Folder as FolderType } from '@/types';
 import { SidebarHeader } from './SidebarHeader';
 import { FolderItem } from './FolderItem';
-import DeleteAllDialogue from "./DeleteAllDialogue";
 import { Skeleton } from "@/components/ui/skeleton"
 import { useSidebarContext } from "./SidebarContext";
 
@@ -43,12 +41,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onRenameFolder,
   onSearch,
   onToggleVisibility,
-  onConfirmDeleteAll,
-  onDeleteSelected,
-  onMoveNote,
   onDeleteNote,
 }) => {
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
   const [newFolderName, setNewFolderName] = useState('');
   const { isLoading } = useSidebarContext();
@@ -67,18 +61,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     setExpandedFolders(prev =>
       prev.includes(folderId) ? prev.filter(id => id !== folderId) : [...prev, folderId]
     );
-  };
-
-  const onDragEnd = (result: DropResult) => {
-    const { destination, draggableId } = result;
-    if (!destination) return;
-
-    const destinationFolderId = destination.droppableId === 'root' ? null : destination.droppableId;
-    onMoveNote(draggableId, destinationFolderId);
-
-    if (destinationFolderId && !expandedFolders.includes(destinationFolderId)) {
-      setExpandedFolders(prev => [...prev, destinationFolderId]);
-    }
   };
 
   const startResizing = useCallback((e: React.MouseEvent) => {
@@ -135,7 +117,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   }
   else {
     return (
-      <DragDropContext onDragEnd={onDragEnd}>
+      <>
         {/* Mobile menu button */}
         <Button
           onClick={onToggleVisibility}
@@ -180,15 +162,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onSearch={onSearch}
             />
 
-            {/*<DeleteAllDialogue
-            isOpen={isDeleteDialogOpen}
-            setIsOpen={setIsDeleteDialogOpen}
-            onConfirm={() => {
-              onConfirmDeleteAll();
-              setIsDeleteDialogOpen(false);
-            }}
-          /> */}
-
             <hr className="border-t border-gray-400 dark:border-gray-600 mt-1 mb-1" />
 
             <div className="space-y-1 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 30vh)' }}>
@@ -224,7 +197,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           )}
         </div>
-      </DragDropContext>
+      </>
     );
   }
 };

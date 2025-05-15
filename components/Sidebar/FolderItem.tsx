@@ -12,7 +12,6 @@ import {
   FileText,
   Wand
 } from "lucide-react";
-import { Droppable } from "react-beautiful-dnd";
 import {
   Popover,
   PopoverContent,
@@ -56,7 +55,12 @@ export const FolderItem: React.FC<FolderItemProps> = ({
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const { toast } = useToast() // toast notification pop-up
   const { setLoading, forceUpdate } = useSidebarContext();
-  setLoading(false);
+  //setLoading(false);
+
+  useEffect(() => {
+    setLoading(false);
+  }, []);
+  
 
   // Button click triggers a job to run for an LLM
   // to move notes to their appropriate folders.
@@ -253,23 +257,14 @@ export const FolderItem: React.FC<FolderItemProps> = ({
       </div>
       {isExpanded && (
         <div className="ml-6">
-          <Droppable droppableId={folder.id}>
-            {(provided, snapshot) => (
-              <div
-                {...provided.droppableProps}
-                ref={provided.innerRef}
-                className={`p-2 rounded ${snapshot.isDraggingOver ? "bg-gray-200 dark:bg-gray-700" : ""}`}
-              >
-                <NoteList
-                  notes={notes.filter(note => note.folderId === folder.id)}
-                  selectedNoteId={selectedNoteId}
-                  onSelectNote={onSelectNote}
-                  onDeleteNote={onDeleteNote}  // Add this new prop
-                />
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
+          <div className="p-2 rounded">
+            <NoteList
+              notes={notes.filter(note => note.folderId === folder.id)}
+              selectedNoteId={selectedNoteId}
+              onSelectNote={onSelectNote}
+              onDeleteNote={onDeleteNote} // Add this new prop
+            />
+          </div>
         </div>
       )}
     </div>

@@ -71,6 +71,7 @@ if __name__ == "__main__":
     print('Semantic search results:')
     count = 1
     for doc in retrieved_docs:
-        print(f"{count}. Score: {doc.score:.2f}\n   Category: {doc.meta['folder']}\n   Content: \"{doc.content[:100]}...\"\n")
+        #print(f"{count}. Score: {doc.score:.2f}\n   Category: {doc.meta['folder']}\n   Content: \"{doc.content[:100]}...\"\n")
+        print(f'Score: {doc.score:.2f}\n {doc.id}\n {doc.content[:80]}...\n')
         count += 1
 
