@@ -25,9 +25,8 @@ interface SidebarProps {
   onDeleteNote: (id: string) => void;
 }
 
-const MIN_SIDEBAR_WIDTH = 325;
-const MAX_SIDEBAR_WIDTH = 600;
 const COLLAPSED_WIDTH = 0;
+const SIDEBAR_WIDTH = 325;
 
 export const Sidebar: React.FC<SidebarProps> = ({
   folders,
@@ -46,8 +45,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
   const [newFolderName, setNewFolderName] = useState('');
   const { isLoading } = useSidebarContext();
-  const [sidebarWidth, setSidebarWidth] = useState(MIN_SIDEBAR_WIDTH);
-  const [isResizing, setIsResizing] = useState(false);
   const [isDesktopCollapsed, setIsDesktopCollapsed] = useState(false);
 
   const handleCreateFolder = () => {
@@ -63,35 +60,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     );
   };
 
-  const startResizing = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsResizing(true);
-  }, []);
-
-  const stopResizing = useCallback(() => {
-    setIsResizing(false);
-  }, []);
-
-  const resize = useCallback((e: MouseEvent) => {
-    if (isResizing) {
-      const newWidth = e.clientX;
-      if (newWidth >= MIN_SIDEBAR_WIDTH && newWidth <= MAX_SIDEBAR_WIDTH) {
-        setSidebarWidth(newWidth);
-      }
-    }
-  }, [isResizing]);
-
-  useEffect(() => {
-    if (isResizing) {
-      document.addEventListener('mousemove', resize);
-      document.addEventListener('mouseup', stopResizing);
-      return () => {
-        document.removeEventListener('mousemove', resize);
-        document.removeEventListener('mouseup', stopResizing);
-      };
-    }
-  }, [isResizing, resize, stopResizing]);
-
   const toggleDesktopSidebar = () => {
     setIsDesktopCollapsed(!isDesktopCollapsed);
   };
@@ -99,7 +67,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   if (isLoading) {
     return (
       <div
-        style={{ width: `${sidebarWidth}px` }}
+        style={{ width: `${SIDEBAR_WIDTH}px` }}
         className={`fixed inset-y-0 left-0 bg-gray-100 dark:bg-gray-800 overflow-hidden transition-transform duration-300 ease-in-out transform ${isVisible ? "translate-x-0" : "-translate-x-full"
           } md:relative md:translate-x-0 z-10`}
       >
@@ -144,13 +112,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         <div
           style={{
-            width: isDesktopCollapsed ? COLLAPSED_WIDTH : `${sidebarWidth}px`,
+            width: isDesktopCollapsed ? COLLAPSED_WIDTH : `${SIDEBAR_WIDTH}px`,
             transition: 'width 300ms ease-in-out'
           }}
           className={`fixed inset-y-0 left-0 bg-gray-100 dark:bg-gray-800 overflow-hidden transform ${isVisible ? 'translate-x-0' : '-translate-x-full'
             } md:relative md:translate-x-0 z-10`}
         >
           <div className="p-4">
+            {/* 'X' button to toggle sidebar on mobile */}
             <Button onClick={onToggleVisibility} variant="ghost" size="icon" className="mb-4 w-full md:hidden">
               <X className="h-4 w-4" />
             </Button>
@@ -184,18 +153,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
               ))}
             </div>
           </div>
-
-          {/* Resize Handle */}
-          {!isDesktopCollapsed && (
-            <div
-              className="absolute right-0 top-0 bottom-0 w-1 cursor-ew-resize hover:bg-gray-300 dark:hover:bg-gray-600"
-              onMouseDown={startResizing}
-            >
-              <div className="absolute top-1/2 right-0 transform -translate-y-1/2">
-                <GripVertical className="w-4 h-4 text-gray-400" />
-              </div>
-            </div>
-          )}
         </div>
       </>
     );
