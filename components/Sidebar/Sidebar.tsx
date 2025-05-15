@@ -131,7 +131,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onSearch={onSearch}
             />
 
-            <hr className="border-t border-gray-400 dark:border-gray-600 mt-1 mb-1" />
+            {/*<hr className="border-t border-gray-400 dark:border-gray-600 mt-1 mb-1" /> */}
 
             <div className="space-y-1 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 30vh)' }}>
               {folders.map((folder, index) => (

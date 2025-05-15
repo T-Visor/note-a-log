@@ -49,14 +49,14 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
         </Button>
       </div>
 
-      <div className="relative mb-4">
+      {/*<div className="relative mb-4">
         <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
         <Input
           placeholder="Search notes..."
           className="pl-8 bg-white dark:bg-gray-700"
           onChange={(e) => onSearch(e.target.value)}
         />
-      </div>
+      </div> */}
     </div>
   );
 };
