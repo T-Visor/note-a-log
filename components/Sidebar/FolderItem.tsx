@@ -256,13 +256,13 @@ export const FolderItem: React.FC<FolderItemProps> = ({
         </div>
       </div>
       {isExpanded && (
-        <div className="ml-6">
-          <div className="p-2 rounded">
+        <div className="relative before:absolute before:top-0 before:bottom-0 before:left-[-0.33rem] before:w-px before:bg-gray-300 dark:before:bg-gray-600 ml-4">
+        <div className="pl-4">
             <NoteList
               notes={notes.filter(note => note.folderId === folder.id)}
               selectedNoteId={selectedNoteId}
               onSelectNote={onSelectNote}
-              onDeleteNote={onDeleteNote} // Add this new prop
+              onDeleteNote={onDeleteNote}
             />
           </div>
         </div>
