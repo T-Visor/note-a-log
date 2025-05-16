@@ -41,9 +41,9 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete }) => {
   const handleSave = useCallback(async () => {
     try {
       setIsSaving(true);
-      await onSave({ 
-        ...note, 
-        title, 
+      await onSave({
+        ...note,
+        title,
         content: latestContentRef.current
       });
       toast({
@@ -71,9 +71,8 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete }) => {
 
   return (
     <div
-      className={`flex flex-col h-full w-full max-w-3xl mx-auto mt-5 md:mt-0 ${
-        theme === "dark" ? "dark" : ""
-      }`}
+      className={`flex flex-col h-full mx-auto mt-5 md:mt-0 px-4 ${theme === "dark" ? "dark" : ""
+        } max-w-screen-sm md:max-w-screen-md lg:max-w-screen-md xl:max-w-screen-xl 2xl:max-w-screen-2xl`}
     >
       <div className="flex items-center justify-between mb-4">
         <Input
