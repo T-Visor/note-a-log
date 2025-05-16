@@ -35,7 +35,9 @@ app.add_middleware(
 class NoteEmbeddingRequest(BaseModel):
     note_contents: str
 
-# Create a request body schema
+class DeleteEmbeddingRequest(BaseModel):
+    embeddings_ID: str
+
 class UpdateEmbeddingRequest(BaseModel):
     embeddings_ID: str
     note_contents: str
@@ -73,9 +75,9 @@ def update_note_embeddings(payload: UpdateEmbeddingRequest):
         raise HTTPException(status_code=500, detail=f'An error occurred: {str(e)}')
 
 @app.post('/delete_note_embeddings')
-def delete_note_embeddings(embeddings_ID: str):
+def delete_note_embeddings(payload: DeleteEmbeddingRequest):
     try: 
-        EMBEDDINGS_MANAGER.delete_embedding(embeddings_ID)
-        return {"status": "success", "message": embeddings_ID}
+        EMBEDDINGS_MANAGER.delete_embedding(payload.embeddings_ID)
+        return {"status": "success", "message": payload.embeddings_ID}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f'An error occurred: {str(e)}')

@@ -193,20 +193,35 @@ export const useNotes = () => {
     }
   };
   
-
   const handleDeleteNote = async (id: string) => {
     try {
-      // Delete the note via API.
+      // 1. Find the note before deleting it
+      const noteToDelete = notes.find(note => note.id === id);
+  
+      if (!noteToDelete) {
+        console.warn(`Note with id ${id} not found.`);
+        return;
+      }
+  
+      const { embeddingsId } = noteToDelete;
+  
+      // 2. Delete the note via API
       await axios.delete(`/api/notes/${id}`);
-
-      // Update local state by removing the deleted note.
+  
+      // 3. Delete associated embedding if it exists
+      if (embeddingsId) {
+        await axios.post('http://localhost:8000/delete_note_embeddings', {
+          embeddings_ID: embeddingsId
+        });
+      }
+  
+      // 4. Update local state
       setNotes(notes.filter(note => note.id !== id));
       setSelectedNote(null);
-    }
-    catch (error) {
+    } catch (error) {
       console.error('Error deleting note:', error);
     }
-  };
+  };  
 
   const handleDeleteSelectedNotes = async (ids: string[]) => {
     try {
