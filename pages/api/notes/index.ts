@@ -9,12 +9,12 @@ export default function handler(request: NextApiRequest, response: NextApiRespon
   }
   // Add a new note (POST request)
   else if (request.method === 'POST') {
-    const { id, title, content, folderId } = request.body;
+    const { id, title, content, folderId, embeddingsId } = request.body;
     const statement = databaseConnection.prepare(`INSERT INTO notes 
-                                                 (id, title, content, folderId) 
-                                                 VALUES (?, ?, ?, ?)`);
-    statement.run(id, title, content, folderId);
-    response.status(201).json({ id, title, content, folderId });
+                                                 (id, title, content, folderId, embeddingsId) 
+                                                 VALUES (?, ?, ?, ?, ?)`);
+    statement.run(id, title, content, folderId, embeddingsId);
+    response.status(201).json({ id, title, content, folderId, embeddingsId });
   }
   // Reject the request 
   else {

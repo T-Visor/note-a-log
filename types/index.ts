@@ -3,6 +3,7 @@ export interface Note {
   title: string;
   content: string;
   folderId: string | null;
+  embeddingsId: string | null;
 }
 
 export interface Folder {

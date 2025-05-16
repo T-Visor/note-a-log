@@ -5,6 +5,7 @@ from indexer import Indexer
 from retriever import Retriever
 from indexer import Indexer
 from embeddings_manager import EmbeddingsManager
+from pydantic import BaseModel
 
 EMBEDDING_RETRIEVER = Retriever()
 NOTES_INDEXER = Indexer()
@@ -31,6 +32,14 @@ app.add_middleware(
     allow_headers=['*'],
 )
 
+class NoteEmbeddingRequest(BaseModel):
+    note_contents: str
+
+# Create a request body schema
+class UpdateEmbeddingRequest(BaseModel):
+    embeddings_ID: str
+    note_contents: str
+
 @app.get('/auto_categorize_notes')
 def auto_categorize():
     """
@@ -45,18 +54,21 @@ def auto_categorize():
         raise HTTPException(status_code=500, detail=f'An error occurred: {str(e)}')
 
 @app.post('/create_initial_note_embeddings')
-def create_initial_note_embeddings(note_contents: str):
+def create_initial_note_embeddings(payload: NoteEmbeddingRequest):
     try: 
-        embeddings_ID = NOTES_INDEXER.embed_note_information(note_contents)
+        embeddings_ID = NOTES_INDEXER.embed_note_information(payload.note_contents)
         return {"status": "success", "message": embeddings_ID}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f'An error occurred: {str(e)}')
 
 @app.post('/update_note_embeddings')
-def update_note_embeddings(embeddings_ID: str, note_contents: str):
-    try: 
-        EMBEDDINGS_MANAGER.update_embedding(embeddings_ID, note_contents)
-        return {"status": "success", "message": embeddings_ID}
+def update_note_embeddings(payload: UpdateEmbeddingRequest):
+    try:
+        EMBEDDINGS_MANAGER.update_embedding(
+            payload.embeddings_ID,
+            payload.note_contents
+        )
+        return {"status": "success", "message": payload.embeddings_ID}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f'An error occurred: {str(e)}')
 

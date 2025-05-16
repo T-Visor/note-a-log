@@ -23,7 +23,7 @@ export const useNotes = () => {
       const notesData = responseWithNotes.data.map((note: Note) => ({
         ...note,
         folderId: note.folderId ?? null, // Ensure `null` for `undefined` or missing `folderId`
-      }));      
+      }));
       setNotes(notesData);
     }
     fetchData();
@@ -38,17 +38,17 @@ export const useNotes = () => {
       alert("Folder name must be unique.");
       return;
     }
-  
+
     // Create a new folder with a unique ID
     const newFolder: Folder = { id: uuidv4(), name };
-  
+
     // Update local state with the new folder
     setFolders((existingFolders) => [...existingFolders, newFolder]);
-  
+
     try {
       // Persist the new folder to the backend
       await axios.post('/api/folders', newFolder);
-    } 
+    }
     catch (error) {
       // Log error and revert state if API fails
       console.error('Error saving the folder:', error);
@@ -76,7 +76,7 @@ export const useNotes = () => {
       setFolders((existingFolders) =>
         existingFolders.filter((folder) => folder.id !== id)
       );
-    } 
+    }
     catch (error) {
       console.error("Error deleting folder:", error);
     }
@@ -101,7 +101,7 @@ export const useNotes = () => {
           folder.id === id ? { ...folder, name: newName.trim() } : folder
         )
       );
-    } 
+    }
     catch (error) {
       console.error(error);
     }
@@ -111,7 +111,13 @@ export const useNotes = () => {
 
   const handleNewNote = async (folderId: string | null = null) => {
     // Create new empty note
-    const newNote: Note = { id: uuidv4(), title: '', content: '', folderId };
+    const newNote: Note = {
+      id: uuidv4(),
+      title: '',
+      content: '',
+      folderId,
+      embeddingsId: ''
+    };
 
     try {
       // Persist new (empty) note to the backend
@@ -128,47 +134,65 @@ export const useNotes = () => {
 
   const handleSaveNote = async (updatedNote: Note): Promise<void> => {
     try {
-      // Update notes using the previous state to avoid closure issues
+      let noteToSave: Note | null = null;
+      let currentNote: Note | undefined;
+  
+      // Optimistically update local state
       setNotes((existingNotes) => {
-        const currentNote = existingNotes.find(note => note.id === updatedNote.id);
-        
+        currentNote = existingNotes.find(note => note.id === updatedNote.id);
+  
         if (!currentNote) {
-          throw new Error(`Note with id ${updatedNote.id} not found`);
+          console.error(`Note with id ${updatedNote.id} not found`);
+          return existingNotes;
         }
   
-        const noteToSave = {
+        noteToSave = {
           ...updatedNote,
-          folderId: currentNote.folderId
+          folderId: currentNote.folderId,
+          embeddingsId: currentNote.embeddingsId
         };
   
-        // Make API call
-        // Using Promise here since we're inside a state update
-        void axios.put(`/api/notes/${updatedNote.id}`, noteToSave)
-          .catch((error: Error) => {
-            // Revert the state change on API failure
-            setNotes(existingNotes);
-            setSelectedNote(currentNote);
-            throw error; // Re-throw to be caught by outer catch block
-          });
-  
-        // Update local state optimistically
-        setSelectedNote(noteToSave);
-        
-        // Return new notes array
-        return existingNotes.map((note) => 
-          note.id === updatedNote.id ? noteToSave : note
+        return existingNotes.map((note) =>
+          note.id === updatedNote.id ? noteToSave! : note
         );
       });
+  
+      if (!noteToSave || !currentNote) return;
+  
+      setSelectedNote(noteToSave);
+  
+      if (noteToSave.embeddingsId) {
+        await axios.post('http://localhost:8000/update_note_embeddings', {
+          embeddings_ID: noteToSave.embeddingsId,
+          note_contents: noteToSave.content
+        });
+      } else {
+        const response = await axios.post('http://localhost:8000/create_initial_note_embeddings', {
+          note_contents: noteToSave.content
+        });
+  
+        noteToSave.embeddingsId = response.data.message;
+  
+        // Optional: Update state again with new embeddingsId
+        setNotes((prev) =>
+          prev.map((note) =>
+            note.id === noteToSave!.id ? { ...note, embeddingsId: noteToSave!.embeddingsId } : note
+          )
+        );
+      }
+  
+      await axios.put(`/api/notes/${updatedNote.id}`, noteToSave);
+  
     } catch (error) {
-      // Properly type and handle the error
-      const errorMessage = error instanceof Error 
-        ? error.message 
+      const errorMessage = error instanceof Error
+        ? error.message
         : 'An unknown error occurred while saving the note';
-      
+  
       console.error('Error saving note:', errorMessage);
-      throw error; // Propagate error to calling component
+      throw error;
     }
   };
+  
 
   const handleDeleteNote = async (id: string) => {
     try {
@@ -214,15 +238,15 @@ export const useNotes = () => {
 
   const handleMoveNote = async (note: Note, targetFolderId: string | null) => {
     const updatedNote = { ...note, folderId: targetFolderId };
-  
+
     setNotes((existingNotes) =>
       existingNotes.map((n) => n.id === note.id ? updatedNote : n)
     );
-  
+
     if (selectedNote?.id === note.id) {
       setSelectedNote(updatedNote);
     }
-  
+
     try {
       await axios.put(`/api/notes/${note.id}`, updatedNote);
     } catch (error) {
@@ -232,7 +256,7 @@ export const useNotes = () => {
         existingNotes.map((n) => n.id === note.id ? note : n)
       );
     }
-  };  
+  };
 
   return {
     folders,

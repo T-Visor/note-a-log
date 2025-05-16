@@ -5,28 +5,27 @@ export default function handler(request: NextApiRequest, response: NextApiRespon
   const { id } = request.query;
 
   if (request.method === 'PUT') {
-    // Update a note
-    const { title, content, folderId } = request.body;
-
+    const { title, content, folderId, embeddingsId } = request.body;
+  
     try {
       const statement = databaseConnection.prepare(`
         UPDATE notes
-        SET title = ?, content = ?, folderId = ?
+        SET title = ?, content = ?, folderId = ?, embeddingsId = ?
         WHERE id = ?
       `);
-      const result = statement.run(title, content, folderId, id);
-
+      const result = statement.run(title, content, folderId, embeddingsId, id);
+  
       if (result.changes === 0) {
         return response.status(404).json({ error: 'Note not found' });
       }
-
-      response.status(200).json({ id, title, content, folderId });
+  
+      response.status(200).json({ id, title, content, folderId, embeddingsId });
     } 
     catch (error) {
       console.error('Error updating note:', error);
       response.status(500).json({ error: 'Error updating note' });
     }
-  } 
+  }  
   else if (request.method === 'DELETE') {
     try {
       console.log('Request to delete note with ID:', id);
