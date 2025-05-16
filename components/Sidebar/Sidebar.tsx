@@ -118,8 +118,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           className={`fixed inset-y-0 left-0 bg-gray-100 dark:bg-gray-800 overflow-hidden transform ${isVisible ? 'translate-x-0' : '-translate-x-full'
             } md:relative md:translate-x-0 z-10`}
         >
-          <div className="p-4">
-            {/* 'X' button to toggle sidebar on mobile */}
+          <div className="flex flex-col h-full p-4">
             <Button onClick={onToggleVisibility} variant="ghost" size="icon" className="mb-4 w-full md:hidden">
               <X className="h-4 w-4" />
             </Button>
@@ -131,9 +130,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onSearch={onSearch}
             />
 
-            {/*<hr className="border-t border-gray-400 dark:border-gray-600 mt-1 mb-1" /> */}
-
-            <div className="space-y-1 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 30vh)' }}>
+            <div className="flex-1 overflow-y-auto space-y-1 mt-2">
               {folders.map((folder, index) => (
                 <FolderItem
                   key={folder.id}
@@ -153,6 +150,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               ))}
             </div>
           </div>
+
         </div>
       </>
     );
