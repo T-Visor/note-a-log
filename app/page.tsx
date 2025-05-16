@@ -87,7 +87,7 @@ const NotesAppContent = () => {
         onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
         variant="ghost"
         size="icon"
-        className="hidden md:flex absolute top-4 right-6 z-20"
+        className="hidden md:flex absolute top-4 md:right-2 xl:right-4 z-20"
       >
         {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
       </Button>

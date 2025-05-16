@@ -26,7 +26,7 @@ interface SidebarProps {
 }
 
 const COLLAPSED_WIDTH = 0;
-const SIDEBAR_WIDTH = 325;
+const SIDEBAR_WIDTH = 18.75;
 
 export const Sidebar: React.FC<SidebarProps> = ({
   folders,
@@ -67,7 +67,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   if (isLoading) {
     return (
       <div
-        style={{ width: `${SIDEBAR_WIDTH}px` }}
+        style={{ width: `${SIDEBAR_WIDTH}rem` }}
         className={`fixed inset-y-0 left-0 bg-gray-100 dark:bg-gray-800 overflow-hidden transition-transform duration-300 ease-in-out transform ${isVisible ? "translate-x-0" : "-translate-x-full"
           } md:relative md:translate-x-0 z-10`}
       >
@@ -112,7 +112,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         <div
           style={{
-            width: isDesktopCollapsed ? COLLAPSED_WIDTH : `${SIDEBAR_WIDTH}px`,
+            width: isDesktopCollapsed ? COLLAPSED_WIDTH : `${SIDEBAR_WIDTH}rem`,
             transition: 'width 300ms ease-in-out'
           }}
           className={`fixed inset-y-0 left-0 bg-gray-100 dark:bg-gray-800 overflow-hidden transform ${isVisible ? 'translate-x-0' : '-translate-x-full'
