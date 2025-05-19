@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { Search, NotebookPen } from "lucide-react";
+import { Search, NotebookPen, Wand } from "lucide-react";
 import NewFolderDialog from './NewFolderDialog';
 
 interface SidebarHeaderProps {
@@ -18,10 +18,10 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
     <div>
       <div className="flex justify-end items-center space-x-2">
         {/* Pass onNewFolder directly to the NewFolderDialog */}
-        <NewFolderDialog onNewFolder={onCreateFolder} />
         <Button variant="ghost" size="icon">
           <Search className="h-5 w-5"/>
         </Button>
+        <NewFolderDialog onNewFolder={onCreateFolder} />
         <Button variant="ghost" size="icon">
           <NotebookPen className="h-5 w-5"/>
         </Button>

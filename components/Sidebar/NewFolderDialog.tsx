@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Folder } from "lucide-react";
+import { FolderPlus } from "lucide-react";
 
 // Modify the props to directly accept onNewFolder instead of onCreateFolder
 const NewFolderDialog = ({ onNewFolder }) => {
@@ -22,7 +22,7 @@ const NewFolderDialog = ({ onNewFolder }) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="ghost" size="icon">
-          <Folder className="h-5 w-5" />
+          <FolderPlus className="h-6 w-6" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
