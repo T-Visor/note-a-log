@@ -118,6 +118,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <SidebarHeader
               onCreateFolder={onNewFolder}
               onSearch={onSearch}
+              onNewNote={onNewNote}
+              firstFolderId={folders[0]?.id}
             />
 
             <div className="flex-1 overflow-y-auto space-y-1 mt-2">

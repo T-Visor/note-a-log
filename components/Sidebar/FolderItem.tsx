@@ -10,7 +10,8 @@ import {
   Trash2,
   MoreVertical,
   FileText,
-  Wand
+  Wand,
+  Plus
 } from "lucide-react";
 import {
   Popover,
@@ -37,6 +38,52 @@ interface FolderItemProps {
   onDeleteNote: (id: string) => void;
 }
 
+// Specialized component just for the actions of the first folder
+export const FirstFolderActions: React.FC<{
+  folderId: string;
+  onNewNote: (folderId: string) => void;
+}> = ({ folderId, onNewNote }) => {
+  const { toast } = useToast();
+  const { setLoading, forceUpdate } = useSidebarContext();
+
+  const handleAutoCategorize = async () => {
+    try {
+      setLoading(true);
+      await axios.get("http://localhost:8000/auto_categorize_notes");
+      toast({
+        title: "Success",
+        description: "Completed successfully.",
+      });
+      forceUpdate();
+    }
+    catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Couldn't auto-categorize notes. Check logs",
+      });
+      console.error("Error during auto-categorization for notes:", error);
+    }
+    finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="flex items-center space-x-1 mb-3">
+      <Button
+        onClick={handleAutoCategorize}
+        variant="ghost"
+        size="sm"
+        className="flex items-center text-xs"
+      >
+        <Wand className="w-3 h-3 mr-1" />
+        <span>Auto-categorize</span>
+      </Button>
+    </div>
+  );
+};
+
 export const FolderItem: React.FC<FolderItemProps> = ({
   folder,
   isFirstFolder,
@@ -50,59 +97,31 @@ export const FolderItem: React.FC<FolderItemProps> = ({
   onNewNote,
   onDeleteNote
 }) => {
+  // If this is the special first folder, render only its notes without the folder container
+  if (isFirstFolder) {
+    const folderNotes = notes.filter(note => note.folderId === folder.id);
+    return (
+      <>
+        <FirstFolderActions folderId={folder.id} onNewNote={onNewNote} />
+        <NoteList
+          notes={folderNotes}
+          selectedNoteId={selectedNoteId}
+          onSelectNote={onSelectNote}
+          onDeleteNote={onDeleteNote}
+        />
+      </>
+    );
+  }
+
+  // Regular folder implementation starts here
   const [isEditing, setIsEditing] = useState(false);
   const [editingName, setEditingName] = useState(folder.name);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  const { toast } = useToast() // toast notification pop-up
-  const { setLoading, forceUpdate } = useSidebarContext();
-
-  // Calculate if the folder should be displayed as expanded
-  // First folder is ALWAYS expanded if it has notes
-  const shouldBeExpanded = isFirstFolder && notes.length > 0 ? true : isExpanded;
+  const { setLoading } = useSidebarContext();
 
   useEffect(() => {
     setLoading(false);
   }, []);
-
-  // Force the first folder to be expanded if it has notes and isn't already expanded
-  useEffect(() => {
-    if (isFirstFolder && notes.length > 0 && !isExpanded) {
-      onToggleExpand(folder.id);
-    }
-  }, [isFirstFolder, notes.length, isExpanded, folder.id, onToggleExpand]);
-
-  // Button click triggers a job to run for an LLM
-  // to move notes to their appropriate folders.
-  const handleAutoCategorize = async () => {
-    try {
-      // Initialize loading animation in sidebar
-      setLoading(true);
-
-      // Use API call to organize notes in the sidebar
-      await axios.get("http://localhost:8000/auto_categorize_notes");
-
-      // Show success toast
-      toast({
-        title: "Success",
-        description: "Completed successfully.",
-      });
-
-      forceUpdate();
-    }
-    catch (error) {
-      // Show error toast
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Couldn't auto-categorize notes. Check logs",
-      });
-      console.error("Error during auto-categorization for notes:", error);
-    }
-    finally {
-      // Ensure loading state is reset regardless of success or failure
-      setLoading(false);
-    }
-  };
 
   const handleNewNote = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
@@ -145,35 +164,18 @@ export const FolderItem: React.FC<FolderItemProps> = ({
   /* 
   Handles the case where a user deletes the last note in a folder.
   This will automatically close the folder once it becomes empty.
-  Special case: Don't auto-close the first folder if it becomes empty.
   */
   useEffect(() => {
-    if (notes.length === 0 && isExpanded && !isFirstFolder) {
+    if (notes.length === 0 && isExpanded) {
       onToggleExpand(folder.id);
     }
-  }, [notes.length, isExpanded, isFirstFolder, folder.id, onToggleExpand]);
-
-  // Handle folder toggling with special handling for first folder
-  const handleToggleExpand = () => {
-    // If it's the first folder with notes, don't allow collapsing
-    if (isFirstFolder && notes.length > 0) {
-      // Ensure it's expanded
-      if (!isExpanded) {
-        onToggleExpand(folder.id);
-      }
-      // Don't allow collapsing
-      return;
-    }
-    
-    // For other folders, toggle normally
-    onToggleExpand(folder.id);
-  };
+  }, [notes.length, isExpanded, folder.id, onToggleExpand]);
 
   return (
     <div className="mb-1">
       <div
-        className={`flex items-center justify-between cursor-pointer p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded group ${isFirstFolder ? "font-bold" : ""}`}
-        onClick={handleToggleExpand}
+        className="flex items-center justify-between cursor-pointer p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded group"
+        onClick={() => onToggleExpand(folder.id)}
       >
         <div className="flex items-center flex-1 overflow-hidden">
           <Folder className="h-4 w-4 mr-4" />
@@ -192,10 +194,10 @@ export const FolderItem: React.FC<FolderItemProps> = ({
             <span className="truncate w-0 flex-1">{folder.name}</span>
           )}
           {(() => {
-            if (notes.length > 0 && shouldBeExpanded) {
+            if (notes.length > 0 && isExpanded) {
               return <ChevronDown className="h-4 w-4 mr-2" />;
             }
-            else if (notes.length > 0 && !shouldBeExpanded) {
+            else if (notes.length > 0 && !isExpanded) {
               return <ChevronRight className="h-4 w-4 mr-2" />;
             }
             else {
@@ -218,63 +220,38 @@ export const FolderItem: React.FC<FolderItemProps> = ({
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-40 p-1">
-              {isFirstFolder ? (
-                <>
-                  <Button
-                    onClick={handleNewNote}
-                    variant="ghost"
-                    size="sm"
-                    className="w-full flex items-center justify-start"
-                  >
-                    <FileText className="w-4 h-4 mr-2" />
-                    <span>New Note</span>
-                  </Button>
-                  <Button
-                    onClick={handleAutoCategorize}
-                    variant="ghost"
-                    size="sm"
-                    className="w-full flex items-center justify-start"
-                  >
-                    <Wand className="w-4 h-4 mr-2" />
-                    <span className="font-bold">Auto-categorize</span>
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button
-                    onClick={handleNewNote}
-                    variant="ghost"
-                    size="sm"
-                    className="w-full flex items-center justify-start"
-                  >
-                    <FileText className="w-4 h-4 mr-2" />
-                    <span>New Note</span>
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setIsEditing(true)}
-                    className="w-full flex items-center justify-start"
-                  >
-                    <Pencil className="h-4 w-4 mr-2" />
-                    Rename Folder
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onDeleteFolder(folder.id)}
-                    className="w-full flex items-center justify-start text-red-600 hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-900/10"
-                  >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Delete Folder
-                  </Button>
-                </>
-              )}
+              <Button
+                onClick={handleNewNote}
+                variant="ghost"
+                size="sm"
+                className="w-full flex items-center justify-start"
+              >
+                <FileText className="w-4 h-4 mr-2" />
+                <span>New Note</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsEditing(true)}
+                className="w-full flex items-center justify-start"
+              >
+                <Pencil className="h-4 w-4 mr-2" />
+                Rename Folder
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onDeleteFolder(folder.id)}
+                className="w-full flex items-center justify-start text-red-600 hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-900/10"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete Folder
+              </Button>
             </PopoverContent>
           </Popover>
         </div>
       </div>
-      {shouldBeExpanded && (
+      {isExpanded && (
         <div className="relative before:absolute before:top-0 before:bottom-0 before:left-[-0.33rem] before:w-px before:bg-gray-300 dark:before:bg-gray-600 ml-4">
           <div className="pl-4">
             <NoteList

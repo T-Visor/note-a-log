@@ -8,11 +8,15 @@ interface SidebarHeaderProps {
   onNewFolderNameChange: (name: string) => void;
   onCreateFolder: () => void;
   onSearch: (query: string) => void;
+  onNewNote: (folderId: string) => void;
+  firstFolderId: string;
 }
 
 export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
   onCreateFolder,
   onSearch,
+  onNewNote,
+  firstFolderId
 }) => {
   return (
     <div>
@@ -22,7 +26,10 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
           <Search className="h-5 w-5"/>
         </Button>
         <NewFolderDialog onNewFolder={onCreateFolder} />
-        <Button variant="ghost" size="icon">
+        <Button
+          variant="ghost" 
+          size="icon"
+          onClick={() => onNewNote(firstFolderId)}>
           <NotebookPen className="h-5 w-5"/>
         </Button>
       </div>
