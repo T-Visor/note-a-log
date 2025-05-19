@@ -82,16 +82,8 @@ const NotesAppContent = () => {
   })();
 
   return (
-    <div className="flex md:flex-row h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 relative">
-      <Button
-        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-        variant="ghost"
-        size="icon"
-        className="hidden md:flex absolute top-4 right-4 z-20"
-      >
-        {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-      </Button>
-
+    <div className="flex flex-col md:flex-row h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+      {/* Sidebar */}
       <Sidebar
         folders={folders}
         notes={filteredNotes}
@@ -109,8 +101,27 @@ const NotesAppContent = () => {
         onMoveNote={handleMoveNote}
         onDeleteNote={handleDeleteNote}
       />
-      <div className="flex-1 overflow-auto">
-        <div className="max-w-4xl mx-auto px-4 py-8 h-full">{content}</div>
+      
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Header with theme toggle */}
+        <header className="flex items-center justify-end border-gray-200 dark:border-gray-700">
+          <Button
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            variant="ghost"
+            size="icon"
+            className="ml-auto mt-2 mr-2"
+          >
+            {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </Button>
+        </header>
+        
+        {/* Content area */}
+        <div className="flex-1 overflow-auto">
+          <div className="max-w-4xl mx-auto px-4 pb-4 h-full">
+            {content}
+          </div>
+        </div>
       </div>
       <Toaster />
     </div>

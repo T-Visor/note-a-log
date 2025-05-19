@@ -101,7 +101,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           onClick={toggleDesktopSidebar}
           variant="ghost"
           size="icon"
-          className="hidden md:flex absolute top-4 left-4 z-20"
+          className="hidden md:flex absolute top-2 left-2 z-20"
         >
           {isDesktopCollapsed ? (
             <PanelRightClose className="h-5 w-5" />
@@ -118,7 +118,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           className={`fixed inset-y-0 left-0 bg-gray-100 dark:bg-gray-800 overflow-hidden transform ${isVisible ? 'translate-x-0' : '-translate-x-full'
             } md:relative md:translate-x-0 z-10`}
         >
-          <div className="flex flex-col h-full p-4">
+          <div className="flex flex-col h-full p-2">
             <Button onClick={onToggleVisibility} variant="ghost" size="icon" className="mb-4 w-full md:hidden">
               <X className="h-4 w-4" />
             </Button>
@@ -150,7 +150,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
               ))}
             </div>
           </div>
-
         </div>
       </>
     );
