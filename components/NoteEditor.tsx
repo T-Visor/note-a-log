@@ -86,9 +86,9 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete }) => {
           onClick={handleSave}
           disabled={isSaving}
         >
-          {isSaving ? 
-            <Loader className="h-4 w-4 animate-spin"/> : 
-            <Save className="h-4 w-4"/>
+          {isSaving ?
+            <Loader className="h-4 w-4 animate-spin" /> :
+            <Save className="h-4 w-4" />
           }
         </Button>
       </div>
@@ -105,8 +105,8 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete }) => {
           frontmatterPlugin(),
           tablePlugin(),
         ]}
-        className="flex-1 rounded-md bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 dark:dark-theme overflow-auto"
-        contentEditableClassName="prose dark:prose-invert p-4 min-h-[300px] text-gray-900 dark:text-white"
+        className="flex-1 w-full rounded-md bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 dark:dark-theme overflow-auto"
+        contentEditableClassName="prose dark:prose-invert max-w-none !leading-normal p-4 min-h-[300px] text-gray-900 dark:text-white"
       />
     </div>
   );
