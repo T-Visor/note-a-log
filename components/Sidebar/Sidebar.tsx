@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Menu, X, GripVertical, PanelRightOpen, PanelRightClose } from "lucide-react";
+import { Menu, X, PanelRightOpen, PanelRightClose } from "lucide-react";
 import type { Note, Folder as FolderType } from '@/types';
 import { SidebarHeader } from './SidebarHeader';
 import { FolderItem } from './FolderItem';
@@ -43,16 +43,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onDeleteNote,
 }) => {
   const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
-  const [newFolderName, setNewFolderName] = useState('');
   const { isLoading } = useSidebarContext();
   const [isDesktopCollapsed, setIsDesktopCollapsed] = useState(false);
-
-  const handleCreateFolder = () => {
-    if (newFolderName.trim()) {
-      onNewFolder(newFolderName.trim());
-      setNewFolderName('');
-    }
-  };
 
   const toggleFolderExpansion = (folderId: string) => {
     setExpandedFolders(prev =>
@@ -91,7 +83,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           onClick={onToggleVisibility}
           variant="ghost"
           size="icon"
-          className={`md:hidden absolute top-4 left-4 z-20 ${isVisible ? 'hidden' : ''}`}
+          className={`md:hidden absolute top-2 left-2 z-20 ${isVisible ? 'hidden' : ''}`}
         >
           <Menu className="h-4 w-4" />
         </Button>
@@ -101,7 +93,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           onClick={toggleDesktopSidebar}
           variant="ghost"
           size="icon"
-          className="hidden md:flex absolute top-2 left-2 z-20"
+          className="hidden md:flex absolute top-2 left-0.5 z-20"
         >
           {isDesktopCollapsed ? (
             <PanelRightClose className="h-5 w-5" />
@@ -124,9 +116,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </Button>
 
             <SidebarHeader
-              newFolderName={newFolderName}
-              onNewFolderNameChange={setNewFolderName}
-              onCreateFolder={handleCreateFolder}
+              onCreateFolder={onNewFolder}
               onSearch={onSearch}
             />
 
