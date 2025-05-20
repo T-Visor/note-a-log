@@ -2,12 +2,12 @@ import auto_categorize_notes
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from indexer import Indexer
-from retriever import Retriever
+from retriever import HybridRetrieverPipeline
 from indexer import Indexer
 from embeddings_manager import EmbeddingsManager
 from pydantic import BaseModel
 
-EMBEDDING_RETRIEVER = Retriever()
+EMBEDDING_RETRIEVER = HybridRetrieverPipeline()
 NOTES_INDEXER = Indexer()
 EMBEDDINGS_MANAGER = EmbeddingsManager()
 
@@ -79,5 +79,13 @@ def delete_note_embeddings(payload: DeleteEmbeddingRequest):
     try: 
         EMBEDDINGS_MANAGER.delete_embedding(payload.embeddings_ID)
         return {"status": "success", "message": payload.embeddings_ID}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f'An error occurred: {str(e)}')
+
+@app.get('/retrieve_similar_to_document')
+def retrieve_similar_to_document(embeddings_ID: str):
+    try: 
+        results = EMBEDDING_RETRIEVER.retrieve_similar_to_document(embeddings_ID) 
+        return {"status": "success", "message": results}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f'An error occurred: {str(e)}')
