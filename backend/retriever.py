@@ -1,3 +1,4 @@
+from pprint import pprint
 from haystack import Pipeline
 from haystack_integrations.components.retrievers.qdrant import QdrantHybridRetriever
 from haystack_integrations.document_stores.qdrant import QdrantDocumentStore
@@ -79,15 +80,28 @@ class Retriever:
         _ = doc.embedding
         _ = doc.sparse_embedding
 
-        return self.retriever.run(
+        results = self.retriever.run(
             query_embedding=doc.embedding,
-            query_sparse_embedding=doc.sparse_embedding
+            query_sparse_embedding=doc.sparse_embedding,
+            top_k= QDRANT_TOP_K_RESULTS + 1
         )
+
+        if len(results['documents']) > 1:
+            # The first document in the results set will always be the document ID matching the one passed in
+            # So only obtain results after the first
+            return results['documents'][1:]
+        else:
+            raise ValueError(f'No other documents similar to doc id: {document_id}')
 
 
 if __name__ == "__main__":
     retriever = Retriever()
 
     results = retriever.find_similar("81fd2f70fadb18a395fecc23ae71fa1462fc78c7e201363ff02b07e6723297c9")
-    print(results)
-    print(len(results["documents"]))
+
+    for result in results:
+        print(f'Document ID: {result.id}')
+        print(f'Content: {result.content}')
+        print(f'Similarity: {result.score:.2f}')
+        print()
+    print(len(results))
