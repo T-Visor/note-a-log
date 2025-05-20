@@ -82,9 +82,9 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete }) => {
           className="focus-visible:ring-0 text-md mr-4 bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 border"
         />
         <Button
-          size="sm"
           onClick={handleSave}
           disabled={isSaving}
+          size="sm"
         >
           {isSaving ?
             <Loader className="h-4 w-4 animate-spin" /> :

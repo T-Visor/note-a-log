@@ -57,7 +57,7 @@ export const NoteList: React.FC<NoteListProps> = ({
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => setCurrentNote(note)}
+                      onClick={() => (setCurrentNote(note), forceUpdate())}
                       className="w-full flex items-center justify-start"
                     >
                       <FolderUp className="h-4 w-4 mr-2" />

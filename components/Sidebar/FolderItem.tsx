@@ -104,13 +104,14 @@ export const FolderItem: React.FC<FolderItemProps> = ({
     const folderNotes = notes.filter(note => note.folderId === folder.id);
     return (
       <>
-        <FirstFolderActions folderId={folder.id} onNewNote={onNewNote} />
+        {notes.length > 0 && <FirstFolderActions folderId={folder.id} onNewNote={onNewNote} />}
         <NoteList
           notes={folderNotes}
           selectedNoteId={selectedNoteId}
           onSelectNote={onSelectNote}
           onDeleteNote={onDeleteNote}
         />
+        {/*notes.length > 0 && <div className="h-px bg-gray-300 dark:bg-gray-500 mt-1"></div>*/}
       </>
     );
   }
