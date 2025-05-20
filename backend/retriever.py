@@ -70,7 +70,7 @@ class Retriever:
         Find similar documents based on the embeddings of a known document.
 
         :param document_id: ID of the document to use as reference.
-        :return: Retrieval result with similar documents.
+        :return: Retrieval result with similar document ids
         """
         documents = self.document_store.get_documents_by_id([document_id])
         if not documents:
@@ -91,7 +91,8 @@ class Retriever:
         if len(results['documents']) > 1:
             # The first document in the results set will always be the document ID matching the one passed in
             # So only obtain results after the first
-            return results['documents'][1:]
+            similar_doc_ids = [ result.id for result in results['documents'][1:]]
+            return similar_doc_ids
         else:
             raise ValueError(f'No other documents similar to doc id: {document_id}')
 
@@ -102,9 +103,4 @@ if __name__ == "__main__":
     results = retriever.find_similar("81fd2f70fadb18a395fecc23ae71fa1462fc78c7e201363ff02b07e6723297c9")
 
     for result in results:
-        print(f'Document ID: {result.id}')
-        preview = result.content[:CONTENT_CHARACTER_LIMIT] + ("..." if len(result.content) > CONTENT_CHARACTER_LIMIT else "")
-        print(f'Content: {preview}')
-        print(f'Similarity: {result.score:.2f}')
-        print()
-    print(len(results))
+        print(result)
