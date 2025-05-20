@@ -1,4 +1,3 @@
-from pprint import pprint
 from haystack import Pipeline
 from haystack_integrations.components.retrievers.qdrant import QdrantHybridRetriever
 from haystack_integrations.document_stores.qdrant import QdrantDocumentStore
@@ -15,92 +14,109 @@ from config import (
 )
 
 
-CONTENT_CHARACTER_LIMIT = 100
+CONTENT_PREVIEW_LIMIT = 100  # Character limit for content preview display
 
-class Retriever:
+
+class HybridRetrieverPipeline:
+    """
+    Encapsulates a Haystack pipeline that uses dense and sparse FastEmbed models
+    with a Qdrant backend for hybrid document retrieval.
+    """
+
     def __init__(self):
-        """Initialize the Qdrant retriever pipeline using dense and sparse FastEmbed models."""
+        """Initialize the document store, hybrid retriever, and pipeline."""
         self.document_store = QdrantDocumentStore(**QDRANT_CONFIG)
-        self.retriever = QdrantHybridRetriever(
+
+        self.hybrid_retriever = QdrantHybridRetriever(
             document_store=self.document_store,
             top_k=QDRANT_TOP_K_RESULTS
         )
-        self.pipeline = self._build_pipeline()
 
-    def _build_pipeline(self) -> Pipeline:
-        """Build and connect the hybrid retrieval pipeline."""
+        self.pipeline = self._initialize_pipeline()
+
+    def _initialize_pipeline(self) -> Pipeline:
+        """
+        Set up the Haystack pipeline with dense and sparse embedders and connect them to the hybrid retriever.
+
+        :return: Configured Pipeline instance.
+        """
         pipeline = Pipeline()
 
-        # Add embedders
+        # Dense embedder with prompt prefix
         dense_embedder = FastembedTextEmbedder(
             model=FASTEMBED_DENSE_MODEL,
             cache_dir=FASTEMBED_CACHE_DIRECTORY,
             prefix="Identify the passage most semantically similar to: "
         )
+
+        # Sparse embedder
         sparse_embedder = FastembedSparseTextEmbedder(
             model=FASTEMBED_SPARSE_MODEL,
             cache_dir=FASTEMBED_CACHE_DIRECTORY
         )
 
+        # Register components
         pipeline.add_component("dense_text_embedder", dense_embedder)
         pipeline.add_component("sparse_text_embedder", sparse_embedder)
-        pipeline.add_component("retriever", self.retriever)
+        pipeline.add_component("retriever", self.hybrid_retriever)
 
-        # Connect embedding outputs to the hybrid retriever
+        # Connect embedders to the hybrid retriever
         pipeline.connect("dense_text_embedder.embedding", "retriever.query_embedding")
         pipeline.connect("sparse_text_embedder.sparse_embedding", "retriever.query_sparse_embedding")
 
         return pipeline
 
-    def query(self, text: str):
+    def retrieve_by_query(self, query_text: str):
         """
-        Query the pipeline with a user-provided text string.
+        Retrieve documents similar to a user-provided query.
 
-        :param text: Input query string.
-        :return: List of retrieved documents.
+        :param query_text: Input query string.
+        :return: List of retrieved Document objects.
         """
-        results = self.pipeline.run({
-            "dense_text_embedder": {"text": text},
-            "sparse_text_embedder": {"text": text}
+        result = self.pipeline.run({
+            "dense_text_embedder": {"text": query_text},
+            "sparse_text_embedder": {"text": query_text}
         })
-        return results["retriever"]["documents"]
+        return result["retriever"]["documents"]
 
-    def find_similar(self, document_id: str):
+    def retrieve_similar_to_document(self, doc_id: str):
         """
-        Find similar documents based on the embeddings of a known document.
+        Retrieve documents similar to the given document ID, using its embeddings.
 
-        :param document_id: ID of the document to use as reference.
-        :return: Retrieval result with similar document ids
+        :param doc_id: ID of the reference document.
+        :return: List of similar document IDs (excluding the original).
         """
-        documents = self.document_store.get_documents_by_id([document_id])
+        documents = self.document_store.get_documents_by_id([doc_id])
         if not documents:
-            raise ValueError(f"Document with ID {document_id} not found.")
+            raise ValueError(f"Document with ID '{doc_id}' not found.")
 
-        doc = documents[0]
+        reference_doc = documents[0]
 
-        # Ensure embeddings are computed before passing to retriever
-        _ = doc.embedding
-        _ = doc.sparse_embedding
+        # Force lazy-loaded embeddings to load before use
+        _ = reference_doc.embedding
+        _ = reference_doc.sparse_embedding
 
-        results = self.retriever.run(
-            query_embedding=doc.embedding,
-            query_sparse_embedding=doc.sparse_embedding,
-            top_k= QDRANT_TOP_K_RESULTS + 1
+        retrieval_result = self.hybrid_retriever.run(
+            query_embedding=reference_doc.embedding,
+            query_sparse_embedding=reference_doc.sparse_embedding,
+            top_k=QDRANT_TOP_K_RESULTS + 1  # include original doc in results
         )
 
-        if len(results['documents']) > 1:
-            # The first document in the results set will always be the document ID matching the one passed in
-            # So only obtain results after the first
-            similar_doc_ids = [ result.id for result in results['documents'][1:]]
-            return similar_doc_ids
-        else:
-            raise ValueError(f'No other documents similar to doc id: {document_id}')
+        retrieved_docs = retrieval_result["documents"]
+
+        if len(retrieved_docs) <= 1:
+            raise ValueError(f"No similar documents found for document ID: {doc_id}")
+
+        # Exclude the original document (first in the result list)
+        similar_doc_ids = [doc.id for doc in retrieved_docs[1:]]
+        return similar_doc_ids
 
 
 if __name__ == "__main__":
-    retriever = Retriever()
+    retriever = HybridRetrieverPipeline()
 
-    results = retriever.find_similar("81fd2f70fadb18a395fecc23ae71fa1462fc78c7e201363ff02b07e6723297c9")
+    document_id = "81fd2f70fadb18a395fecc23ae71fa1462fc78c7e201363ff02b07e6723297c9"
+    similar_documents = retriever.retrieve_similar_to_document(document_id)
 
-    for result in results:
-        print(result)
+    for doc_id in similar_documents:
+        print(doc_id)
