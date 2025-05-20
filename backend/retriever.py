@@ -15,6 +15,8 @@ from config import (
 )
 
 
+CONTENT_CHARACTER_LIMIT = 100
+
 class Retriever:
     def __init__(self):
         """Initialize the Qdrant retriever pipeline using dense and sparse FastEmbed models."""
@@ -101,7 +103,8 @@ if __name__ == "__main__":
 
     for result in results:
         print(f'Document ID: {result.id}')
-        print(f'Content: {result.content}')
+        preview = result.content[:CONTENT_CHARACTER_LIMIT] + ("..." if len(result.content) > CONTENT_CHARACTER_LIMIT else "")
+        print(f'Content: {preview}')
         print(f'Similarity: {result.score:.2f}')
         print()
     print(len(results))
