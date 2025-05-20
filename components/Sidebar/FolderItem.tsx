@@ -10,7 +10,7 @@ import {
   Trash2,
   MoreVertical,
   FileText,
-  Wand,
+  Sparkles,
   Plus
 } from "lucide-react";
 import {
@@ -70,15 +70,17 @@ export const FirstFolderActions: React.FC<{
   };
 
   return (
-    <div className="flex items-center space-x-1 mb-3">
+    <div className="flex justify-center mb-2">
       <Button
         onClick={handleAutoCategorize}
         variant="ghost"
-        size="sm"
-        className="flex items-center text-xs"
+        className="flex items-center"
+        disabled={true}
       >
-        <Wand className="w-3 h-3 mr-1" />
-        <span>Auto-categorize</span>
+        <span className="text-sm">
+          Organize with AI
+        </span>
+        <Sparkles className="w-4 h-4 ml-1"/>
       </Button>
     </div>
   );
