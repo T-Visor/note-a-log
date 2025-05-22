@@ -2,6 +2,8 @@ import axios from "axios";
 import databaseConnection from "@/lib/database";
 import { Note } from "@/types/index";
 
+const MAX_CHARACTER_COUNT = 70;
+
 interface SimilarResult {
   id: string;
   score: number;
@@ -56,7 +58,7 @@ const main = async () => {
   const enrichedNotes = matchingNotes.map(({ title, content, folderId, embeddingsId }) => ({
     Folder: folderId,
     Title: title,
-    Content: content,
+    Content: content.length > MAX_CHARACTER_COUNT ? content.slice(0, MAX_CHARACTER_COUNT) + "..." : content,
     Score: embeddingScoreMap.get(embeddingsId!) ?? null
   }));
 
