@@ -2,22 +2,21 @@ import axios from "axios";
 import databaseConnection from "@/lib/database";
 import { Note } from "@/types/index";
 
-interface SimilarDocument {
+interface SimilarResult {
   id: string;
   score: number;
 }
 
 /**
- * Fetches document IDs similar to the given embeddings ID from a local API.
+ * Fetches similarity results for a given embeddings ID from the local API.
  * @param embeddingsId - The embeddings ID to find similar documents for.
- * @returns An array of similar embeddings IDs.
+ * @returns An array of objects containing matched embeddings IDs and similarity scores.
  */
-const fetchSimilarEmbeddingsIds = async (embeddingsId: string): Promise<SimilarDocument[]> => {
+const fetchSimilarResults = async (embeddingsId: string): Promise<SimilarResult[]> => {
   const response = await axios.get("http://localhost:8000/retrieve_similar_to_document", {
     params: { embeddings_ID: embeddingsId }
   });
 
-  // Assumes the response format is: { message: SimilarDocument[] }
   return response.data.message;
 };
 
@@ -26,10 +25,10 @@ const fetchSimilarEmbeddingsIds = async (embeddingsId: string): Promise<SimilarD
  * @param embeddingsIds - An array of embeddings IDs to search for.
  * @returns Array of Note records matching the given embeddings IDs.
  */
-const fetchNotesByEmbeddingsIds = (embeddingsIds: string[]): Note[] => {
+const fetchNotesByEmbeddingIds = (embeddingsIds: string[]): Note[] => {
   if (embeddingsIds.length === 0) return [];
 
-  const cleanedIds = embeddingsIds.map(id => id.trim()); // <- just in case
+  const cleanedIds = embeddingsIds.map(id => id.trim());
   const placeholders = cleanedIds.map(() => "?").join(", ");
   const query = `SELECT * FROM notes WHERE embeddingsId IN (${placeholders})`;
 
@@ -37,25 +36,31 @@ const fetchNotesByEmbeddingsIds = (embeddingsIds: string[]): Note[] => {
 };
 
 /**
- * Entry point to retrieve and log notes similar to a given document.
+ * Entry point to retrieve and log enriched notes similar to a given document.
  */
 const main = async () => {
-  const targetEmbeddingsId = "36df8eda42b5ed5069850d432d18ab90c32d207ee5f2b38f06cac76b8dc7e408";
-  const similarDocuments: SimilarDocument[] = await fetchSimilarEmbeddingsIds(targetEmbeddingsId);
-  console.log(similarDocuments);
+  const targetEmbeddingsId =
+    "36df8eda42b5ed5069850d432d18ab90c32d207ee5f2b38f06cac76b8dc7e408";
 
-  const matchingNotes = fetchNotesByEmbeddingsIds(similarDocuments.map(document => document.id));
+  const similarResults = await fetchSimilarResults(targetEmbeddingsId);
+  console.log("Similarity Results:", similarResults);
+
+  const matchedEmbeddingIds = similarResults.map(result => result.id);
+  const matchingNotes = fetchNotesByEmbeddingIds(matchedEmbeddingIds);
   console.log("Matching Notes:", matchingNotes);
 
-  const filteredInfo = matchingNotes.map(
-    ({ title, content, folderId }) => ({
-      Folder: folderId,
-      Title: title,
-      Content: content
-    })
+  const embeddingScoreMap = new Map(
+    similarResults.map(result => [result.id, result.score])
   );
 
-  console.log(filteredInfo);
+  const enrichedNotes = matchingNotes.map(({ title, content, folderId, embeddingsId }) => ({
+    Folder: folderId,
+    Title: title,
+    Content: content,
+    Score: embeddingScoreMap.get(embeddingsId!) ?? null
+  }));
+
+  console.log("Enriched Notes:", enrichedNotes);
 };
 
 main();
