@@ -1,6 +1,7 @@
 import Database from 'better-sqlite3';
 
 const databaseConnection = new Database('data/notesApp.db', { verbose: console.log });
+//const databaseConnection = new Database('../data/notesApp.db', { verbose: console.log }); // For testing locally
 
 // Initialize tables if they don’t exist
 databaseConnection.prepare(`
