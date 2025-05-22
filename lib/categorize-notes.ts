@@ -24,22 +24,25 @@ const fetchSimilarEmbeddingsIds = async (embeddingsId: string): Promise<string[]
 const fetchNotesByEmbeddingsIds = (embeddingsIds: string[]): Note[] => {
   if (embeddingsIds.length === 0) return [];
 
-  // Generate placeholders for parameterized query: ?, ?, ?, ...
-  const placeholders = embeddingsIds.map(() => "?").join(", ");
+  const cleanedIds = embeddingsIds.map(id => id.trim()); // <- just in case
+  const placeholders = cleanedIds.map(() => "?").join(", ");
   const query = `SELECT * FROM notes WHERE embeddingsId IN (${placeholders})`;
 
-  // Run the query with all the IDs as parameters
-  return databaseConnection.prepare(query).all(...embeddingsIds) as Note[];
+  console.log("Query:", query);
+  console.log("Params:", cleanedIds); // make sure these are full hashes
+
+  return databaseConnection.prepare(query).all(...cleanedIds) as Note[];
 };
 
 /**
  * Entry point to retrieve and log notes similar to a given document.
  */
 const main = async () => {
-  const targetEmbeddingsId = "81fd2f70fadb18a395fecc23ae71fa1462fc78c7e201363ff02b07e6723297c9";
+  const targetEmbeddingsId = "36df8eda42b5ed5069850d432d18ab90c32d207ee5f2b38f06cac76b8dc7e408";
   const similarEmbeddingsIds = await fetchSimilarEmbeddingsIds(targetEmbeddingsId);
-  const matchingNotes = fetchNotesByEmbeddingsIds(similarEmbeddingsIds);
+  console.log(similarEmbeddingsIds);
 
+  const matchingNotes = fetchNotesByEmbeddingsIds(similarEmbeddingsIds);
   console.log("Matching Notes:", matchingNotes);
 };
 
