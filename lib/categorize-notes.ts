@@ -2,17 +2,22 @@ import axios from "axios";
 import databaseConnection from "@/lib/database";
 import { Note } from "@/types/index";
 
+interface SimilarDocument {
+  id: string;
+  score: number;
+}
+
 /**
  * Fetches document IDs similar to the given embeddings ID from a local API.
  * @param embeddingsId - The embeddings ID to find similar documents for.
  * @returns An array of similar embeddings IDs.
  */
-const fetchSimilarEmbeddingsIds = async (embeddingsId: string): Promise<string[]> => {
+const fetchSimilarEmbeddingsIds = async (embeddingsId: string): Promise<SimilarDocument[]> => {
   const response = await axios.get("http://localhost:8000/retrieve_similar_to_document", {
     params: { embeddings_ID: embeddingsId }
   });
 
-  // Assumes the response format is: { message: string[] }
+  // Assumes the response format is: { message: SimilarDocument[] }
   return response.data.message;
 };
 
@@ -36,10 +41,10 @@ const fetchNotesByEmbeddingsIds = (embeddingsIds: string[]): Note[] => {
  */
 const main = async () => {
   const targetEmbeddingsId = "36df8eda42b5ed5069850d432d18ab90c32d207ee5f2b38f06cac76b8dc7e408";
-  const similarEmbeddingsIds = await fetchSimilarEmbeddingsIds(targetEmbeddingsId);
-  console.log(similarEmbeddingsIds);
+  const similarDocuments: SimilarDocument[] = await fetchSimilarEmbeddingsIds(targetEmbeddingsId);
+  console.log(similarDocuments);
 
-  const matchingNotes = fetchNotesByEmbeddingsIds(similarEmbeddingsIds);
+  const matchingNotes = fetchNotesByEmbeddingsIds(similarDocuments.map(document => document.id));
   console.log("Matching Notes:", matchingNotes);
 
   const filteredInfo = matchingNotes.map(
