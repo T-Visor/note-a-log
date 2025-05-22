@@ -28,9 +28,6 @@ const fetchNotesByEmbeddingsIds = (embeddingsIds: string[]): Note[] => {
   const placeholders = cleanedIds.map(() => "?").join(", ");
   const query = `SELECT * FROM notes WHERE embeddingsId IN (${placeholders})`;
 
-  console.log("Query:", query);
-  console.log("Params:", cleanedIds); // make sure these are full hashes
-
   return databaseConnection.prepare(query).all(...cleanedIds) as Note[];
 };
 
@@ -44,6 +41,16 @@ const main = async () => {
 
   const matchingNotes = fetchNotesByEmbeddingsIds(similarEmbeddingsIds);
   console.log("Matching Notes:", matchingNotes);
+
+  const filteredInfo = matchingNotes.map(
+    ({ title, content, folderId }) => ({
+      Folder: folderId,
+      Title: title,
+      Content: content
+    })
+  );
+
+  console.log(filteredInfo);
 };
 
 main();
