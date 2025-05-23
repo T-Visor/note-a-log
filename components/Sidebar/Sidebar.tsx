@@ -107,7 +107,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             width: isDesktopCollapsed ? COLLAPSED_WIDTH : `${SIDEBAR_WIDTH}rem`,
             transition: 'width 300ms ease-in-out'
           }}
-          className={`fixed inset-y-0 left-0 border-r bg-gray-100 dark:bg-gray-800 overflow-hidden transform ${isVisible ? 'translate-x-0' : '-translate-x-full'
+          className={`text-sm fixed inset-y-0 left-0 border-r bg-gray-100 dark:bg-gray-800 overflow-hidden transform ${isVisible ? 'translate-x-0' : '-translate-x-full'
             } md:relative md:translate-x-0 z-10`}
         >
           <div className="flex flex-col h-full p-2">

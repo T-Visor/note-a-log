@@ -198,10 +198,10 @@ export const FolderItem: React.FC<FolderItemProps> = ({
           )}
           {(() => {
             if (notes.length > 0 && isExpanded) {
-              return <ChevronDown className="h-4 w-4 mr-2" />;
+              return <ChevronDown className="h-4 w-4" />;
             }
             else if (notes.length > 0 && !isExpanded) {
-              return <ChevronRight className="h-4 w-4 mr-2" />;
+              return <ChevronRight className="h-4 w-4" />;
             }
             else {
               return <span className="h-4 w-4 mr-2 text-gray-400" />;
@@ -217,7 +217,7 @@ export const FolderItem: React.FC<FolderItemProps> = ({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8"
+                className="h-8 w-6"
               >
                 <MoreVertical className="h-4 w-4" />
               </Button>
