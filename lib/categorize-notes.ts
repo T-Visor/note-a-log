@@ -1,8 +1,8 @@
 import axios from "axios";
 import databaseConnection from "@/lib/database";
 import { Note, Folder } from "@/types/index";
-import Mustache from 'mustache';
-import { render } from "react-dom";
+import Mustache from "mustache";
+import ollama from "ollama";
 
 const MAX_CONTENT_LENGTH = 70;
 const PROMPT_TEMPLATE_FOR_NOTE_CATEGORIZATION = `
@@ -125,7 +125,12 @@ const fetchAllFolders = (): Folder[] => {
  * @param {Array<string>} categories - A list of existing category names to choose from.
  * @returns {string} The rendered prompt string to be passed to the language model.
  */
-function renderNoteCategorizationPrompt(title, content, search_results, categories) {
+const renderNoteCategorizationPrompt = (
+  title: string, 
+  content: string, 
+  search_results: EnrichedNote[], 
+  categories: string[]
+): string => {
   return Mustache.render(PROMPT_TEMPLATE_FOR_NOTE_CATEGORIZATION, {
     title,
     content,
@@ -133,6 +138,27 @@ function renderNoteCategorizationPrompt(title, content, search_results, categori
     categoriesList: categories.join(', ')
   });
 }
+
+/**
+ * Generates a note category using a language model (Ollama).
+ * @param {string} prompt - The formatted prompt string.
+ * @returns {Promise<string>} The generated LLM response.
+ */
+const generateCategoryUsingPrompt = async (
+  prompt: string
+): Promise<string> => {
+  const response = await ollama.chat({
+    model: "llama3.1:8b-instruct-q3_K_S",
+    messages: [
+      { role: "user", content: prompt }
+    ],
+    options: {
+      temperature: 0
+    },
+  });
+
+  return response.message.content;
+};
 
 /**
  * Main execution flow for retrieving enriched notes based on a similarity query.
