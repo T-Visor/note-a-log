@@ -77,10 +77,10 @@ export const FirstFolderActions: React.FC<{
         className="flex items-center"
         disabled={true}
       >
+        <Sparkles className="w-4 h-4 mr-1"/>
         <span className="text-sm">
           Organize with AI
         </span>
-        <Sparkles className="w-4 h-4 ml-1"/>
       </Button>
     </div>
   );
