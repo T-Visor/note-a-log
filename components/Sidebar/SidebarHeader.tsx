@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { Search, NotebookPen, Wand } from "lucide-react";
+import { Search, NotebookPen, Sparkles } from "lucide-react";
 import NewFolderDialog from './NewFolderDialog';
 
 interface SidebarHeaderProps {

@@ -40,9 +40,8 @@ interface FolderItemProps {
 
 // Specialized component just for the actions of the first folder
 export const FirstFolderActions: React.FC<{
-  folderId: string;
-  onNewNote: (folderId: string) => void;
-}> = ({ folderId, onNewNote }) => {
+  shouldBeDisabled: boolean;
+}> = ({ shouldBeDisabled }) => {
   const { toast } = useToast();
   const { setLoading, forceUpdate } = useSidebarContext();
 
@@ -72,12 +71,12 @@ export const FirstFolderActions: React.FC<{
   return (
     <div className="flex justify-center mb-2">
       <Button
-        onClick={handleAutoCategorize}
+        onClick={() => alert("Needs to be implemented")}
         variant="ghost"
         className="flex items-center"
-        disabled={true}
+        disabled={shouldBeDisabled}
       >
-        <Sparkles className="w-4 h-4 mr-1"/>
+        <Sparkles className="w-4 h-4 mr-1" />
         <span className="text-sm">
           Organize with AI
         </span>
@@ -104,7 +103,7 @@ export const FolderItem: React.FC<FolderItemProps> = ({
     const folderNotes = notes.filter(note => note.folderId === folder.id);
     return (
       <>
-        {notes.length > 0 && <FirstFolderActions folderId={folder.id} onNewNote={onNewNote} />}
+        <FirstFolderActions shouldBeDisabled={notes.length === 0} />
         <NoteList
           notes={folderNotes}
           selectedNoteId={selectedNoteId}
