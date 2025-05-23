@@ -177,7 +177,7 @@ export const FolderItem: React.FC<FolderItemProps> = ({
   return (
     <div className="mb-1">
       <div
-        className="flex items-center justify-between cursor-pointer p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded group"
+        className="flex items-center p-1 py-0 justify-between cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 rounded group"
         onClick={() => onToggleExpand(folder.id)}
       >
         <div className="flex items-center flex-1 overflow-hidden">

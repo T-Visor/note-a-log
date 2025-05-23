@@ -33,7 +33,7 @@ export const NoteList: React.FC<NoteListProps> = ({
       {[...notes].reverse().map((note) => (
         <div
           key={note.id}
-          className={`flex items-center justify-between cursor-pointer p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded group ${selectedNoteId === note.id ? 'bg-gray-200 dark:bg-gray-700' : ''}`}
+          className={`flex items-center justify-between cursor-pointer p-1 py-0 hover:bg-gray-200 dark:hover:bg-gray-700 rounded group ${selectedNoteId === note.id ? 'bg-gray-200 dark:bg-gray-700' : ''}`}
           onClick={() => onSelectNote(note)}
         >
           <span className="truncate flex-1 mr-2">{note.title || 'Untitled'}</span>
