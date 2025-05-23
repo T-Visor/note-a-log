@@ -188,7 +188,7 @@ export const FolderItem: React.FC<FolderItemProps> = ({
               onChange={(e) => setEditingName(e.target.value)}
               onKeyDown={handleKeyDown}
               onBlur={handleRename}
-              className="h-6 py-0 px-1 text-sm dark:focus:ring-0 border-gray-300 focus:ring-0 dark:border-gray-600"
+              className="h-6 px-1 text-sm focus-visible:ring-0 border-gray-300 dark:border-gray-600"
               autoFocus
               onClick={(e) => e.stopPropagation()}
               onFocus={(e) => e.target.select()}
