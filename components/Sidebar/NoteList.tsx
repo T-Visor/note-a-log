@@ -66,7 +66,7 @@ export const NoteList: React.FC<NoteListProps> = ({
                   </PopoverTrigger>
                   <PopoverContent className="w-80 p-4 border rounded-md shadow-lg">
                     <Command>
-                      <CommandInput placeholder="Search folders..." className="mb-2" />
+                      <CommandInput placeholder="Search folders..." className="" />
                       <CommandList>
                         {folders.map((folder) => (
                           <CommandItem
