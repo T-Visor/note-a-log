@@ -79,7 +79,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete }) => {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Note Title"
-          className="focus-visible:ring-0 text-md mr-4 bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 border"
+          className="focus-visible:ring-0 border text-md mr-4 bg-gray-100 dark:bg-gray-800"
         />
         <Button
           onClick={handleSave}
@@ -105,7 +105,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete }) => {
           frontmatterPlugin(),
           tablePlugin(),
         ]}
-        className="flex-1 w-full rounded-md bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 dark:dark-theme overflow-auto"
+        className="flex-1 w-full rounded-md bg-gray-100 dark:bg-gray-800 dark:dark-theme overflow-auto border"
         contentEditableClassName="prose dark:prose-invert max-w-none !leading-normal p-4 min-h-[300px] text-gray-900 dark:text-white"
       />
     </div>
