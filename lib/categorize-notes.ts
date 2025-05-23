@@ -1,8 +1,34 @@
 import axios from "axios";
 import databaseConnection from "@/lib/database";
-import { Note } from "@/types/index";
+import { Note, Folder } from "@/types/index";
+import Mustache from 'mustache';
+import { render } from "react-dom";
 
 const MAX_CONTENT_LENGTH = 70;
+const PROMPT_TEMPLATE_FOR_NOTE_CATEGORIZATION = `
+You are a content categorizer. Help me organize content by selecting the most appropriate category.
+
+Content to categorize:
+Title: {{{title}}}
+Content: {{{content}}}
+
+Most similar existing content:
+{{#search_results}}
+Folder: {{{Folder}}}, 
+Title: {{{Title}}}, 
+Content: {{{Content}}}, 
+Score: {{Score}}
+
+{{/search_results}}
+
+Existing Categories: [{{{categoriesList}}}]
+
+Instructions:
+1. Choose an existing category if it fits well
+2. Create a new category only if necessary (keep it brief)
+3. Return ONLY the category name without explanation
+
+Category:`;
 
 interface SimilarityMatch {
   id: string;
@@ -82,16 +108,40 @@ const buildEnrichedNotes = (
       content.length > MAX_CONTENT_LENGTH
         ? content.slice(0, MAX_CONTENT_LENGTH) + "..."
         : content,
-    Score: scoreMap.get(embeddingsId!) ?? null
+    Score: scoreMap.get(embeddingsId!)?.toFixed(2) ?? null
   }));
 };
+
+const fetchAllFolders = (): Folder[] => {
+  const folders = databaseConnection.prepare('SELECT * FROM folders').all() as Folder[];
+  return folders;
+}
+
+/**
+ * Renders the categorization prompt using Mustache.
+ * @param {string} title - The title of the note to categorize.
+ * @param {string} content - The content/body of the note to categorize.
+ * @param {Array<EnrichedNote>} search_results - An array of similar existing content items, each with folder, title, content, and score.
+ * @param {Array<string>} categories - A list of existing category names to choose from.
+ * @returns {string} The rendered prompt string to be passed to the language model.
+ */
+function renderNoteCategorizationPrompt(title, content, search_results, categories) {
+  return Mustache.render(PROMPT_TEMPLATE_FOR_NOTE_CATEGORIZATION, {
+    title,
+    content,
+    search_results,
+    categoriesList: categories.join(', ')
+  });
+}
 
 /**
  * Main execution flow for retrieving enriched notes based on a similarity query.
  */
 const main = async () => {
+  const currentTitle = "Hello there!";
+  const currentContent = "This is another test";
   const targetEmbeddingId =
-    "36df8eda42b5ed5069850d432d18ab90c32d207ee5f2b38f06cac76b8dc7e408";
+    "8f84b1e9a631a43ec95755008af664a3683c5b49ec84884e12648213174f3355";
 
   // Step 1: Fetch similar embedding matches
   const similarityMatches = await fetchSimilarityMatches(targetEmbeddingId);
@@ -107,7 +157,8 @@ const main = async () => {
   // Step 4: Enrich notes with folder name, truncated content, and similarity score
   const enrichedNotes = buildEnrichedNotes(matchingNotes, folderNames, scoreMap);
 
-  console.log("Enriched Notes:", enrichedNotes);
+  const foldersNames = fetchAllFolders();
+  console.log(renderNoteCategorizationPrompt(currentTitle, currentContent, enrichedNotes, folderNames.map(folder => folder.name)));
 };
 
 main();
