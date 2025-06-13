@@ -94,7 +94,7 @@ const fetchFolderNamesForNotes = (notes: Note[]): { name: string | null }[] => {
 };
 
 /**
- * Builds enriched note objects with folder name, truncated content, and score.
+ * Builds enriched note objects with folder name, title, truncated content, and score.
  */
 const buildEnrichedNotes = (
   notes: Note[],
@@ -167,7 +167,7 @@ const main = async () => {
   const currentTitle = "Hello there!";
   const currentContent = "This is another test";
   const targetEmbeddingId =
-    "8f84b1e9a631a43ec95755008af664a3683c5b49ec84884e12648213174f3355";
+    "349f062f6d2784ae0a56e71d405b4e7e8cef261aa46a27060f2e7862e7a56edb";
 
   // Step 1: Fetch similar embedding matches
   const similarityMatches = await fetchSimilarityMatches(targetEmbeddingId);
@@ -184,7 +184,11 @@ const main = async () => {
   const enrichedNotes = buildEnrichedNotes(matchingNotes, folderNames, scoreMap);
 
   const foldersNames = fetchAllFolders();
-  console.log(renderNoteCategorizationPrompt(currentTitle, currentContent, enrichedNotes, folderNames.map(folder => folder.name)));
+  const noteCategorizationPrompt = renderNoteCategorizationPrompt(currentTitle, currentContent, enrichedNotes, folderNames.map(folder => folder.name));
+  console.log(noteCategorizationPrompt);
+
+  const categoryName = await generateCategoryUsingPrompt(noteCategorizationPrompt);
+  console.log(categoryName);
 };
 
 main();
