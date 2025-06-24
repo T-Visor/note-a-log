@@ -126,9 +126,9 @@ const fetchAllFolders = (): Folder[] => {
  * @returns {string} The rendered prompt string to be passed to the language model.
  */
 const renderNoteCategorizationPrompt = (
-  title: string, 
-  content: string, 
-  search_results: EnrichedNote[], 
+  title: string,
+  content: string,
+  search_results: EnrichedNote[],
   categories: string[]
 ): string => {
   return Mustache.render(PROMPT_TEMPLATE_FOR_NOTE_CATEGORIZATION, {
@@ -163,14 +163,14 @@ const generateCategoryUsingPrompt = async (
 /**
  * Main execution flow for retrieving enriched notes based on a similarity query.
  */
-const main = async () => {
-  const currentTitle = "Hello there!";
-  const currentContent = "This is another test";
-  const targetEmbeddingId =
-    "349f062f6d2784ae0a56e71d405b4e7e8cef261aa46a27060f2e7862e7a56edb";
+const categorizeNoteWithAI = async (
+  noteTitle: string,
+  noteContent: string,
+  noteEmbeddingID: string
+) => {
 
   // Step 1: Fetch similar embedding matches
-  const similarityMatches = await fetchSimilarityMatches(targetEmbeddingId);
+  const similarityMatches = await fetchSimilarityMatches(noteEmbeddingID);
   const matchedEmbeddingIds = similarityMatches.map(match => match.id);
 
   // Step 2: Retrieve notes and their associated folder names
@@ -184,11 +184,19 @@ const main = async () => {
   const enrichedNotes = buildEnrichedNotes(matchingNotes, folderNames, scoreMap);
 
   const foldersNames = fetchAllFolders();
-  const noteCategorizationPrompt = renderNoteCategorizationPrompt(currentTitle, currentContent, enrichedNotes, folderNames.map(folder => folder.name));
+  const noteCategorizationPrompt = renderNoteCategorizationPrompt(
+    noteTitle,
+    noteContent,
+    enrichedNotes,
+    folderNames.map(folder => folder.name)
+  );
   console.log(noteCategorizationPrompt);
 
   const categoryName = await generateCategoryUsingPrompt(noteCategorizationPrompt);
   console.log(categoryName);
 };
 
-main();
+const currentTitle = "Hello there!";
+const currentContent = "This is another test";
+const targetEmbeddingId = "349f062f6d2784ae0a56e71d405b4e7e8cef261aa46a27060f2e7862e7a56edb";
+categorizeNoteWithAI(currentTitle, currentContent, targetEmbeddingId);

@@ -22,6 +22,7 @@ import type { Folder as FolderType, Note } from "@/types";
 import { NoteList } from "./NoteList";
 import axios from "axios";
 import { useSidebarContext } from "./SidebarContext";
+import RecommendedCategoriesDialog from "@/components/RecommendedCategoriesDialog"
 
 interface FolderItemProps {
   folder: FolderType;
@@ -70,17 +71,21 @@ export const FirstFolderActions: React.FC<{
 
   return (
     <div className="flex justify-center mb-2">
-      <Button
-        onClick={() => alert("Needs to be implemented")}
-        variant="ghost"
-        className="flex items-center"
-        disabled={shouldBeDisabled}
-      >
-        <Sparkles className="w-4 h-4 mr-1" />
-        <span className="text-sm">
-          Organize with AI
-        </span>
-      </Button>
+      <RecommendedCategoriesDialog
+        trigger={
+          <Button
+            onClick={() => console.log("Needs to be implemented!")}
+            variant="ghost"
+            className="flex items-center"
+            disabled={shouldBeDisabled}
+          >
+            <Sparkles className="w-4 h-4 mr-1" />
+            <span className="text-sm">
+              Organize with AI
+            </span>
+          </Button>
+        }
+      />
     </div>
   );
 };
