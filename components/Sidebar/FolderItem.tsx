@@ -76,7 +76,7 @@ export const FirstFolderActions: React.FC<{
           <Button
             onClick={() => console.log("Needs to be implemented!")}
             variant="ghost"
-            className="flex items-center"
+            className="flex items-center hover:bg-gray-200 dark:hover:bg-gray-600"
             disabled={shouldBeDisabled}
           >
             <Sparkles className="w-4 h-4 mr-1" />

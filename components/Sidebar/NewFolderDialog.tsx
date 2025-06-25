@@ -21,7 +21,11 @@ const NewFolderDialog = ({ onNewFolder }) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon">
+        <Button 
+          className="hover:bg-gray-200 dark:hover:bg-gray-600"
+          variant="ghost" 
+          size="icon"
+        >
           <FolderPlus className="h-5 w-5" />
         </Button>
       </DialogTrigger>

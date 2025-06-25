@@ -22,11 +22,16 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
     <div>
       <div className="flex justify-end items-center space-x-2">
         {/* Pass onNewFolder directly to the NewFolderDialog */}
-        <Button variant="ghost" size="icon">
+        <Button 
+          className="hover:bg-gray-200 dark:hover:bg-gray-600"
+          variant="ghost" 
+          size="icon"
+        >
           <Search className="h-5 w-5"/>
         </Button>
         <NewFolderDialog onNewFolder={onCreateFolder} />
         <Button
+          className="hover:bg-gray-200 dark:hover:bg-gray-600"
           variant="ghost" 
           size="icon"
           onClick={() => onNewNote(firstFolderId)}>

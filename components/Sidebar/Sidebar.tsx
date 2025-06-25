@@ -93,7 +93,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           onClick={toggleDesktopSidebar}
           variant="ghost"
           size="icon"
-          className="hidden md:flex absolute top-2 left-0.5 z-20"
+          className="hidden md:flex absolute top-2 left-0.5 z-20 hover:bg-gray-200 dark:hover:bg-gray-600"
         >
           {isDesktopCollapsed ? (
             <PanelRightClose className="h-5 w-5" />
