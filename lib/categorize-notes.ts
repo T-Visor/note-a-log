@@ -179,6 +179,7 @@ export const categorizeNoteWithAI = async (
   let enrichedNotes: EnrichedNote[] = [];
   const allExistingFolders = fetchAllFolders();
 
+  // Only do a search for similar notes that are assigned to folders already.
   if (notesAssignedToFoldersExist()) {
     // Fetch similar embedding matches
     const similarityMatches = await fetchSimilarityMatches(noteEmbeddingID);
