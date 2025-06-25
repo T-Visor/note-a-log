@@ -10,6 +10,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command"
+import { useEffect, useRef } from "react"
 
 type Note = {
   id: string
@@ -46,14 +54,14 @@ export default function RecommendedCategoriesDialog({ trigger }) {
       <DialogTrigger asChild>
         {trigger}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg overflow-y-auto max-h-[75%]">
         <DialogHeader>
           <DialogTitle>AI Recommendations</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div className="grid grid-cols-[1fr_1fr] items-center gap-2 font-medium text-sm text-muted-foreground px-1">
             <div>Note Title</div>
-            <div>Category</div>
+            <div>Recommended Folder</div>
           </div>
           <div className="space-y-3">
             {notes.map((note) => (
@@ -88,15 +96,6 @@ export default function RecommendedCategoriesDialog({ trigger }) {
     </Dialog>
   )
 }
-
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "@/components/ui/command"
-import { useEffect, useRef } from "react"
 
 export function ComboboxEditor({
   value,

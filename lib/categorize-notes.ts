@@ -113,7 +113,8 @@ const buildEnrichedNotes = (
 };
 
 const fetchAllFolders = (): Folder[] => {
-  const folders = databaseConnection.prepare('SELECT * FROM folders').all() as Folder[];
+  const folders = databaseConnection.prepare("SELECT * FROM folders WHERE id != 'unassigned'").all() as Folder[];
+  console.log(folders);
   return folders;
 }
 
@@ -163,7 +164,7 @@ const generateCategoryUsingPrompt = async (
 /**
  * Main execution flow for retrieving enriched notes based on a similarity query.
  */
-const categorizeNoteWithAI = async (
+export const categorizeNoteWithAI = async (
   noteTitle: string,
   noteContent: string,
   noteEmbeddingID: string
@@ -183,15 +184,19 @@ const categorizeNoteWithAI = async (
   // Step 4: Enrich notes with folder name, truncated content, and similarity score
   const enrichedNotes = buildEnrichedNotes(matchingNotes, folderNames, scoreMap);
 
-  const foldersNames = fetchAllFolders();
+  // Step 5: Fetch all existing folders for storing notes
+  const allExistingFolders = fetchAllFolders();
+
+  // Step 6: Engineer the prompt for the large language model
   const noteCategorizationPrompt = renderNoteCategorizationPrompt(
     noteTitle,
     noteContent,
     enrichedNotes,
-    folderNames.map(folder => folder.name)
+    allExistingFolders.map(folder => folder.name)
   );
   console.log(noteCategorizationPrompt);
 
+  // Step 7: Fetch the resulting category name from the large language model
   const categoryName = await generateCategoryUsingPrompt(noteCategorizationPrompt);
   console.log(categoryName);
 };
