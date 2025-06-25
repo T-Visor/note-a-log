@@ -168,7 +168,7 @@ export const categorizeNoteWithAI = async (
   noteTitle: string,
   noteContent: string,
   noteEmbeddingID: string
-) => {
+): Promise<string> => {
 
   // Step 1: Fetch similar embedding matches
   const similarityMatches = await fetchSimilarityMatches(noteEmbeddingID);
@@ -198,10 +198,14 @@ export const categorizeNoteWithAI = async (
 
   // Step 7: Fetch the resulting category name from the large language model
   const categoryName = await generateCategoryUsingPrompt(noteCategorizationPrompt);
-  console.log(categoryName);
+  return categoryName;
 };
 
-const currentTitle = "Hello there!";
-const currentContent = "This is another test";
-const targetEmbeddingId = "349f062f6d2784ae0a56e71d405b4e7e8cef261aa46a27060f2e7862e7a56edb";
-categorizeNoteWithAI(currentTitle, currentContent, targetEmbeddingId);
+const main = async () => {
+  const currentTitle = "Hello there!";
+  const currentContent = "This is another test";
+  const targetEmbeddingId = "349f062f6d2784ae0a56e71d405b4e7e8cef261aa46a27060f2e7862e7a56edb";
+  const category = await categorizeNoteWithAI(currentTitle, currentContent, targetEmbeddingId);
+  console.log(category);
+}
+main();
