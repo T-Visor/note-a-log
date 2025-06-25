@@ -4,7 +4,7 @@ import { Note, Folder } from "@/types/index";
 import Mustache from "mustache";
 import ollama from "ollama";
 
-const MAX_CONTENT_LENGTH = 70;
+const MAX_NOTE_CONTENT_LENGTH = 70;
 const PROMPT_TEMPLATE_FOR_NOTE_CATEGORIZATION = `
 You are a content categorizer. Help me organize content by selecting the most appropriate category.
 
@@ -12,16 +12,17 @@ Content to categorize:
 Title: {{{title}}}
 Content: {{{content}}}
 
+{{#searchResults}}
 Most similar existing content:
-{{#search_results}}
 Folder: {{{Folder}}}, 
 Title: {{{Title}}}, 
 Content: {{{Content}}}, 
 Score: {{Score}}
+{{/searchResults}}
 
-{{/search_results}}
-
+{{#categoriesList}}
 Existing Categories: [{{{categoriesList}}}]
+{{/categoriesList}}
 
 Instructions:
 1. Choose an existing category if it fits well
@@ -105,8 +106,8 @@ const buildEnrichedNotes = (
     Folder: folderNames[index]?.name ?? null,
     Title: title,
     Content:
-      content.length > MAX_CONTENT_LENGTH
-        ? content.slice(0, MAX_CONTENT_LENGTH) + "..."
+      content.length > MAX_NOTE_CONTENT_LENGTH
+        ? content.slice(0, MAX_NOTE_CONTENT_LENGTH) + "..."
         : content,
     Score: scoreMap.get(embeddingsId!)?.toFixed(2) ?? null
   }));
@@ -114,28 +115,32 @@ const buildEnrichedNotes = (
 
 const fetchAllFolders = (): Folder[] => {
   const folders = databaseConnection.prepare("SELECT * FROM folders WHERE id != 'unassigned'").all() as Folder[];
-  console.log(folders);
   return folders;
+}
+
+const notesAssignedToFoldersExist = (): boolean => {
+  const notes = databaseConnection.prepare("SELECT * FROM notes WHERE folderId != 'unassigned'").all() as Note[];
+  return (Array.isArray(notes) && notes.length > 0);
 }
 
 /**
  * Renders the categorization prompt using Mustache.
  * @param {string} title - The title of the note to categorize.
  * @param {string} content - The content/body of the note to categorize.
- * @param {Array<EnrichedNote>} search_results - An array of similar existing content items, each with folder, title, content, and score.
+ * @param {Array<EnrichedNote>} searchResults - An array of similar existing content items, each with folder, title, content, and score.
  * @param {Array<string>} categories - A list of existing category names to choose from.
  * @returns {string} The rendered prompt string to be passed to the language model.
  */
 const renderNoteCategorizationPrompt = (
   title: string,
   content: string,
-  search_results: EnrichedNote[],
+  searchResults: EnrichedNote[],
   categories: string[]
 ): string => {
   return Mustache.render(PROMPT_TEMPLATE_FOR_NOTE_CATEGORIZATION, {
     title,
     content,
-    search_results,
+    searchResults: searchResults,
     categoriesList: categories.join(', ')
   });
 }
@@ -169,32 +174,33 @@ export const categorizeNoteWithAI = async (
   noteContent: string,
   noteEmbeddingID: string
 ): Promise<string> => {
-
-  // Step 1: Fetch similar embedding matches
-  const similarityMatches = await fetchSimilarityMatches(noteEmbeddingID);
-  const matchedEmbeddingIds = similarityMatches.map(match => match.id);
-
-  // Step 2: Retrieve notes and their associated folder names
-  const matchingNotes = fetchNotesByEmbeddingIds(matchedEmbeddingIds);
-  const folderNames = fetchFolderNamesForNotes(matchingNotes);
-
-  // Step 3: Create a quick lookup for scores
-  const scoreMap = new Map(similarityMatches.map(match => [match.id, match.score]));
-
-  // Step 4: Enrich notes with folder name, truncated content, and similarity score
-  const enrichedNotes = buildEnrichedNotes(matchingNotes, folderNames, scoreMap);
-
-  // Step 5: Fetch all existing folders for storing notes
+  
+  let noteCategorizationPrompt;
+  let enrichedNotes: EnrichedNote[] = [];
   const allExistingFolders = fetchAllFolders();
 
-  // Step 6: Engineer the prompt for the large language model
-  const noteCategorizationPrompt = renderNoteCategorizationPrompt(
+  if (notesAssignedToFoldersExist()) {
+    // Fetch similar embedding matches
+    const similarityMatches = await fetchSimilarityMatches(noteEmbeddingID);
+    const matchedEmbeddingIds = similarityMatches.map(match => match.id);
+
+    // Retrieve notes and their associated folder names
+    const matchingNotes = fetchNotesByEmbeddingIds(matchedEmbeddingIds);
+    const folderNames = fetchFolderNamesForNotes(matchingNotes);
+
+    // Enrich notes with folder name, truncated content, and similarity score
+    const scoreMap = new Map(similarityMatches.map(match => [match.id, match.score]));
+    enrichedNotes = buildEnrichedNotes(matchingNotes, folderNames, scoreMap);
+  }
+
+  // Build the enriched prompt
+  noteCategorizationPrompt = renderNoteCategorizationPrompt(
     noteTitle,
     noteContent,
     enrichedNotes,
     allExistingFolders.map(folder => folder.name)
   );
-  console.log(noteCategorizationPrompt);
+  console.log(noteCategorizationPrompt)
 
   // Step 7: Fetch the resulting category name from the large language model
   const categoryName = await generateCategoryUsingPrompt(noteCategorizationPrompt);
