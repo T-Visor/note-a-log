@@ -22,7 +22,7 @@ const NewFolderDialog = ({ onNewFolder }) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button 
-          className="hover:bg-gray-200 dark:hover:bg-gray-600"
+          className="hover:bg-gray-200 dark:hover:bg-gray-700"
           variant="ghost" 
           size="icon"
         >
