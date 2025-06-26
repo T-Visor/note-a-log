@@ -8,6 +8,7 @@ interface SuggestedNoteMove {
   suggestedFolder: {
     name: string;
     id: string | null;
+    exists: boolean;
   };
 }
 
@@ -56,6 +57,7 @@ const suggestNoteFoldersHandler = async (
         suggestedFolder: {
           name: suggestedFolderName,
           id: matchedFolder ? matchedFolder.id : null,
+          exists: !!matchedFolder
         },
       };
     });
