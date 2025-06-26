@@ -45,7 +45,6 @@ export const FirstFolderActions: React.FC<{
   shouldBeDisabled: boolean;
 }> = ({ shouldBeDisabled }) => {
   const { toast } = useToast();
-  const { setLoading, forceUpdate } = useSidebarContext();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [aiSuggestions, setAiSuggestions] = useState<SuggestedNoteMove[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -56,31 +55,35 @@ export const FirstFolderActions: React.FC<{
       const res = await fetch("/api/categorize-note", { method: "POST" });
       const data = await res.json();
       setAiSuggestions(data.suggestions);
-      setIsDialogOpen(true);
-    } catch (err) {
+      setIsDialogOpen(true); // 🔥 This is what actually opens the dialog
+    }
+    catch (err) {
       console.error(err);
-    } finally {
+    }
+    finally {
       setIsLoading(false);
     }
   };
+  /*const handleClick = () => {
+    //setAiSuggestions([{ noteId: "n1", suggestedFolder: { name: "hi", id: "123", exists: true}}]);
+    setIsDialogOpen(true);
+  };*/
 
   return (
     <div className="flex justify-center mb-2">
+      <Button
+        className="hover:bg-gray-200 dark:hover:bg-gray-700"
+        onClick={handleClick}
+        disabled={shouldBeDisabled || isLoading}
+        variant="ghost"
+      >
+        <Sparkles className="w-4 h-4 mr-1" />
+        <span className="text-sm">Organize with AI</span>
+      </Button>
       <RecommendedCategoriesDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         suggestions={aiSuggestions}
-        trigger={
-          <Button
-            className="hover:bg-gray-200 dark:hover:bg-gray-700"
-            onClick={handleClick}
-            disabled={shouldBeDisabled || isLoading}
-            variant="ghost"
-          >
-            <Sparkles className="w-4 h-4 mr-1" />
-            <span className="text-sm">Organize with AI</span>
-          </Button>
-        }
       />
     </div>
   );
