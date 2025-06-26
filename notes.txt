@@ -2,14 +2,19 @@ const { notes, folders, handleMoveNote, handleNewFolder } = useNotes();
 
 I'll need the code above to handle folder move management.
 
+(1st API call)
 1. Grab all notes where folderId = "unassigned" -> Uncategorized notes only
 2. Loop through each uncategorized note and send relevant data to 'categorize-note' api call
 3. Build a JSON object which stores the following:
    a. Note information
    b. Suggested Folder name (from API call)
    c. Folder ID (if it exists) or null if a new folder name
-4. Push this JSON list to the dialogue pop-up
+
+( Get results of API call and populate dialog pop-up, which can modify the JSON structure )
+4. Push this JSON list to the dialog pop-up
 5. Dialog pop-up can allow user to modify the folder name
    a. Need to build a mechanism to update folder ID if the name is modified (or put as nothing)
    b. Once "save" is hit, dialog pop-up will close and change the JSON list
+
+( 2nd API call to take JSON structure and handle bulk move)
 6. For each item in the JSON list, call handleMoveNote() (if the folderID is present) (else call handleNewFolder if folderID is null)
