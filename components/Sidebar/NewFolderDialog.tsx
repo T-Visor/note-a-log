@@ -21,9 +21,9 @@ const NewFolderDialog = ({ onNewFolder }) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button 
+        <Button
           className="hover:bg-gray-200 dark:hover:bg-gray-700"
-          variant="ghost" 
+          variant="ghost"
           size="icon"
         >
           <FolderPlus className="h-5 w-5" />
@@ -48,11 +48,11 @@ const NewFolderDialog = ({ onNewFolder }) => {
           />
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)}>
-            Cancel
-          </Button>
           <Button onClick={handleCreateFolder} disabled={!folderName.trim()}>
             Create
+          </Button>
+          <Button variant="outline" onClick={() => setOpen(false)}>
+            Cancel
           </Button>
         </DialogFooter>
       </DialogContent>
