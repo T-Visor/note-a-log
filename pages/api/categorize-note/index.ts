@@ -1,6 +1,6 @@
 import { categorizeNoteWithAI } from '@/lib/categorize-notes';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { useNotes } from '@/hooks/useNotes';
+import axios from 'axios';
 import { Note, Folder } from "@/types";
 
 interface NoteWithSuggestedFolderMove {
@@ -10,43 +10,48 @@ interface NoteWithSuggestedFolderMove {
 }
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
-  if (request.method === 'POST') {
-    const { noteTitle, noteContent, noteEmbeddingID } = request.body;
-    const category = await categorizeNoteWithAI(noteTitle, noteContent, noteEmbeddingID);
-    response.status(200).json({ category });
-  }
-  else {
+  if (request.method !== 'POST') {
     response.setHeader('Allow', ['POST']);
-    response.status(405).end(`Method ${request.method} Not Allowed`);
+    return response.status(405).end(`Method ${request.method} Not Allowed`);
+  }
+
+  try {
+    // 1. Fetch notes and folders from existing APIs
+    const [notesRes, foldersRes] = await Promise.all([
+      axios.get<Note[]>(`/api/notes`),
+      axios.get<Folder[]>(`/api/folders`)
+    ]);
+
+    const notes = notesRes.data;
+    const folders = foldersRes.data;
+
+    // 2. Filter unassigned notes
+    const unassignedNotes = notes.filter(note => note.folderId === 'unassigned');
+
+    // 3. Get AI-suggested folder names
+    const suggestedFolderNames = await Promise.all(
+      unassignedNotes.map(note =>
+        categorizeNoteWithAI(note.title, note.content, note.embeddingsId!)
+      )
+    );
+
+    // 4. Build suggestions
+    const suggestions: NoteWithSuggestedFolderMove[] = unassignedNotes.map((note, index) => {
+      const suggestedName = suggestedFolderNames[index];
+      const matchedFolder = folders.find(folder => folder.name === suggestedName);
+
+      return {
+        note,
+        folderName: suggestedName,
+        folderId: matchedFolder ? matchedFolder.id : null
+      };
+    });
+    console.log(suggestions);
+
+    return response.status(200).json({ suggestions });
+  } 
+  catch (error) {
+    console.error('Error in suggestion handler:', error);
+    return response.status(500).json({ error: 'Internal Server Error' });
   }
 }
-
-const main = async () => {
-  const { notes, folders, handleMoveNote, handleNewFolder } = useNotes();
-
-  // 1. Get unassigned notes
-  const unassignedNotes = notes.filter(note => note.folderId === "unassigned");
-
-  // 2. Call AI API in parallel to get suggested folder names
-  const suggestedFolderNames = await Promise.all(
-    unassignedNotes.map(note => 
-      categorizeNoteWithAI(note.title, note.content, note.embeddingsId!)
-    )
-  );
-
-  // 3. Map notes to their suggestion with folder info
-  const suggestions: NoteWithSuggestedFolderMove[] = unassignedNotes.map((note, index) => {
-    const suggestedName = suggestedFolderNames[index];
-    const matchedFolder = folders.find(folder => folder.name === suggestedName);
-
-    return {
-      note,
-      folderName: suggestedName,
-      folderId: matchedFolder ? matchedFolder.id : null
-    };
-  });
-
-  // (Optional) Log or return
-  console.log(suggestions);
-  return suggestions;
-};
