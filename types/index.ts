@@ -10,3 +10,12 @@ export interface Folder {
   id: string;
   name: string;
 }
+
+export interface SuggestedNoteMove {
+  noteId: string;
+  suggestedFolder: {
+    name: string;
+    id: string | null;
+    exists: boolean;
+  };
+}

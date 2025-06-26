@@ -1,16 +1,7 @@
 import { categorizeNoteWithAI } from '@/lib/categorize-notes';
 import { NextApiRequest, NextApiResponse } from 'next';
 import axios from 'axios';
-import { Note, Folder } from '@/types';
-
-interface SuggestedNoteMove {
-  noteId: string;
-  suggestedFolder: {
-    name: string;
-    id: string | null;
-    exists: boolean;
-  };
-}
+import { Note, Folder, SuggestedNoteMove } from '@/types';
 
 // Main API handler to suggest folder moves for unassigned notes using AI
 const suggestNoteFoldersHandler = async (

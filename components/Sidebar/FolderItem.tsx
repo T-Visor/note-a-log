@@ -23,6 +23,7 @@ import { NoteList } from "./NoteList";
 import axios from "axios";
 import { useSidebarContext } from "./SidebarContext";
 import RecommendedCategoriesDialog from "@/components/RecommendedCategoriesDialog"
+import { SuggestedNoteMove } from "@/types";
 
 interface FolderItemProps {
   folder: FolderType;
@@ -45,44 +46,39 @@ export const FirstFolderActions: React.FC<{
 }> = ({ shouldBeDisabled }) => {
   const { toast } = useToast();
   const { setLoading, forceUpdate } = useSidebarContext();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [aiSuggestions, setAiSuggestions] = useState<SuggestedNoteMove[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleAutoCategorize = async () => {
+  const handleClick = async () => {
+    setIsLoading(true);
     try {
-      setLoading(true);
-      await axios.get("http://localhost:8000/auto_categorize_notes");
-      toast({
-        title: "Success",
-        description: "Completed successfully.",
-      });
-      forceUpdate();
-    }
-    catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Couldn't auto-categorize notes. Check logs",
-      });
-      console.error("Error during auto-categorization for notes:", error);
-    }
-    finally {
-      setLoading(false);
+      const res = await fetch("/api/categorize-note", { method: "POST" });
+      const data = await res.json();
+      setAiSuggestions(data.suggestions);
+      setIsDialogOpen(true);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="flex justify-center mb-2">
       <RecommendedCategoriesDialog
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        suggestions={aiSuggestions}
         trigger={
           <Button
-            onClick={() => console.log("Needs to be implemented!")}
+            className="hover:bg-gray-200 dark:hover:bg-gray-700"
+            onClick={handleClick}
+            disabled={shouldBeDisabled || isLoading}
             variant="ghost"
-            className="flex items-center hover:bg-gray-200 dark:hover:bg-gray-700"
-            disabled={shouldBeDisabled}
           >
             <Sparkles className="w-4 h-4 mr-1" />
-            <span className="text-sm">
-              Organize with AI
-            </span>
+            <span className="text-sm">Organize with AI</span>
           </Button>
         }
       />

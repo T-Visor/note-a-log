@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, ReactNode } from "react"
 import { Edit2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -18,6 +18,7 @@ import {
   CommandItem,
 } from "@/components/ui/command"
 import { useEffect, useRef } from "react"
+import { SuggestedNoteMove } from "@/types"
 
 type Note = {
   id: string
@@ -26,7 +27,19 @@ type Note = {
   isEditingCategory: boolean
 }
 
-export default function RecommendedCategoriesDialog({ trigger }) {
+interface RecommendedCategoriesDialogProps {
+  trigger: React.ReactElement;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  suggestions: SuggestedNoteMove[];
+}
+
+const RecommendedCategoriesDialog = ({
+  trigger,
+  open,
+  onOpenChange,
+  suggestions,
+}: RecommendedCategoriesDialogProps) => {
   const [notes, setNotes] = useState<Note[]>([
     { id: "1", title: "30,000 mile maintenance", category: "Automotive Maintenance", isEditingCategory: false },
     { id: "2", title: "Company idea", category: "Business Ideas", isEditingCategory: false },
@@ -50,54 +63,56 @@ export default function RecommendedCategoriesDialog({ trigger }) {
   }
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        {trigger}
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-lg overflow-y-auto max-h-[75%]">
-        <DialogHeader>
-          <DialogTitle>AI Recommendations</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4 py-4">
-          <div className="grid grid-cols-[1fr_1fr] items-center gap-2 font-medium text-sm text-muted-foreground px-1">
-            <div>Note Title</div>
-            <div>Recommended Folder</div>
+    <>
+      {trigger}
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogTrigger asChild>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-lg overflow-y-auto max-h-[75%]">
+          <DialogHeader>
+            <DialogTitle>AI Recommendations</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="grid grid-cols-[1fr_1fr] items-center gap-2 font-medium text-sm text-muted-foreground px-1">
+              <div>Note Title</div>
+              <div>Recommended Folder</div>
+            </div>
+            <div className="space-y-3">
+              {notes.map((note) => (
+                <div key={note.id} className="grid grid-cols-[1fr_1fr_auto] items-center gap-2">
+                  <div className="font-medium">{note.title}</div>
+                  {note.isEditingCategory ? (
+                    <ComboboxEditor
+                      value={note.category}
+                      options={categories}
+                      onSelect={(newVal) => handleCategoryChange(note.id, newVal)}
+                    />
+                  ) : (
+                    <div>{note.category}</div>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleEditCategory(note.id)}
+                    className="h-8 w-8"
+                  >
+                    <Edit2 className="h-4 w-4" />
+                    <span className="sr-only">Edit category</span>
+                  </Button>
+                </div>
+              ))}
+            </div>
+            <Button variant="outline" size="sm" className="mt-4 w-full">
+              Accept
+            </Button>
           </div>
-          <div className="space-y-3">
-            {notes.map((note) => (
-              <div key={note.id} className="grid grid-cols-[1fr_1fr_auto] items-center gap-2">
-                <div className="font-medium">{note.title}</div>
-                {note.isEditingCategory ? (
-                  <ComboboxEditor
-                    value={note.category}
-                    options={categories}
-                    onSelect={(newVal) => handleCategoryChange(note.id, newVal)}
-                  />
-                ) : (
-                  <div>{note.category}</div>
-                )}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleEditCategory(note.id)}
-                  className="h-8 w-8"
-                >
-                  <Edit2 className="h-4 w-4" />
-                  <span className="sr-only">Edit category</span>
-                </Button>
-              </div>
-            ))}
-          </div>
-          <Button variant="outline" size="sm" className="mt-4 w-full">
-            Accept
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
 
-export function ComboboxEditor({
+const ComboboxEditor = ({
   value,
   options,
   onSelect,
@@ -105,7 +120,7 @@ export function ComboboxEditor({
   value: string
   options: string[]
   onSelect: (val: string) => void
-}) {
+}) => {
   const [input, setInput] = useState(value)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -150,3 +165,5 @@ export function ComboboxEditor({
     </div>
   )
 }
+
+export default RecommendedCategoriesDialog;
