@@ -24,11 +24,29 @@ export default async function handler(request: NextApiRequest, response: NextApi
 const main = async () => {
   const { notes, folders, handleMoveNote, handleNewFolder } = useNotes();
 
+  // 1. Get unassigned notes
   const unassignedNotes = notes.filter(note => note.folderId === "unassigned");
 
-  const results = await Promise.all(
+  // 2. Call AI API in parallel to get suggested folder names
+  const suggestedFolderNames = await Promise.all(
     unassignedNotes.map(note => 
       categorizeNoteWithAI(note.title, note.content, note.embeddingsId!)
     )
-  )
-}
+  );
+
+  // 3. Map notes to their suggestion with folder info
+  const suggestions: NoteWithSuggestedFolderMove[] = unassignedNotes.map((note, index) => {
+    const suggestedName = suggestedFolderNames[index];
+    const matchedFolder = folders.find(folder => folder.name === suggestedName);
+
+    return {
+      note,
+      folderName: suggestedName,
+      folderId: matchedFolder ? matchedFolder.id : null
+    };
+  });
+
+  // (Optional) Log or return
+  console.log(suggestions);
+  return suggestions;
+};
