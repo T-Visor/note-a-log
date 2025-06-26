@@ -18,8 +18,8 @@ export default async function handler(request: NextApiRequest, response: NextApi
   try {
     // 1. Fetch notes and folders from existing APIs
     const [notesRes, foldersRes] = await Promise.all([
-      axios.get<Note[]>(`/api/notes`),
-      axios.get<Folder[]>(`/api/folders`)
+      axios.get<Note[]>(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/notes`),
+      axios.get<Folder[]>(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/folders`)
     ]);
 
     const notes = notesRes.data;
