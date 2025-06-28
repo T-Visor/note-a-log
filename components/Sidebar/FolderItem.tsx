@@ -50,9 +50,11 @@ export const FirstFolderActions: React.FC<{
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [aiSuggestions, setAiSuggestions] = useState<SuggestedNoteMove[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const { forceUpdate } = useSidebarContext();
 
   const handleClick = async () => {
     setIsLoading(true);
+    forceUpdate(); // This forces a fresh fetch of all notes
     try {
       const res = await fetch("/api/categorize-note", { method: "POST" });
       const data = await res.json();
