@@ -19,14 +19,6 @@ import {
 } from "@/components/ui/command"
 import { useEffect, useRef } from "react"
 import { SuggestedNoteMove, Note } from "@/types"
-import { useNotes } from "@/hooks/useNotes"
-
-type NoteCategorizationInfo = {
-  id: string
-  title: string
-  category: string
-  isEditingCategory: boolean
-}
 
 interface RecommendedCategoriesDialogProps {
   open: boolean;
@@ -35,101 +27,107 @@ interface RecommendedCategoriesDialogProps {
   suggestions: SuggestedNoteMove[];
 }
 
+type EditableRecommendation = {
+  noteId: string
+  title: string
+  category: string
+  isEditing: boolean
+}
+
 const RecommendedCategoriesDialog = ({
   open,
   onOpenChange,
   allNotes,
   suggestions,
 }: RecommendedCategoriesDialogProps) => {
-  const notes = allNotes; // assumes notes are fetched here
-  const [notesInfo, setNotesInfo] = useState<NoteCategorizationInfo[]>([]);
+  if (!allNotes.length || !suggestions.length) return null
 
-  // Derive notesInfo when suggestions and notes are ready
-  useEffect(() => {
-    console.log("Suggestions:", suggestions);
-    console.log("Notes:", notes);
-    if (!suggestions.length || !notes.length) return;
+  // Initialize editable state for each suggestion
+  const initialRecommendations: EditableRecommendation[] = suggestions
+    .map((s) => {
+      const note = allNotes.find((n) => n.id === s.noteId)
+      if (!note) return null
+      return {
+        noteId: note.id,
+        title: note.title,
+        category: s.suggestedFolder.name,
+        isEditing: false,
+      }
+    })
+    .filter(Boolean) as EditableRecommendation[]
 
-    const suggestion = suggestions[0];
-    const matchedNote = notes.find((note) => note.id === suggestion.noteId);
+  const [recommendations, setRecommendations] = useState(initialRecommendations)
 
-    if (matchedNote) {
-      setNotesInfo([
-        {
-          id: matchedNote.id,
-          title: matchedNote.title,
-          category: suggestion.suggestedFolder.name,
-          isEditingCategory: false,
-        },
-      ]);
-    }
-  }, [suggestions, notes]);
+  const categories = Array.from(new Set(recommendations.map((r) => r.category)))
 
-  const categories = Array.from(new Set(notesInfo.map((n) => n.category)))
-
-  const handleEditCategory = (id: string) => {
-    setNotesInfo(notesInfo.map((note) =>
-      note.id === id ? { ...note, isEditingCategory: !note.isEditingCategory } : note
-    ))
+  const toggleEditing = (id: string) => {
+    setRecommendations((prev) =>
+      prev.map((r) =>
+        r.noteId === id ? { ...r, isEditing: !r.isEditing } : r
+      )
+    )
   }
 
-  const handleCategoryChange = (id: string, newCategory: string) => {
-    setNotesInfo(notesInfo.map((note) =>
-      note.id === id ? { ...note, category: newCategory, isEditingCategory: false } : note
-    ))
+  const updateCategory = (id: string, newCategory: string) => {
+    setRecommendations((prev) =>
+      prev.map((r) =>
+        r.noteId === id
+          ? { ...r, category: newCategory, isEditing: false }
+          : r
+      )
+    )
   }
 
   return (
-    <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-lg overflow-y-auto max-h-[75%]">
-          <DialogHeader>
-            <DialogTitle>AI Recommendations</DialogTitle>
-          </DialogHeader>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-lg overflow-y-auto max-h-[75%]">
+        <DialogHeader>
+          <DialogTitle>AI Recommendations</DialogTitle>
+        </DialogHeader>
 
-          {notesInfo.length === 0 ? (
-            <div className="text-sm text-muted-foreground py-4 px-2">Loading recommendations...</div>
-          ) : (
-            <div className="space-y-4 py-4">
-              <div className="grid grid-cols-[1fr_1fr] items-center gap-2 font-medium text-sm text-muted-foreground px-1">
-                <div>Note Title</div>
-                <div>Recommended Folder</div>
+        <div className="space-y-4 py-4">
+          <div className="grid grid-cols-[1fr_1fr] items-center gap-2 font-medium text-sm text-muted-foreground px-1">
+            <div>Note Title</div>
+            <div>Recommended Folder</div>
+          </div>
+
+          <div className="space-y-3">
+            {recommendations.map((rec) => (
+              <div
+                key={rec.noteId}
+                className="grid grid-cols-[1fr_1fr_auto] items-center gap-2"
+              >
+                <div className="font-medium">{rec.title}</div>
+                {rec.isEditing ? (
+                  <ComboboxEditor
+                    value={rec.category}
+                    options={categories}
+                    onSelect={(val) => updateCategory(rec.noteId, val)}
+                  />
+                ) : (
+                  <div>{rec.category}</div>
+                )}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => toggleEditing(rec.noteId)}
+                  className="h-8 w-8"
+                >
+                  <Edit2 className="h-4 w-4" />
+                  <span className="sr-only">Edit category</span>
+                </Button>
               </div>
-              <div className="space-y-3">
-                {notesInfo.map((note) => (
-                  <div key={note.id} className="grid grid-cols-[1fr_1fr_auto] items-center gap-2">
-                    <div className="font-medium">{note.title}</div>
-                    {note.isEditingCategory ? (
-                      <ComboboxEditor
-                        value={note.category}
-                        options={categories}
-                        onSelect={(newVal) => handleCategoryChange(note.id, newVal)}
-                      />
-                    ) : (
-                      <div>{note.category}</div>
-                    )}
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleEditCategory(note.id)}
-                      className="h-8 w-8"
-                    >
-                      <Edit2 className="h-4 w-4" />
-                      <span className="sr-only">Edit category</span>
-                    </Button>
-                  </div>
-                ))}
-              </div>
-              <Button variant="outline" size="sm" className="mt-4 w-full">
-                Accept
-              </Button>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-    </>
+            ))}
+          </div>
+
+          <Button variant="outline" size="sm" className="mt-4 w-full">
+            Accept
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   )
-} 
+}
 
 const ComboboxEditor = ({
   value,
