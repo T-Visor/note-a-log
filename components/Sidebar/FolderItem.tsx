@@ -28,7 +28,8 @@ import { SuggestedNoteMove } from "@/types";
 interface FolderItemProps {
   folder: FolderType;
   isFirstFolder?: boolean;
-  notes: Note[];
+  allNotes: Note[];
+  notesInThisFolder: Note[];
   isExpanded: boolean;
   selectedNoteId: string | null;
   selectedNoteIds: string[];
@@ -43,7 +44,8 @@ interface FolderItemProps {
 // Specialized component just for the actions of the first folder
 export const FirstFolderActions: React.FC<{
   shouldBeDisabled: boolean;
-}> = ({ shouldBeDisabled }) => {
+  allNotes: Note[];
+}> = ({ shouldBeDisabled, allNotes }) => {
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [aiSuggestions, setAiSuggestions] = useState<SuggestedNoteMove[]>([]);
@@ -55,7 +57,7 @@ export const FirstFolderActions: React.FC<{
       const res = await fetch("/api/categorize-note", { method: "POST" });
       const data = await res.json();
       setAiSuggestions(data.suggestions);
-      setIsDialogOpen(true); // 🔥 This is what actually opens the dialog
+      setIsDialogOpen(true);
     }
     catch (err) {
       console.error(err);
@@ -83,6 +85,7 @@ export const FirstFolderActions: React.FC<{
       <RecommendedCategoriesDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
+        allNotes={allNotes}
         suggestions={aiSuggestions}
       />
     </div>
@@ -92,7 +95,8 @@ export const FirstFolderActions: React.FC<{
 export const FolderItem: React.FC<FolderItemProps> = ({
   folder,
   isFirstFolder,
-  notes,
+  notesInThisFolder: notesInThisFolder,
+  allNotes,
   isExpanded,
   selectedNoteId,
   onToggleExpand,
@@ -104,12 +108,14 @@ export const FolderItem: React.FC<FolderItemProps> = ({
 }) => {
   // If this is the special first folder, render only its notes without the folder container
   if (isFirstFolder) {
-    const folderNotes = notes.filter(note => note.folderId === folder.id);
     return (
       <>
-        <FirstFolderActions shouldBeDisabled={notes.length === 0} />
+        <FirstFolderActions 
+          shouldBeDisabled={notesInThisFolder.length === 0} 
+          allNotes={allNotes}
+        />
         <NoteList
-          notes={folderNotes}
+          notes={notesInThisFolder}
           selectedNoteId={selectedNoteId}
           onSelectNote={onSelectNote}
           onDeleteNote={onDeleteNote}
@@ -172,10 +178,10 @@ export const FolderItem: React.FC<FolderItemProps> = ({
   This will automatically close the folder once it becomes empty.
   */
   useEffect(() => {
-    if (notes.length === 0 && isExpanded) {
+    if (notesInThisFolder.length === 0 && isExpanded) {
       onToggleExpand(folder.id);
     }
-  }, [notes.length, isExpanded, folder.id, onToggleExpand]);
+  }, [notesInThisFolder.length, isExpanded, folder.id, onToggleExpand]);
 
   return (
     <div className="mb-1">
@@ -200,10 +206,10 @@ export const FolderItem: React.FC<FolderItemProps> = ({
             <span className="truncate w-0 flex-1">{folder.name}</span>
           )}
           {(() => {
-            if (notes.length > 0 && isExpanded) {
+            if (notesInThisFolder.length > 0 && isExpanded) {
               return <ChevronDown className="h-4 w-4" />;
             }
-            else if (notes.length > 0 && !isExpanded) {
+            else if (notesInThisFolder.length > 0 && !isExpanded) {
               return <ChevronRight className="h-4 w-4" />;
             }
             else {
@@ -261,7 +267,7 @@ export const FolderItem: React.FC<FolderItemProps> = ({
         <div className="relative before:absolute before:top-0 before:bottom-0 before:left-[-0.33rem] before:w-px before:bg-gray-300 dark:before:bg-gray-600 ml-4">
           <div className="pl-4">
             <NoteList
-              notes={notes.filter(note => note.folderId === folder.id)}
+              notes={notesInThisFolder}
               selectedNoteId={selectedNoteId}
               onSelectNote={onSelectNote}
               onDeleteNote={onDeleteNote}

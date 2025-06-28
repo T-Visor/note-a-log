@@ -31,15 +31,17 @@ type NoteCategorizationInfo = {
 interface RecommendedCategoriesDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  allNotes: Note[];
   suggestions: SuggestedNoteMove[];
 }
 
 const RecommendedCategoriesDialog = ({
   open,
   onOpenChange,
+  allNotes,
   suggestions,
 }: RecommendedCategoriesDialogProps) => {
-  const { notes } = useNotes(); // assumes notes are fetched here
+  const notes = allNotes; // assumes notes are fetched here
   const [notesInfo, setNotesInfo] = useState<NoteCategorizationInfo[]>([]);
 
   // Derive notesInfo when suggestions and notes are ready
