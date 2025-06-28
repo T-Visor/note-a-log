@@ -24,11 +24,11 @@ import axios from "axios";
 import { useSidebarContext } from "./SidebarContext";
 import RecommendedCategoriesDialog from "@/components/RecommendedCategoriesDialog"
 import { SuggestedNoteMove } from "@/types";
+import { useNotes } from "@/hooks/useNotes";
 
 interface FolderItemProps {
   folder: FolderType;
   isFirstFolder?: boolean;
-  allNotes: Note[];
   notesInThisFolder: Note[];
   isExpanded: boolean;
   selectedNoteId: string | null;
@@ -41,37 +41,37 @@ interface FolderItemProps {
   onDeleteNote: (id: string) => void;
 }
 
-// Specialized component just for the actions of the first folder
-export const FirstFolderActions: React.FC<{
-  shouldBeDisabled: boolean;
-  allNotes: Note[];
-}> = ({ shouldBeDisabled, allNotes }) => {
+export const FirstFolderActions: React.FC<{ shouldBeDisabled: boolean }> = ({ shouldBeDisabled }) => {
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [aiSuggestions, setAiSuggestions] = useState<SuggestedNoteMove[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const { forceUpdate } = useSidebarContext();
+  const [notes, setNotes] = useState<Note[]>([]);
+
+  async function fetchNotes() {
+    // Fetch saved notes from API
+    const responseWithNotes = await axios.get('api/notes');
+    const notesData = responseWithNotes.data.map((note: Note) => ({
+      ...note,
+      folderId: note.folderId ?? null, // Ensure `null` for `undefined` or missing `folderId`
+    }));
+    setNotes(notesData);
+  }
 
   const handleClick = async () => {
     setIsLoading(true);
-    forceUpdate(); // This forces a fresh fetch of all notes
+    await fetchNotes();
     try {
       const res = await fetch("/api/categorize-note", { method: "POST" });
       const data = await res.json();
       setAiSuggestions(data.suggestions);
       setIsDialogOpen(true);
-    }
-    catch (err) {
+    } catch (err) {
       console.error(err);
-    }
-    finally {
+    } finally {
       setIsLoading(false);
     }
   };
-  /*const handleClick = () => {
-    //setAiSuggestions([{ noteId: "n1", suggestedFolder: { name: "hi", id: "123", exists: true}}]);
-    setIsDialogOpen(true);
-  };*/
 
   return (
     <div className="flex justify-center mb-2">
@@ -87,7 +87,7 @@ export const FirstFolderActions: React.FC<{
       <RecommendedCategoriesDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
-        allNotes={allNotes}
+        allNotes={notes} // ✅ Always up-to-date
         suggestions={aiSuggestions}
       />
     </div>
@@ -98,7 +98,6 @@ export const FolderItem: React.FC<FolderItemProps> = ({
   folder,
   isFirstFolder,
   notesInThisFolder: notesInThisFolder,
-  allNotes,
   isExpanded,
   selectedNoteId,
   onToggleExpand,
@@ -112,9 +111,8 @@ export const FolderItem: React.FC<FolderItemProps> = ({
   if (isFirstFolder) {
     return (
       <>
-        <FirstFolderActions 
-          shouldBeDisabled={notesInThisFolder.length === 0} 
-          allNotes={allNotes}
+        <FirstFolderActions
+          shouldBeDisabled={notesInThisFolder.length === 0}
         />
         <NoteList
           notes={notesInThisFolder}

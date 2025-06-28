@@ -128,7 +128,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   key={folder.id}
                   folder={folder}
                   isFirstFolder={index === 0}
-                  allNotes={notes}
                   notesInThisFolder={notes.filter(note => note.folderId === folder.id)}
                   isExpanded={expandedFolders.includes(folder.id)}
                   selectedNoteId={selectedNoteId}

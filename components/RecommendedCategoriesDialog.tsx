@@ -40,23 +40,25 @@ const RecommendedCategoriesDialog = ({
   allNotes,
   suggestions,
 }: RecommendedCategoriesDialogProps) => {
-  if (!allNotes.length || !suggestions.length) return null
+  const [recommendations, setRecommendations] = useState<EditableRecommendation[]>([])
 
-  // Initialize editable state for each suggestion
-  const initialRecommendations: EditableRecommendation[] = suggestions
-    .map((s) => {
-      const note = allNotes.find((n) => n.id === s.noteId)
-      if (!note) return null
-      return {
-        noteId: note.id,
-        title: note.title,
-        category: s.suggestedFolder.name,
-        isEditing: false,
-      }
-    })
-    .filter(Boolean) as EditableRecommendation[]
+  useEffect(() => {
+    const fresh = suggestions
+      .map((s) => {
+        const note = allNotes.find((n) => n.id === s.noteId)
+        if (!note) return null
+        return {
+          noteId: note.id,
+          title: note.title,
+          category: s.suggestedFolder.name,
+          isEditing: false,
+        }
+      })
+      .filter(Boolean) as EditableRecommendation[]
+    setRecommendations(fresh)
+  }, [allNotes, suggestions])
 
-  const [recommendations, setRecommendations] = useState(initialRecommendations)
+  if (!recommendations.length) return null
 
   const categories = Array.from(new Set(recommendations.map((r) => r.category)))
 

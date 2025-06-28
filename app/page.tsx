@@ -50,11 +50,6 @@ const NotesAppContent = () => {
     setIsSidebarVisible(!isSidebarVisible);
   };
 
-  const filteredNotes = notes.filter(note =>
-    note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    note.content.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   const content = (() => {
     if (isLoading) {
       return (
@@ -86,7 +81,7 @@ const NotesAppContent = () => {
       {/* Sidebar */}
       <Sidebar
         folders={folders}
-        notes={filteredNotes}
+        notes={notes}
         selectedNoteId={selectedNote?.id || null}
         isVisible={isSidebarVisible}
         onSelectNote={setSelectedNote}
