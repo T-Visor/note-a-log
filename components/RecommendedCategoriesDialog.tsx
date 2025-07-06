@@ -125,7 +125,14 @@ const RecommendedCategoriesDialog = ({
             ))}
           </div>
 
-          <Button variant="outline" size="sm" className="mt-4 w-full">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="mt-4 w-full"
+            onClick={() => {
+              console.table(recommendations);
+            }}
+          >
             Accept
           </Button>
         </div>
