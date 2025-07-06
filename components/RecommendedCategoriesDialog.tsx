@@ -18,12 +18,14 @@ import {
   CommandItem,
 } from "@/components/ui/command"
 import { useEffect, useRef } from "react"
-import { SuggestedNoteMove, Note } from "@/types"
+import { SuggestedNoteMove, Note, Folder } from "@/types"
+import { useNotes } from "@/hooks/useNotes";
 
 interface RecommendedCategoriesDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   allNotes: Note[];
+  allFolders: Folder[];
   suggestions: SuggestedNoteMove[];
 }
 
@@ -38,6 +40,7 @@ const RecommendedCategoriesDialog = ({
   open,
   onOpenChange,
   allNotes,
+  allFolders,
   suggestions,
 }: RecommendedCategoriesDialogProps) => {
   const [recommendations, setRecommendations] = useState<EditableRecommendation[]>([])
