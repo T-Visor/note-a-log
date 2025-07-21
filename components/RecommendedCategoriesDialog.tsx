@@ -153,7 +153,7 @@ const RecommendedCategoriesDialog = ({
 
                 if (noteToMove && destinationFolder) {
                   console.log("moved");
-                  await handleMoveNote(noteToMove);
+                  await handleMoveNote(noteToMove, destinationFolder.id);
                 }
               });
 
