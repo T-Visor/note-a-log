@@ -146,6 +146,12 @@ const RecommendedCategoriesDialog = ({
                 if (!destinationFolder) {
                   // Create the folder and wait for it to be returned
                   await handleNewFolder(recommendation.category);
+
+                  // TODO: Need to find way to re-fetch all folders here before finding again!
+                  // IMPLEMENT
+                  
+                  //===========
+
                   destinationFolder = allFolders.find(
                     (folder) => folder.name === recommendation.category
                   );
