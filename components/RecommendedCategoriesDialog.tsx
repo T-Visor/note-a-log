@@ -43,7 +43,8 @@ const RecommendedCategoriesDialog = ({
   allFolders,
   suggestions,
 }: RecommendedCategoriesDialogProps) => {
-  const [recommendations, setRecommendations] = useState<EditableRecommendation[]>([])
+  const [recommendations, setRecommendations] = useState<EditableRecommendation[]>([]);
+  const { handleNewFolder, handleMoveNote } = useNotes();
 
   useEffect(() => {
     const fresh = suggestions
@@ -125,13 +126,29 @@ const RecommendedCategoriesDialog = ({
             ))}
           </div>
 
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             className="mt-4 w-full"
-            onClick={() => {
-              console.table(recommendations);
+            onClick={async () => {
+              const movePromises = recommendations.map(async (recommendation) => {
+                const noteToMove: Note | undefined = allNotes.find((note) => note.id === recommendation.noteId);
+                let destinationFolder: Folder | undefined = allFolders.find((folder) => folder.name === recommendation.category);
+
+                if (!destinationFolder) {
+                  // Create the folder since it doesn't exist yet
+                  await handleNewFolder(recommendation.category);
+                  destinationFolder = allFolders.find((folder) => folder.name === recommendation.category);
+                }
+
+                if (noteToMove && destinationFolder) {
+                  return handleMoveNote(noteToMove, destinationFolder.id);
+                }
+              });
+
+              await Promise.all(movePromises);
             }}
+
           >
             Accept
           </Button>
