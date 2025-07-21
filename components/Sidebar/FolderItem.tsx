@@ -68,6 +68,7 @@ export const FirstFolderActions: React.FC<{ shouldBeDisabled: boolean }> = ({ sh
   const handleClick = async () => {
     setIsLoading(true);
     await fetchNotes();
+    await fetchFolders();
     try {
       const res = await fetch("/api/categorize-note", { method: "POST" });
       const data = await res.json();

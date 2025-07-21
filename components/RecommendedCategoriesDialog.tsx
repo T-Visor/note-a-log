@@ -132,23 +132,33 @@ const RecommendedCategoriesDialog = ({
             className="mt-4 w-full"
             onClick={async () => {
               const movePromises = recommendations.map(async (recommendation) => {
-                const noteToMove: Note | undefined = allNotes.find((note) => note.id === recommendation.noteId);
-                let destinationFolder: Folder | undefined = allFolders.find((folder) => folder.name === recommendation.category);
+                const noteToMove: Note | undefined = allNotes.find(
+                  (note) => note.id === recommendation.noteId
+                );
+
+                let destinationFolder: Folder | undefined = allFolders.find(
+                  (folder) => folder.name === recommendation.category
+                );
+                allFolders.forEach(folder => {
+                  console.log("Folder:", folder.name);
+                });
 
                 if (!destinationFolder) {
-                  // Create the folder since it doesn't exist yet
+                  // Create the folder and wait for it to be returned
                   await handleNewFolder(recommendation.category);
-                  destinationFolder = allFolders.find((folder) => folder.name === recommendation.category);
+                  destinationFolder = allFolders.find(
+                    (folder) => folder.name === recommendation.category
+                  );
                 }
 
                 if (noteToMove && destinationFolder) {
-                  return handleMoveNote(noteToMove, destinationFolder.id);
+                  console.log("moved");
+                  await handleMoveNote(noteToMove);
                 }
               });
 
               await Promise.all(movePromises);
             }}
-
           >
             Accept
           </Button>
