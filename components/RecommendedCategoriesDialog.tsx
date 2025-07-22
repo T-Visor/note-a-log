@@ -20,12 +20,12 @@ import {
 import { useEffect, useRef } from "react"
 import { SuggestedNoteMove, Note, Folder } from "@/types"
 import { useNotes } from "@/hooks/useNotes";
+import axios from "axios";
 
 interface RecommendedCategoriesDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   allNotes: Note[];
-  allFolders: Folder[];
   suggestions: SuggestedNoteMove[];
 }
 
@@ -40,7 +40,6 @@ const RecommendedCategoriesDialog = ({
   open,
   onOpenChange,
   allNotes,
-  allFolders,
   suggestions,
 }: RecommendedCategoriesDialogProps) => {
   const [recommendations, setRecommendations] = useState<EditableRecommendation[]>([]);
@@ -83,6 +82,12 @@ const RecommendedCategoriesDialog = ({
       )
     )
   }
+
+  const fetchFolders = async () => {
+    const responseWithFolders = await axios.get("api/folders");
+    const foldersData = responseWithFolders.data;
+    return foldersData;
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -131,6 +136,7 @@ const RecommendedCategoriesDialog = ({
             size="sm"
             className="mt-4 w-full"
             onClick={async () => {
+              let allFolders: Folder[] = await fetchFolders();
               const movePromises = recommendations.map(async (recommendation) => {
                 const noteToMove: Note | undefined = allNotes.find(
                   (note) => note.id === recommendation.noteId
@@ -144,13 +150,9 @@ const RecommendedCategoriesDialog = ({
                 });
 
                 if (!destinationFolder) {
-                  // Create the folder and wait for it to be returned
+                  // Create the folder and refresh collection of folders.
                   await handleNewFolder(recommendation.category);
-
-                  // TODO: Need to find way to re-fetch all folders here before finding again!
-                  // IMPLEMENT
-                  
-                  //===========
+                  allFolders = await fetchFolders();
 
                   destinationFolder = allFolders.find(
                     (folder) => folder.name === recommendation.category

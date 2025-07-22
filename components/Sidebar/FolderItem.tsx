@@ -47,7 +47,6 @@ export const FirstFolderActions: React.FC<{ shouldBeDisabled: boolean }> = ({ sh
   const [aiSuggestions, setAiSuggestions] = useState<SuggestedNoteMove[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [notes, setNotes] = useState<Note[]>([]);
-  const [folders, setFolders] = useState<FolderType[]>([]);
 
   const fetchNotes = async () => {
     // Fetch saved notes from API
@@ -59,16 +58,9 @@ export const FirstFolderActions: React.FC<{ shouldBeDisabled: boolean }> = ({ sh
     setNotes(notesData);
   }
 
-  const fetchFolders = async () => {
-    const responseWithFolders = await axios.get("api/folders");
-    const foldersData = responseWithFolders.data;
-    setFolders(foldersData);
-  }
-
   const handleClick = async () => {
     setIsLoading(true);
     await fetchNotes();
-    await fetchFolders();
     try {
       const res = await fetch("/api/categorize-note", { method: "POST" });
       const data = await res.json();
@@ -98,7 +90,6 @@ export const FirstFolderActions: React.FC<{ shouldBeDisabled: boolean }> = ({ sh
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         allNotes={notes} // ✅ Always up-to-date
-        allFolders={folders}
         suggestions={aiSuggestions}
       />
     </div>
