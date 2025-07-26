@@ -21,6 +21,7 @@ import { useEffect, useRef } from "react"
 import { SuggestedNoteMove, Note, Folder } from "@/types"
 import { useNotes } from "@/hooks/useNotes";
 import axios from "axios";
+import { useSidebarContext } from "./Sidebar/SidebarContext";
 
 interface RecommendedCategoriesDialogProps {
   open: boolean;
@@ -44,6 +45,7 @@ const RecommendedCategoriesDialog = ({
 }: RecommendedCategoriesDialogProps) => {
   const [recommendations, setRecommendations] = useState<EditableRecommendation[]>([]);
   const { handleNewFolder, handleMoveNote } = useNotes();
+  const { forceUpdate } = useSidebarContext();
 
   useEffect(() => {
     const fresh = suggestions
@@ -166,6 +168,8 @@ const RecommendedCategoriesDialog = ({
               });
 
               await Promise.all(movePromises);
+              onOpenChange(!open);
+              forceUpdate();
             }}
           >
             Accept
