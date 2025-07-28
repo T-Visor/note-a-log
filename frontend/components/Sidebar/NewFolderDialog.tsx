@@ -4,8 +4,12 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { FolderPlus } from "lucide-react";
 
+interface NewFolderDialogProps {
+  onNewFolder: (name: string) => void;
+}
+
 // Modify the props to directly accept onNewFolder instead of onCreateFolder
-const NewFolderDialog = ({ onNewFolder }) => {
+const NewFolderDialog: React.FC<NewFolderDialogProps> = ({ onNewFolder }) => {
   const [open, setOpen] = useState(false);
   const [folderName, setFolderName] = useState('');
 

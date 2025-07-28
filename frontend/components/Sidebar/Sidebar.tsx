@@ -21,7 +21,7 @@ interface SidebarProps {
   onToggleVisibility: () => void;
   onConfirmDeleteAll: () => void;
   onDeleteSelected: (ids: string[]) => void;
-  onMoveNote: (noteId: string, targetFolderId: string | null) => void;
+  onMoveNote: (note: Note, targetFolderId: string | null) => void;
   onDeleteNote: (id: string) => void;
 }
 

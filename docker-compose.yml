@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend/data:/app/data
+
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "8000:8000"

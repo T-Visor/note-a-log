@@ -4,9 +4,7 @@ import { Search, NotebookPen, Sparkles } from "lucide-react";
 import NewFolderDialog from './NewFolderDialog';
 
 interface SidebarHeaderProps {
-  newFolderName: string;
-  onNewFolderNameChange: (name: string) => void;
-  onCreateFolder: () => void;
+  onCreateFolder: (name: string) => void;
   onSearch: (query: string) => void;
   onNewNote: (folderId: string) => void;
   firstFolderId: string;
