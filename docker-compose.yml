@@ -9,8 +9,8 @@ services:
     volumes:
       - ./frontend/data:/app/data
 
-  backend:
+  python:
     build:
-      context: ./backend
+      context: ./python
     ports:
       - "8000:8000"
