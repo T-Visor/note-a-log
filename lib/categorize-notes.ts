@@ -18,6 +18,7 @@ Folder: {{{Folder}}},
 Title: {{{Title}}}, 
 Content: {{{Content}}}, 
 Score: {{Score}}
+
 {{/searchResults}}
 
 {{#categoriesList}}
