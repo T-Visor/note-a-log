@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import {
   Folder,
   ChevronRight,
@@ -11,7 +18,7 @@ import {
   MoreVertical,
   FileText,
   Sparkles,
-  Plus
+  Loader
 } from "lucide-react";
 import {
   Popover,
@@ -24,7 +31,6 @@ import axios from "axios";
 import { useSidebarContext } from "./SidebarContext";
 import RecommendedCategoriesDialog from "@/components/RecommendedCategoriesDialog"
 import { SuggestedNoteMove } from "@/types";
-import { useNotes } from "@/hooks/useNotes";
 
 interface FolderItemProps {
   folder: FolderType;
@@ -66,10 +72,10 @@ export const FirstFolderActions: React.FC<{ shouldBeDisabled: boolean }> = ({ sh
       const data = await res.json();
       setAiSuggestions(data.suggestions);
       setIsDialogOpen(true);
-    } 
+    }
     catch (err) {
       console.error(err);
-    } 
+    }
     finally {
       setIsLoading(false);
     }
@@ -86,6 +92,14 @@ export const FirstFolderActions: React.FC<{ shouldBeDisabled: boolean }> = ({ sh
         <Sparkles className="w-4 h-4 mr-1" />
         <span className="text-sm">Organize with AI</span>
       </Button>
+      <Dialog open={isLoading}>
+        <DialogContent className="sm:max-w-lg overflow-y-auto max-h-[75%]">
+          <DialogHeader>
+            <DialogTitle>Generating Category Recommendations</DialogTitle>
+          </DialogHeader>
+          <Loader className="h-4 w-4 animate-spin" />
+        </DialogContent>
+      </Dialog>
       <RecommendedCategoriesDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
