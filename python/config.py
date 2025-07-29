@@ -1,3 +1,9 @@
+import os
+from dotenv import load_dotenv
+
+# Load variables from .env into the environment
+load_dotenv()
+
 # Database 
 DATABASE_PATH = '../data/notesApp.db'
 DATABASE_TABLE_WITH_NOTES = 'notes'
@@ -5,7 +11,7 @@ DATABASE_TABLE_WITH_FOLDERS = 'folders'
 
 # Embeddings Database
 QDRANT_CONFIG = {
-    'url': 'http://localhost:6333',
+    'url': os.getenv('QDRANT_URL_BASE', 'https://localhost:6333'),
     'index': 'Test',
     'recreate_index': False,  # Prevent overwriting existing data
     'use_sparse_embeddings': True,  # Enable sparse embeddings
