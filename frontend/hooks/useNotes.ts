@@ -162,12 +162,12 @@ export const useNotes = () => {
       setSelectedNote(noteToSave);
   
       if (noteToSave.embeddingsId) {
-        await axios.post('http://localhost:8000/update_note_embeddings', {
+        await axios.post(`${process.env.NEXT_PUBLIC_FASTAPI_BASE_URL}/update_note_embeddings`, {
           embeddings_ID: noteToSave.embeddingsId,
           note_contents: noteToSave.content
         });
       } else {
-        const response = await axios.post('http://localhost:8000/create_initial_note_embeddings', {
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_FASTAPI_BASE_URL}/create_initial_note_embeddings`, {
           note_contents: noteToSave.content
         });
   
@@ -210,7 +210,7 @@ export const useNotes = () => {
   
       // 3. Delete associated embedding if it exists
       if (embeddingsId) {
-        await axios.post('http://localhost:8000/delete_note_embeddings', {
+        await axios.post(`${process.env.NEXT_PUBLIC_FASTAPI_BASE_URL}/delete_note_embeddings`, {
           embeddings_ID: embeddingsId
         });
       }

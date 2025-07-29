@@ -2,8 +2,10 @@ import axios from "axios";
 import databaseConnection from "@/lib/database";
 import { Note, Folder } from "@/types/index";
 import Mustache from "mustache";
-import ollama from "ollama";
+//import ollama from "ollama";
+import { Ollama } from "ollama";
 
+const OLLAMA_CLIENT = new Ollama({ host: process.env.OLLAMA_BASE_URL })
 const MAX_NOTE_CONTENT_LENGTH = 70;
 const PROMPT_TEMPLATE_FOR_NOTE_CATEGORIZATION = `
 You are a content categorizer. Help me organize content by selecting the most appropriate category.
@@ -50,7 +52,7 @@ export interface EnrichedNote {
  * @returns An array of matches containing embedding IDs and similarity scores.
  */
 const fetchSimilarityMatches = async (embeddingsId: string): Promise<SimilarityMatch[]> => {
-  const response = await axios.get("http://localhost:8000/retrieve_similar_to_document", {
+  const response = await axios.get(`${process.env.NEXT_PUBLIC_FASTAPI_BASE_URL}/retrieve_similar_to_document`, {
     params: { embeddings_ID: embeddingsId }
   });
 
@@ -154,7 +156,7 @@ const renderNoteCategorizationPrompt = (
 const generateCategoryUsingPrompt = async (
   prompt: string
 ): Promise<string> => {
-  const response = await ollama.chat({
+  const response = await OLLAMA_CLIENT.chat({
     model: "llama3.1:8b-instruct-q3_K_S",
     messages: [
       { role: "user", content: prompt }
