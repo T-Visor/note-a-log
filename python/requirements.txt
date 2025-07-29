@@ -1,0 +1,10 @@
+ollama
+jinja2
+fastapi
+uvicorn
+python-dotenv
+haystack
+qdrant-haystack
+fastembed-haystack
+markdown-it-py 
+mdit-plain

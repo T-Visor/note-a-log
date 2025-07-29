@@ -1,0 +1,28 @@
+const { notes, folders, handleMoveNote, handleNewFolder } = useNotes();
+
+I'll need the code above to handle folder move management.
+
+(1st API call)
+1. Grab all notes where folderId = "unassigned" -> Uncategorized notes only
+2. Loop through each uncategorized note and send relevant data to 'categorize-note' api call
+3. Build a JSON object which stores the following:
+   a. Note information
+   b. Suggested Folder name (from API call)
+   c. Folder ID (if it exists) or null if a new folder name
+
+( Get results of API call and populate dialog pop-up, which can modify the JSON structure )
+4. Push this JSON list to the dialog pop-up
+5. Dialog pop-up can allow user to modify the folder name
+   a. Need to build a mechanism to update folder ID if the name is modified (or put as nothing)
+   b. Once "save" is hit, dialog pop-up will close and change the JSON list
+
+( 2nd API call to take JSON structure and handle bulk move)
+6. For each item in the JSON list, call handleMoveNote() (if the folderID is present) (else call handleNewFolder if folderID is null)
+
+
+======================
+
+1. Pass the folder list to "AI Recommendations" pop-up so that there is a search function.
+2. Think about "context injection" for organizing a list of uncategorized notes, that way the LLM has context
+   on where it moved prior notes. Maybe create a message list and pass it back to the AI each time?
+3. Implement search functionality in header
