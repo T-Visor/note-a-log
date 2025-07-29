@@ -10,7 +10,7 @@ services:
       - ./frontend/data:/app/data
     environment:
       - OLLAMA_BASE_URL=http://ollama:11434
-      - NEXT_PUBLIC_FASTAPI_BASE_URL=http://localhost:8000
+      - NEXT_PUBLIC_FASTAPI_BASE_URL=http://python:8000
 
   python:
     build:
@@ -21,7 +21,7 @@ services:
       - ollama
       - qdrant
     environment:
-      - QDRANT_URL_BASE=http://localhost:6333
+      - QDRANT_URL_BASE=http://qdrant:6333
 
   ollama:
     image: ollama/ollama
