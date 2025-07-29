@@ -8,6 +8,9 @@ services:
       - "3000:3000"
     volumes:
       - ./frontend/data:/app/data
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - NEXT_PUBLIC_FASTAPI_BASE_URL=http://localhost:8000
 
   python:
     build:
@@ -15,8 +18,10 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - scanr-classification
-      - scanr-ingest
+      - ollama
+      - qdrant
+    environment:
+      - QDRANT_URL_BASE=http://localhost:6333
 
   ollama:
     image: ollama/ollama
