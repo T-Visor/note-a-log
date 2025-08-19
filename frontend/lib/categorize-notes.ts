@@ -4,8 +4,14 @@ import { Note, Folder } from "@/types/index";
 import Mustache from "mustache";
 //import ollama from "ollama";
 import { Ollama } from "ollama";
+import OpenAI from "openai";
 
-const OLLAMA_CLIENT = new Ollama({ host: process.env.OLLAMA_BASE_URL })
+const OPENAI_CLIENT = new OpenAI({
+    apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY,
+    baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/"
+});
+
+const OLLAMA_CLIENT = new Ollama({ host: process.env.OLLAMA_BASE_URL });
 const MAX_NOTE_CONTENT_LENGTH = 70;
 const PROMPT_TEMPLATE_FOR_NOTE_CATEGORIZATION = `
 You are a content categorizer. Help me organize content by selecting the most appropriate category.
@@ -24,7 +30,7 @@ Score: {{Score}}
 {{/searchResults}}
 
 {{#categoriesList}}
-Existing Categories: [{{{categoriesList}}}]
+Existing Categories: {{{categoriesList}}}
 {{/categoriesList}}
 
 Instructions:
@@ -156,7 +162,7 @@ const renderNoteCategorizationPrompt = (
 const generateCategoryUsingPrompt = async (
   prompt: string
 ): Promise<string> => {
-  const response = await OLLAMA_CLIENT.chat({
+  /*const response = await OLLAMA_CLIENT.chat({
     model: "llama3.1:8b-instruct-q3_K_S",
     messages: [
       { role: "user", content: prompt }
@@ -164,9 +170,25 @@ const generateCategoryUsingPrompt = async (
     options: {
       temperature: 0
     },
+  });*/
+
+  const response = await OPENAI_CLIENT.chat.completions.create({
+    model: "gemini-2.5-flash",
+    reasoning_effort: "none",
+    messages: [
+      {
+        role: "system",
+        content: "You are a content categorizer"
+      },
+      {
+        role: "user",
+        content: prompt
+      },
+    ],
   });
 
-  return response.message.content;
+  console.log(response.choices[0].message.content);
+  return response.choices[0].message.content;
 };
 
 /**
@@ -177,7 +199,7 @@ export const categorizeNoteWithAI = async (
   noteContent: string,
   noteEmbeddingID: string
 ): Promise<string> => {
-  
+
   let noteCategorizationPrompt;
   let enrichedNotes: EnrichedNote[] = [];
   const allExistingFolders = fetchAllFolders();
