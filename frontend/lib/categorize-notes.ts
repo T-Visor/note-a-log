@@ -14,14 +14,15 @@ const OPENAI_CLIENT = new OpenAI({
 const OLLAMA_CLIENT = new Ollama({ host: process.env.OLLAMA_BASE_URL });
 const MAX_NOTE_CONTENT_LENGTH = 70;
 const PROMPT_TEMPLATE_FOR_NOTE_CATEGORIZATION = `
-You are a content categorizer. Help me organize content by selecting the most appropriate category.
+Categorize this note by selecting an existing category or 
+creating a new one if necessary.
 
-Content to categorize:
+**Note to categorize:**
 Title: {{{title}}}
 Content: {{{content}}}
 
 {{#searchResults}}
-Most similar existing content:
+**Similar existing notes:**
 Folder: {{{Folder}}}, 
 Title: {{{Title}}}, 
 Content: {{{Content}}}, 
@@ -30,15 +31,18 @@ Score: {{Score}}
 {{/searchResults}}
 
 {{#categoriesList}}
-Existing Categories: {{{categoriesList}}}
+**Available Categories:** {{{categoriesList}}}
 {{/categoriesList}}
 
-Instructions:
-1. Choose an existing category if it fits well
-2. Create a new category only if necessary (keep it brief)
-3. Return ONLY the category name without explanation
+**Decision criteria:**
+1. Use existing category if content aligns with 70%+ semantic similarity
+2. Create new category only if content represents a distinct topic area
+3. New categories should be 1-3 words maximum
 
-Category:`;
+**Output format:** Return only the category name, no explanation.
+
+Category:
+`;
 
 interface SimilarityMatch {
   id: string;
