@@ -13,6 +13,15 @@ const OPENAI_CLIENT = new OpenAI({
 
 const OLLAMA_CLIENT = new Ollama({ host: process.env.OLLAMA_BASE_URL });
 const MAX_NOTE_CONTENT_LENGTH = 70;
+const SYSTEM_PROMPT = `
+You are an expert content categorizer. Your task is to assign the most appropriate category to notes based on their content and context. You must be consistent, concise, and strategic in your categorization decisions.
+
+Key principles:
+- Prioritize existing categories to maintain organization consistency
+- Only create new categories when content genuinely doesn't fit existing ones
+- Keep category names brief, clear, and descriptive
+- Consider semantic similarity over literal matching
+`;
 const PROMPT_TEMPLATE_FOR_NOTE_CATEGORIZATION = `
 Categorize this note by selecting an existing category or 
 creating a new one if necessary.
@@ -178,11 +187,11 @@ const generateCategoryUsingPrompt = async (
 
   const response = await OPENAI_CLIENT.chat.completions.create({
     model: "gemini-2.5-flash",
-    reasoning_effort: "none",
+    reasoning_effort: "low",
     messages: [
       {
         role: "system",
-        content: "You are a content categorizer"
+        content: SYSTEM_PROMPT
       },
       {
         role: "user",
