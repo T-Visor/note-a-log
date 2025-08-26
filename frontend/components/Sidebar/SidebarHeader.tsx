@@ -23,6 +23,7 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
         <Button 
           className="hover:bg-gray-200 dark:hover:bg-gray-700"
           variant="ghost" 
+          disabled={true}
           size="icon"
         >
           <Search className="h-5 w-5"/>

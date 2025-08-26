@@ -26,6 +26,9 @@ const PROMPT_TEMPLATE_FOR_NOTE_CATEGORIZATION = `
 Categorize this note by selecting an existing category or 
 creating a new one if necessary.
 
+**Prior interaction context:**
+{{{context}}}
+
 **Note to categorize:**
 Title: {{{title}}}
 Content: {{{content}}}
@@ -157,13 +160,15 @@ const renderNoteCategorizationPrompt = (
   title: string,
   content: string,
   searchResults: EnrichedNote[],
-  categories: string[]
+  categories: string[],
+  context: string
 ): string => {
   return Mustache.render(PROMPT_TEMPLATE_FOR_NOTE_CATEGORIZATION, {
     title,
     content,
     searchResults: searchResults,
-    categoriesList: categories.join(', ')
+    categoriesList: categories.join(', '),
+    context
   });
 }
 
@@ -210,7 +215,8 @@ const generateCategoryUsingPrompt = async (
 export const categorizeNoteWithAI = async (
   noteTitle: string,
   noteContent: string,
-  noteEmbeddingID: string
+  noteEmbeddingID: string,
+  context: string
 ): Promise<string> => {
 
   let noteCategorizationPrompt;
@@ -237,7 +243,8 @@ export const categorizeNoteWithAI = async (
     noteTitle,
     noteContent,
     enrichedNotes,
-    allExistingFolders.map(folder => folder.name)
+    allExistingFolders.map(folder => folder.name),
+    context
   );
   console.log(noteCategorizationPrompt)
 
@@ -250,7 +257,7 @@ const main = async () => {
   const currentTitle = "Hello there!";
   const currentContent = "This is another test";
   const targetEmbeddingId = "349f062f6d2784ae0a56e71d405b4e7e8cef261aa46a27060f2e7862e7a56edb";
-  const category = await categorizeNoteWithAI(currentTitle, currentContent, targetEmbeddingId);
-  console.log(category);
+  //const category = await categorizeNoteWithAI(currentTitle, currentContent, targetEmbeddingId);
+  //console.log(category);
 }
 main();

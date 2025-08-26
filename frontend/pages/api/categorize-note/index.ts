@@ -30,11 +30,14 @@ const suggestNoteFoldersHandler = async (
     const unassignedNotes = notes.filter(note => note.folderId === 'unassigned');
 
     // Request AI to suggest folder names based on note title/content
-    const suggestedFolderNames = await Promise.all(
-      unassignedNotes.map(note =>
-        categorizeNoteWithAI(note.title, note.content, note.embeddingsId!)
-      )
-    );
+    let context = []
+    const suggestedFolderNames: string[] = []
+
+    for (const note of unassignedNotes) {
+      const result = await categorizeNoteWithAI(note.title, note.content, note.embeddingsId!, JSON.stringify(context))
+      suggestedFolderNames.push(result)
+      context.push({ title: note.title, category: result })
+    }
 
     // Combine unassigned notes with their AI-suggested folder information
     const suggestions: SuggestedNoteMove[] = unassignedNotes.map((note, index) => {
@@ -55,7 +58,7 @@ const suggestNoteFoldersHandler = async (
 
     // Respond with the generated suggestions
     return response.status(200).json({ suggestions });
-  } 
+  }
   catch (error) {
     console.error('Error generating folder suggestions:', error);
     return response.status(500).json({ error: 'Internal Server Error' });
