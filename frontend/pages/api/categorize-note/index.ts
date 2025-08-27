@@ -30,7 +30,7 @@ const suggestNoteFoldersHandler = async (
     const unassignedNotes = notes.filter(note => note.folderId === 'unassigned');
 
     // Request AI to suggest folder names based on note title/content
-    let context = []
+    const context = []
     const suggestedFolderNames: string[] = []
 
     for (const note of unassignedNotes) {
