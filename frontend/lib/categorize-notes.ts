@@ -33,8 +33,8 @@ creating a new one if necessary.
 Title: {{{title}}}
 Content: {{{content}}}
 
-{{#searchResults}}
 **Similar existing notes:**
+{{#searchResults}}
 Folder: {{{Folder}}}, 
 Title: {{{Title}}}, 
 Content: {{{Content}}}, 
