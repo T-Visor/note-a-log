@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend/data:/app/data
+    environment:
+      - NEXT_PUBLIC_FASTAPI_BASE_URL=http://python:8000
+      # Node/SSR inside the container hits the service name on the Docker network
+      - FASTAPI_INTERNAL_URL=http://python:8000
+      - NEXT_PUBLIC_GEMINI_API_KEY=<PROVIDE_KEY> # PROVIDE KEY
+      - NEXT_PUBLIC_BASE_URL=http://localhost:3000
+
+  python:
+    build:
+      context: ./python
+    ports:
+      - "8000:8000"
+    depends_on:
+      - qdrant
+    environment:
+      - QDRANT_URL_BASE=http://qdrant:6333
+
+  qdrant:
+    image: qdrant/qdrant
+    container_name: qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+volumes:
+  qdrant_data:

@@ -74,7 +74,7 @@ export interface EnrichedNote {
  * @returns An array of matches containing embedding IDs and similarity scores.
  */
 const fetchSimilarityMatches = async (embeddingsId: string): Promise<SimilarityMatch[]> => {
-  const response = await axios.get(`${process.env.NEXT_PUBLIC_FASTAPI_BASE_URL}/retrieve_similar_to_document`, {
+  const response = await axios.get(`${process.env.FASTAPI_INTERNAL_URL}/retrieve_similar_to_document`, {
     params: { embeddings_ID: embeddingsId }
   });
 
