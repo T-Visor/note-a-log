@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, ReactNode } from "react"
-import { Edit2 } from "lucide-react"
+import { Edit2, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -95,22 +95,23 @@ const RecommendedCategoriesDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg overflow-y-auto max-h-[75%]">
         <DialogHeader>
-          <DialogTitle>AI Recommendations</DialogTitle>
+          <DialogTitle>Move Notes</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           <div className="grid grid-cols-[1fr_1fr] items-center gap-2 font-medium text-sm text-muted-foreground px-1">
             <div>Note Title</div>
-            <div>Recommended Folder</div>
+            <div>Folder</div>
           </div>
 
           <div className="space-y-3">
             {recommendations.map((rec) => (
               <div
                 key={rec.noteId}
-                className="grid grid-cols-[1fr_1fr_auto] items-center gap-2"
+                className="grid grid-cols-[1fr_1fr_1fr_1fr] items-center gap-2"
               >
                 <div className="font-medium">{rec.title}</div>
+                <ArrowRight />
                 {rec.isEditing ? (
                   <ComboboxEditor
                     value={rec.category}
