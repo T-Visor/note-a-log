@@ -99,15 +99,19 @@ const RecommendedCategoriesDialog = ({
         </DialogHeader>
 
         <div className="space-y-4 py-4">
-          <div className="grid grid-cols-[1fr_1fr_1fr_1fr] items-center gap-2 font-medium text-sm text-muted-foreground px-1">
+          <div className="grid grid-cols-[2fr_1fr_2fr_auto] items-center gap-2 font-medium text-sm text-muted-foreground px-1">
             <div className="flex justify-center items-center">
               Note Title
             </div>
-            <div>
+            <div className="block w-full h-full">
               {/* Intentionally left blank for grid layout formatting */}
+
             </div>
             <div className="flex justify-center items-center">
               Folder
+            </div>
+            <div className="block h-8 w-8">
+              {/* Intentionally left blank for grid layout formatting */}
             </div>
           </div>
 
@@ -115,7 +119,7 @@ const RecommendedCategoriesDialog = ({
             {recommendations.map((rec) => (
               <div
                 key={rec.noteId}
-                className="grid grid-cols-[1fr_1fr_1fr_1fr] items-center gap-2"
+                className="grid grid-cols-[2fr_1fr_2fr_auto] items-center gap-2"
               >
                 <div className="flex justify-center items-center font-medium">{rec.title}</div>
                 <div className="flex justify-center items-center">
