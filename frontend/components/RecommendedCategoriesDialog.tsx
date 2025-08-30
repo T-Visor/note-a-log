@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, ReactNode } from "react"
-import { Edit2, ArrowRight } from "lucide-react"
+import { Edit2, MoveRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -99,9 +99,16 @@ const RecommendedCategoriesDialog = ({
         </DialogHeader>
 
         <div className="space-y-4 py-4">
-          <div className="grid grid-cols-[1fr_1fr] items-center gap-2 font-medium text-sm text-muted-foreground px-1">
-            <div>Note Title</div>
-            <div>Folder</div>
+          <div className="grid grid-cols-[1fr_1fr_1fr_1fr] items-center gap-2 font-medium text-sm text-muted-foreground px-1">
+            <div className="flex justify-center items-center">
+              Note Title
+            </div>
+            <div>
+              {/* Intentionally left blank for grid layout formatting */}
+            </div>
+            <div className="flex justify-center items-center">
+              Folder
+            </div>
           </div>
 
           <div className="space-y-3">
@@ -110,8 +117,10 @@ const RecommendedCategoriesDialog = ({
                 key={rec.noteId}
                 className="grid grid-cols-[1fr_1fr_1fr_1fr] items-center gap-2"
               >
-                <div className="font-medium">{rec.title}</div>
-                <ArrowRight />
+                <div className="flex justify-center items-center font-medium">{rec.title}</div>
+                <div className="flex justify-center items-center">
+                  <MoveRight />
+                </div>
                 {rec.isEditing ? (
                   <ComboboxEditor
                     value={rec.category}
@@ -119,7 +128,7 @@ const RecommendedCategoriesDialog = ({
                     onSelect={(val) => updateCategory(rec.noteId, val)}
                   />
                 ) : (
-                  <div>{rec.category}</div>
+                  <div className="flex justify-center items-center">{rec.category}</div>
                 )}
                 <Button
                   variant="ghost"
