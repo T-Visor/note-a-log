@@ -164,11 +164,11 @@ export const useNotes = () => {
       if (noteToSave.embeddingsId) {
         await axios.post(`${process.env.NEXT_PUBLIC_FASTAPI_BASE_URL}/update_note_embeddings`, {
           embeddings_ID: noteToSave.embeddingsId,
-          note_contents: noteToSave.content
+          note_contents: (noteToSave.title + "\n" + noteToSave.content)
         });
       } else {
         const response = await axios.post(`${process.env.NEXT_PUBLIC_FASTAPI_BASE_URL}/create_initial_note_embeddings`, {
-          note_contents: noteToSave.content
+          note_contents: (noteToSave.title + "\n" + noteToSave.content)
         });
   
         noteToSave.embeddingsId = response.data.message;
