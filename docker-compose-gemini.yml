@@ -7,12 +7,11 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./frontend/data:/app/data
+      - frontend_data:/app/data
     environment:
       - NEXT_PUBLIC_FASTAPI_BASE_URL=http://python:8000
-      # Node/SSR inside the container hits the service name on the Docker network
       - FASTAPI_INTERNAL_URL=http://python:8000
-      - NEXT_PUBLIC_GEMINI_API_KEY=<PROVIDE_KEY> # PROVIDE KEY
+      - NEXT_PUBLIC_GEMINI_API_KEY=<YOUR_API_KEY>
       - NEXT_PUBLIC_BASE_URL=http://localhost:3000
 
   python:
@@ -36,3 +35,4 @@ services:
 
 volumes:
   qdrant_data:
+  frontend_data:
